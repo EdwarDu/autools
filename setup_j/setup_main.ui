@@ -287,7 +287,7 @@
                <item>
                 <widget class="QRadioButton" name="radioButton_AOTF_YSL">
                  <property name="text">
-                  <string>YSL</string>
+                  <string>&amp;YSL</string>
                  </property>
                 </widget>
                </item>
@@ -826,6 +826,20 @@
                </size>
               </property>
              </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_LP_AddMarker">
+              <property name="text">
+               <string>Add Marker</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_LP_ClearMarkers">
+              <property name="text">
+               <string>Clear Markers</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>

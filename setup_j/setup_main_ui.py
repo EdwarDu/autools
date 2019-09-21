@@ -2,10 +2,9 @@
 
 # Form implementation generated from reading ui file 'setup_main.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.0
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -366,6 +365,12 @@ class Ui_SetupMainWindow(object):
         self.horizontalLayout_10.addWidget(self.checkBox_LP_gaussian_manual)
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_10.addItem(spacerItem2)
+        self.pushButton_LP_AddMarker = QtWidgets.QPushButton(self.tab_LaserProfiler)
+        self.pushButton_LP_AddMarker.setObjectName("pushButton_LP_AddMarker")
+        self.horizontalLayout_10.addWidget(self.pushButton_LP_AddMarker)
+        self.pushButton_LP_ClearMarkers = QtWidgets.QPushButton(self.tab_LaserProfiler)
+        self.pushButton_LP_ClearMarkers.setObjectName("pushButton_LP_ClearMarkers")
+        self.horizontalLayout_10.addWidget(self.pushButton_LP_ClearMarkers)
         self.verticalLayout_6.addLayout(self.horizontalLayout_10)
         self.groupBox = QtWidgets.QGroupBox(self.tab_LaserProfiler)
         self.groupBox.setObjectName("groupBox")
@@ -1158,7 +1163,7 @@ class Ui_SetupMainWindow(object):
         self.label_29.setText(_translate("SetupMainWindow", "F:"))
         self.groupBox_AOTF.setTitle(_translate("SetupMainWindow", "AOTF"))
         self.radioButton_AOTF_Fianium.setText(_translate("SetupMainWindow", "Fianium"))
-        self.radioButton_AOTF_YSL.setText(_translate("SetupMainWindow", "YSL"))
+        self.radioButton_AOTF_YSL.setText(_translate("SetupMainWindow", "&YSL"))
         self.pushButton_AOTF_Config.setText(_translate("SetupMainWindow", "Config"))
         self.label_6.setText(_translate("SetupMainWindow", "Wave L.:"))
         self.label_7.setText(_translate("SetupMainWindow", "Power:"))
@@ -1188,6 +1193,8 @@ class Ui_SetupMainWindow(object):
         self.checkBox_LP_auto_crosshair.setText(_translate("SetupMainWindow", "Cross Hair Auto Hotspot"))
         self.checkBox_LP_gaussian_force.setText(_translate("SetupMainWindow", "Gaussian Fit Force Peak"))
         self.checkBox_LP_gaussian_manual.setText(_translate("SetupMainWindow", "Gaussian Fit Manual Mean"))
+        self.pushButton_LP_AddMarker.setText(_translate("SetupMainWindow", "Add Marker"))
+        self.pushButton_LP_ClearMarkers.setText(_translate("SetupMainWindow", "Clear Markers"))
         self.groupBox.setTitle(_translate("SetupMainWindow", "Alignment Run"))
         self.label_17.setText(_translate("SetupMainWindow", "Run Folder:"))
         self.lineEdit_LaserAlignmentFolder.setText(_translate("SetupMainWindow", "."))
@@ -1280,6 +1287,8 @@ class Ui_SetupMainWindow(object):
         self.pushButton_MapM_Export.setText(_translate("SetupMainWindow", "Export"))
         self.pushButton_MapM_Load.setText(_translate("SetupMainWindow", "Load Raw"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_MapMeasurements), _translate("SetupMainWindow", "Map Measurements"))
+
+
 from ..LaserProfiler.laser_profiler_widget import LaserProfilerWidget
 from ..LaserProfiler.laser_profiler_zdepth_widget import LaserProfilerZDepthWidget
 from .lockin_plot_widget import LockInPlotWidget

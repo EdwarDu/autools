@@ -2,10 +2,9 @@
 
 # Form implementation generated from reading ui file 'laser_alignment_z_dists.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.0
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -48,3 +47,5 @@ class Ui_LaserAlignment_Z_DistTable(object):
         self.pushButton_Copy.setText(_translate("LaserAlignment_Z_DistTable", "Copy"))
         self.pushButton_Clear.setText(_translate("LaserAlignment_Z_DistTable", "Clear Records"))
         self.tableWidget_Z_Dists.setSortingEnabled(True)
+
+

@@ -95,6 +95,8 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.current_cam = None
         self.pushButton_Single.clicked.connect(self.cam_single_clicked)
         self.pushButton_FreeRun.clicked.connect(self.cam_freerun_clicked)
+        self.pushButton_LP_AddMarker.clicked.connect(lambda: self.widget_LaserProfiler.add_cross_marker())
+        self.pushButton_LP_ClearMarkers.clicked.connect(lambda: self.widget_LaserProfiler.remove_all_cross_markers())
 
         self.checkBox_LP_auto_crosshair.setChecked(self.widget_LaserProfiler.cross_hair_auto_hotspot)
         self.checkBox_LP_gaussian_force.setChecked(self.widget_LaserProfiler.gaussian_fit_force_peak)

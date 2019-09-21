@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
+from PyQt5 import QtCore, QtGui
 import pyqtgraph as pg
 import pyqtgraph.exporters
 from matplotlib import cm
 import numpy as np
 import cv2
-from PyQt5 import QtCore, QtGui
 from scipy.optimize import curve_fit, OptimizeWarning
 import math
 import warnings
@@ -257,6 +257,54 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
 
         self.h_dist = None
         self.v_dist = None
+        self.cross_markers = []
+        self.cross_marker_lines = []
+
+    def draw_cross_markers(self):
+        self.remove_all_cross_markers()
+
+        i = 0
+        for i in range(0, len(self.cross_markers)):
+            # if i != len(self.cross_markers) - 1:
+            #     line_color = (0, 255, 0, 0.5)
+            #     line_style = QtCore.Qt.DashDotLine
+            # else:
+            row, col = self.cross_markers[i]
+            self.add_cross_marker(row, col)
+
+    def add_cross_marker(self, row=None, col=None):
+        if row is None:
+            row = self.map_h_line.value()
+        if col is None:
+            col = self.map_v_line.value()
+
+        line_color = (0, 255, 0, 0.8)
+        line_style = QtCore.Qt.DotLine
+        v_line = pg.InfiniteLine(angle=90, pos=col, movable=False,
+                                 label="{value:.1f}",
+                                 labelOpts={"position": 0.4,
+                                            "color": (255, 255, 0),
+                                            "rotateAxis": (1, 0),
+                                            "angle": -180},
+                                 pen=pg.mkPen(line_color, width=1, style=line_style))
+        self.p_map.addItem(v_line)
+        self.cross_marker_lines.append(v_line)
+
+        h_line = pg.InfiniteLine(angle=0, pos=row, movable=False,
+                                 label="{value:.1f}",
+                                 labelOpts={"position": 0.4,
+                                            "color": (255, 255, 0),
+                                            "rotateAxis": (1, 0),
+                                            "angle": -180},
+                                 pen=pg.mkPen(line_color, width=1, style=line_style))
+        self.p_map.addItem(h_line)
+        self.cross_marker_lines.append(h_line)
+
+    def remove_all_cross_markers(self):
+        for line in self.cross_marker_lines:
+            self.p_map.removeItem(line)
+
+        self.cross_marker_lines = []
 
     def map_crosshair_v_moved(self, l: pg.InfiniteLine):
         self.p_h_vline.setPos(l.getPos())

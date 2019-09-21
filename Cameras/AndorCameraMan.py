@@ -492,6 +492,17 @@ class AndorCameraMan(CameraMan):
                 and "SensorTemperature" not in features_update:
             features_update.append("SensorTemperature")
 
+        aoi_features = ["AOIBinning", "AOIHeight", "AOILeft", "AOIStride", "AOITop", "AOIWidth"]
+        b_aoi_notified = False
+        for feature in features_update:
+            if feature.startswith("AOI"):
+                b_aoi_notified = True
+
+        if b_aoi_notified:
+            for feature in aoi_features:
+                if feature not in features_update:
+                    features_update.append(feature)
+
         for feature in features_update:
             if not self.features[feature]['b_implemented']:
                 continue
