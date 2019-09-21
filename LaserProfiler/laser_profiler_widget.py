@@ -277,7 +277,7 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
         if col is None:
             col = self.map_v_line.value()
 
-        line_color = (0, 255, 0, 180)
+        line_color = (0, 255, 0, 200)
         line_style = QtCore.Qt.DotLine
 
         v_line = pg.InfiniteLine(angle=90, pos=col, movable=False,
