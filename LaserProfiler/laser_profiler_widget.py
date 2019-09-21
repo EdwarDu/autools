@@ -234,8 +234,7 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
                                                         labelOpts={"position": 0.8,
                                                                    "color": (255, 255, 0),
                                                                    "rotateAxis": (1, 0),
-                                                                    "angle": -180
-                                                                   },
+                                                                   "angle": -180},
                                                         pen=pg.mkPen('y', width=1, style=QtCore.Qt.DashLine))
 
         self.v_profile_mid_line = self.p_vertical.plot([0, 0, 0], [0, 1, 2],
@@ -278,12 +277,13 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
         if col is None:
             col = self.map_v_line.value()
 
-        line_color = (0, 255, 0, 0.8)
+        line_color = (0, 255, 0, 180)
         line_style = QtCore.Qt.DotLine
+
         v_line = pg.InfiniteLine(angle=90, pos=col, movable=False,
                                  label="{value:.1f}",
-                                 labelOpts={"position": 0.4,
-                                            "color": (255, 255, 0),
+                                 labelOpts={"position": 0.2,
+                                            "color": (0, 255, 0),
                                             "rotateAxis": (1, 0),
                                             "angle": -180},
                                  pen=pg.mkPen(line_color, width=1, style=line_style))
@@ -292,10 +292,8 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
 
         h_line = pg.InfiniteLine(angle=0, pos=row, movable=False,
                                  label="{value:.1f}",
-                                 labelOpts={"position": 0.4,
-                                            "color": (255, 255, 0),
-                                            "rotateAxis": (1, 0),
-                                            "angle": -180},
+                                 labelOpts={"position": 0.2,
+                                            "color": (0, 255, 0)},
                                  pen=pg.mkPen(line_color, width=1, style=line_style))
         self.p_map.addItem(h_line)
         self.cross_marker_lines.append(h_line)
@@ -460,12 +458,14 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
 
 def update_image(window, timer):
     import time
-    image = np.random.rand(2160, 2560)
-    t0 = time.time() * 1000
-    window.update_image_data(image)
-    t1 = time.time() * 1000
-    print(f"Update image cost {t1-t0}ms")
-    timer.singleShot(10000, lambda w=window, t=timer: update_image(w, t))
+    # image = np.random.rand(2160, 2560)
+    # t0 = time.time() * 1000
+    # window.update_image_data(image)
+    # t1 = time.time() * 1000
+    # print(f"Update image cost {t1-t0}ms")
+    # timer.singleShot(10000, lambda w=window, t=timer: update_image(w, t))
+    window.add_cross_marker()
+    timer.singleShot(5000, lambda w=window, t=timer: update_image(w, t))
 
 
 if __name__ == "__main__":
@@ -473,7 +473,7 @@ if __name__ == "__main__":
     win = LaserProfilerWidget()
     win.show()
     win.update_image_data(cv2.imread('/home/elio/ws/autools/tests/test.jpg', cv2.IMREAD_GRAYSCALE))
-    # update_timer = QtCore.QTimer(win)
-    # update_timer.singleShot(1000, lambda w=win, t=update_timer: update_image(w, t))
+    update_timer = QtCore.QTimer(win)
+    update_timer.singleShot(1000, lambda w=win, t=update_timer: update_image(w, t))
 
     QtGui.QApplication.instance().exec_()
