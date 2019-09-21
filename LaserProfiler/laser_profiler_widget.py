@@ -278,7 +278,7 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
             col = self.map_v_line.value()
 
         line_color = (0, 255, 0, 200)
-        line_style = QtCore.Qt.DotLine
+        line_style = QtCore.Qt.DashDotLine
 
         v_line = pg.InfiniteLine(angle=90, pos=col, movable=False,
                                  label="{value:.1f}",
