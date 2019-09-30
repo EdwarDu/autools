@@ -1,11 +1,4 @@
 # distutils: language = c++
-# # Fake to check the Cython binding
-# # distutils: sources = atcore_fake_dev.cpp
-# Real library
-# distutils: libraries = atcorem
-# distutils: include_dirs = .
-# distutils: library_dirs = .
-
 cimport andor_sdk3 as andor3
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
@@ -550,7 +543,7 @@ cdef class Andor3Man:
             pixels_rows = None
             for i in range(0, height):
                 row_bytes = buffer_fixed[i*stride:i*stride+int(3*width/2)]
-                np_row = np.zeros(width, dtype='<u2')
+                np_row = np.zeros(width, dtype='<u4')
                 pixel_col_index = 0
                 byte_index = 0
                 while pixel_col_index < width:
