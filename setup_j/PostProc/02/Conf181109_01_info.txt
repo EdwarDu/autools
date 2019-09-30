@@ -1,0 +1,24 @@
+Sample: 
+Measurement starts at: 1:26:41 PM
+Measurement stops at: 3:39:10 PM
+
+---------- USER NOTES ----------
+
+DPPTTT  -30 plarization -40+-10
+channel
+---------- MAP PARAMETERS ----------
+Map center (um): (-24.2, 9.8)
+Map dimensions (um):  (10, 10)
+#pixels: (50, 50)
+
+---------- SUPERK PARAMETERS ----------
+Probe wavelength (nm): 820
+Probe RF power: 40
+
+---------- LOCKIN PARAMETERS ----------
+Time constant: 1 s
+Filter slope: 24 dB/oct
+Sensitivity: 50 uV/pA
+Reserve: Normal
+Frequency (Hz): 382
+Harmonic: 1
