@@ -31,8 +31,8 @@ setup_main_logger_ch = logging.StreamHandler()
 setup_main_logger_ch.setFormatter(setup_main_logger_formatter)
 setup_main_logger.addHandler(setup_main_logger_ch)
 
-_AUTOZ_TEST = False
-_MAPM_TEST = False
+_AUTOZ_TEST = True
+_MAPM_TEST = True
 
 from ..SRS.SR830Man import SR830Man, float2str
 from ..Cameras.CVCameraMan import CVCameraMan
@@ -63,14 +63,16 @@ def get_available_COMs():
     return {com.device: f'{com.manufacturer} {com.description}' for com in com_port_list}
 
 
-def gen_2d_gaussian(width, height, sx=1, sy=1):
+def gen_2d_gaussian(width, height, sx=1, sy=1, mx=None, my=None):
     x = np.linspace(0, width, num=width)
     y = np.linspace(0, height, num=height)
 
     x, y = np.meshgrid(x, y)
 
-    mx = width / 2
-    my = height / 2
+    if mx is None:
+        mx = width / 2
+    if my is None:
+        my = height / 2
 
     z = 1 / (2. * np.pi * sx * sy) * np.exp(-((x - mx) ** 2. / (2. * sx ** 2.) + (y - my) ** 2. / (2. * sy ** 2.)))
 
@@ -861,7 +863,10 @@ class SetupMainWindow(Ui_SetupMainWindow):
             self.laser_align_z_task_goto(z)
             # FIXME: AUTOZ Test
             if _AUTOZ_TEST:
-                frame = gen_2d_gaussian(640, 480, sx=(z-z0)/(z1-z0)*image_width/2+0.1, sy=(z-z0)/(z1-z0)*image_height/2+0.1)
+                frame = gen_2d_gaussian(640, 480, sx=(z-z0)/(z1-z0)*image_width/2+0.1,
+                                        sy=(z-z0)/(z1-z0)*image_height/3+0.1,
+                                        mx=320,
+                                        my=200)
                 self.widget_LaserProfiler.update_image_data(frame)
                 QtWidgets.qApp.processEvents()
             else:
