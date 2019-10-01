@@ -4,7 +4,7 @@ Measurement stops at: 12:59:28 PM
 
 ---------- USER NOTES ----------
 
-DPPTTT polar 60 -40+-10
+DPPTTT 60 polar -40+-10
 channel
 ---------- MAP PARAMETERS ----------
 Map center (um): (-25, 10)

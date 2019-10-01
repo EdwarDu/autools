@@ -6,17 +6,19 @@ import numpy as np
 from scipy.optimize import curve_fit, OptimizeWarning
 import concurrent.futures
 import matplotlib.pyplot as plt
+import traceback
 
 
 # Fitting function. I(x,y) = M(x,y)cos^2(Beta(x,y) - Theta) + C(x,y)
 def intensity_func(theta, m, beta, c):
-    return m*np.power(np.cos(beta-theta), 2) + c
+    return m*np.power(np.cos(np.deg2rad(beta-theta)), 2) + c
 
 
 def intensity_fit(theta, intensity):
+    print(f"Fitting for {theta} and {intensity}")
     popt, pcov = curve_fit(intensity_func, theta, intensity,
                            p0=[0, 0, 0],
-                           bounds=([-np.inf, -360, -np.inf],
+                           bounds=([0, -360, -np.inf],
                                    [np.inf, 360, np.inf]),
                            maxfev=2000)
     return popt
@@ -27,27 +29,48 @@ def intensity_para_fit(data: dict, data_size):
     beta = np.zeros(data_size)
     cons = np.zeros(data_size)
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
         height, width = data_size
         future_to_loc = {}
         for r in range(0, height):
             for c in range(0, width):
-                theta = data.keys()
-                intensity = [data[angle]["in"][r][c] for angle in theta]
-                future_to_loc[executor.submit((intensity_fit, theta, intensity))] = (r, c)
+                theta = np.array([x for x in data.keys()])
+                intensity = np.array([data[angle]["trans"][r][c] for angle in theta])
+                future_to_loc[executor.submit(intensity_fit, theta, intensity)] = (r, c)
 
         for future in concurrent.futures.as_completed(future_to_loc):
             r, c = future_to_loc[future]
-            m_, beta_, con_ = future.result()
-            m[r][c] = m_
-            beta[r][c] = beta_
-            cons[r][c] = con_
+            try:
+                m_, beta_, con_ = future.result()
+            except Exception as exc:
+                print(f"Fitting for ({r},{c}) failed due to except")
+                break
+                # traceback.print_tb(exc.__traceback__)
+            else:
+                m[r][c] = m_
+                beta[r][c] = beta_
+                cons[r][c] = con_
 
     return m, beta, cons
 
-def display_image(data):
+
+# noinspection DuplicatedCode
+def display_image(data: np.ndarray, title: str = "Image"):
     fig = plt.figure()
-    axes = fig.addsubplot(111, aspect="")
+    axes: plt.Axes = fig.add_subplot(111, aspect='equal')
+    hm_v = axes.imshow(data, cmap=plt.cm.rainbow)
+    axes.set_title(title)
+    fig.colorbar(hm_v, ax=axes)
+
+    # height, width = data.shape
+    # x, y = np.meshgrid(np.arange(0, width, 1), np.arange(0, height, 1))
+    # unit = np.ones(data.shape) * 2
+    # data_deg = (data - np.min(data)) / (np.max(data) - np.min(data)) * np.pi * 2
+    # # TODO: angle function needs to be fixed
+    # u = unit * np.sin(data_deg)
+    # v = unit * np.cos(data_deg)
+    # axes.quiver(x, y, u, v, units='dots', scale=2, scale_units='xy', width=1, headwidth=4, headlength=6)
+    fig.show()
 
 
 if __name__ == "__main__":
@@ -57,21 +80,22 @@ if __name__ == "__main__":
 
     data_dict = {}
     if os.path.exists(args.input):
-        sub_folders = [x for x in os.listdir(args.input) if os.path.isdir(x) and x not in (".", "..")]
+        sub_folders = [x for x in os.listdir(args.input) if os.path.isdir(os.path.join(args.input, x)) and x not in (".", "..")]
         for sub_folder in sub_folders:
+            print(f"Found dataset folder {sub_folder}")
             sub_folder_path = os.path.join(args.input, sub_folder)
-            data_files = [x for x in os.listdir(sub_folder_path) if os.path.isfile(x)]
+            data_files = [x for x in os.listdir(sub_folder_path) if os.path.isfile(os.path.join(sub_folder_path, x))]
 
-            lockin_in_data, lockin_out_data, trans_data = None, None, None
+            lockin_in_data, lockin_out_data, trans_data, polar_angle = None, None, None, None
             for data_file in data_files:
                 file_path = os.path.join(sub_folder_path, data_file)
                 print(f"Loading information from {file_path}")
                 if file_path.endswith("_info.txt"):
                     with open(file_path, "r") as f_info:
                         for line in f_info:
-                            if line.startswith("DPPTTT polar"):
-                                line_parts = re.split(line, " ")
-                                polar_angle = int(line_parts[2])
+                            if line.startswith("DPPTTT"):
+                                line_parts = [x for x in re.split("[ \t]", line) if x != ""]
+                                polar_angle = int(line_parts[1])
                                 print(f"Polar angle {polar_angle}")
                                 break
                 elif file_path.endswith("_LockInIN.dat"):
@@ -102,3 +126,12 @@ if __name__ == "__main__":
                 raise ValueError(f"data size inconsistent for {polar_angle}")
 
         data_m, data_beta, data_cons = intensity_para_fit(data_dict, data_size)
+        display_image(data_m, "M")
+        display_image(data_beta, "BETA")
+        display_image(data_cons, "C")
+
+        plt.pause(1)
+        input('Enter to close')
+        plt.close()
+    else:
+        raise IOError(f"{args.input} does NOT exist.")

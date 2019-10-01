@@ -4,7 +4,7 @@ Measurement stops at: 8:50:02 PM
 
 ---------- USER NOTES ----------
 
-DPPTTT  polarization 120 
+DPPTTT 120 polarization
 -40+-10 channel
 ---------- MAP PARAMETERS ----------
 Map center (um): (-23.3, 9.8)
