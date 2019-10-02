@@ -19,8 +19,8 @@ def intensity_fit(theta, intensity):
     print(f"Fitting for {theta} and {intensity}")
     popt, pcov = curve_fit(intensity_func, theta, intensity,
                            p0=[np.max(intensity)-np.min(intensity), 0, np.min(intensity)],
-                           bounds=([-np.inf, -360, -np.inf],     # Lower bounds for M beta C
-                                   [np.inf, 360, np.inf]),    # Higher bounds
+                           bounds=([-np.inf, -90, -np.inf],     # Lower bounds for M beta C
+                                   [np.inf, 90, np.inf]),    # Higher bounds
                            maxfev=2000)
     return popt
 
@@ -67,10 +67,10 @@ def display_image(data: np.ndarray, title: str = "Image", with_arrow: bool = Fal
         height, width = data.shape
         x, y = np.meshgrid(np.arange(0, width, 1), np.arange(0, height, 1))
         unit = np.ones(data.shape) * 2
-        data_deg = (data - np.min(data)) / (np.max(data) - np.min(data)) * np.pi * 2
+        data_deg = np.deg2rad(data)
         # TODO: angle function needs to be fixed
-        u = unit * np.sin(data_deg)
-        v = unit * np.cos(data_deg)
+        u = unit * np.cos(data_deg)
+        v = unit * np.sin(data_deg)
         axes.quiver(x, y, u, v, units='dots', scale=2, scale_units='xy', width=1, headwidth=4, headlength=6)
 
     fig.show()
