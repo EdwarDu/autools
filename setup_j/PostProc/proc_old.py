@@ -80,12 +80,16 @@ def display_image(data: np.ndarray, title: str = "Image", with_arrow: bool = Fal
 def show_fitting(data: dict, r: int, c: int, m: np.ndarray, beta: np.ndarray, cons: np.ndarray):
     fig = plt.figure()
     axes: plt.Axes = fig.add_subplot(111, aspect="equal")
+    axes.set_xlabel("Degree (Theta)")
+    axes.set_ylabel("Intensity")
+
     theta = np.array([x for x in data.keys()])
     intensity = np.array([data[angle]["in"][r][c] / data[angle]["trans"][r][c] for angle in theta])
-    axes.scatter(theta, intensity)
+    axes.scatter(theta, intensity, label="Measurement")
     theta_360 = np.linspace(-180, 180, 360)
     intensity_360 = intensity_func(theta_360, m[r][c], beta[r][c], cons[r][c])
-    axes.plot(theta_360, intensity_360, '--r')
+    axes.plot(theta_360, intensity_360, '--r', label="Curve fitting")
+    axes.legend()
     fig.show()
     return fig
 
