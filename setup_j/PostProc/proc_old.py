@@ -57,7 +57,7 @@ def intensity_para_fit(data: dict, data_size, n_workers: int = 4):
 
 # noinspection DuplicatedCode
 def display_image(data: np.ndarray, title: str = "Image", with_arrow: bool = False):
-    fig = plt.figure()
+    fig = plt.figure(title)
     axes: plt.Axes = fig.add_subplot(111, aspect='equal')
     hm_v = axes.imshow(data, cmap=plt.cm.rainbow)
     axes.set_title(title)
@@ -78,7 +78,7 @@ def display_image(data: np.ndarray, title: str = "Image", with_arrow: bool = Fal
 
 
 def show_fitting(data: dict, r: int, c: int, m: np.ndarray, beta: np.ndarray, cons: np.ndarray):
-    fig = plt.figure()
+    fig = plt.figure("Fitting")
     axes: plt.Axes = fig.add_subplot(111, aspect="equal")
     axes.set_xlabel("Degree (Theta)")
     axes.set_ylabel("Intensity")
@@ -183,8 +183,11 @@ if __name__ == "__main__":
                 pickle.dump([data_m, data_beta, data_cons], f_p)
 
         display_image(data_m, "M")
-        display_image(data_beta, "BETA")
+        display_image(data_beta, "BETA", with_arrow=True)
         display_image(data_cons, "C")
+
+        data_a = data_m / (data_m + 2*data_cons)
+        display_image(data_a, "A")
 
         show_fitting_errors(data_dict, data_m, data_beta, data_cons)
 
