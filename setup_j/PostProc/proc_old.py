@@ -8,20 +8,33 @@ import concurrent.futures
 import matplotlib.pyplot as plt
 import traceback
 import pickle
+import warnings
+
+
+warnings.simplefilter("error", OptimizeWarning)
 
 
 # Fitting function. I(x,y) = M(x,y)cos^2(Beta(x,y) - Theta) + C(x,y)
 def intensity_func(theta, m, beta, c):
-    return m*np.power(np.cos(np.deg2rad(beta-theta)), 2) + c
+    return m* (np.cos(np.deg2rad(beta-theta))**2) + c
 
 
 def intensity_fit(theta, intensity):
     print(f"Fitting for {theta} and {intensity}")
+    intensity_a = np.max(intensity)-np.min(intensity)
+    con_up = np.min(intensity)
+    if con_up < 0:
+        con_up = np.mean(intensity)
+
     popt, pcov = curve_fit(intensity_func, theta, intensity,
-                           p0=[np.max(intensity)-np.min(intensity), 0, np.min(intensity)],
-                           bounds=([-np.inf, -90, -np.inf],     # Lower bounds for M beta C
-                                   [np.inf, 90, np.inf]),    # Higher bounds
-                           maxfev=2000)
+                           # method='trf',
+                           p0=[intensity_a, 0, 0],
+                           # p0=[0, 0, 0],
+                           bounds=([intensity_a, -90, 0],     # Lower bounds for M beta C
+                                   [np.inf, 90, con_up]),    # Higher bounds
+                           maxfev=200000
+                          )
+
     return popt
 
 
@@ -45,7 +58,6 @@ def intensity_para_fit(data: dict, data_size, n_workers: int = 4):
                 m_, beta_, con_ = future.result()
             except Exception as exc:
                 print(f"Fitting for ({r},{c}) failed due to except")
-                break
                 # traceback.print_tb(exc.__traceback__)
             else:
                 m[r][c] = m_
@@ -82,6 +94,7 @@ def show_fitting(data: dict, r: int, c: int, m: np.ndarray, beta: np.ndarray, co
     axes: plt.Axes = fig.add_subplot(111, aspect="equal")
     axes.set_xlabel("Degree (Theta)")
     axes.set_ylabel("Intensity")
+    axes.set_title(f"M:{m[r][c]}, Beta:{beta[r][c]}, C:{cons[r][c]}")
 
     theta = np.array([x for x in data.keys()])
     intensity = np.array([data[angle]["in"][r][c] / data[angle]["trans"][r][c] for angle in theta])
@@ -96,15 +109,19 @@ def show_fitting(data: dict, r: int, c: int, m: np.ndarray, beta: np.ndarray, co
 
 def show_fitting_errors(data: dict, m: np.ndarray, beta: np.ndarray, cons: np.ndarray):
     err = np.zeros(m.shape)
+    r2 = np.zeros(m.shape)
     height, width = m.shape
     for r in range(0, height):
         for c in range(0, width):
             theta = np.array([x for x in data.keys()])
             intensity = np.array([data[angle]["in"][r][c] / data[angle]["trans"][r][c] for angle in theta])
             intensity_fit_v = intensity_func(theta, m[r][c], beta[r][c], cons[r][c])
-            err[r][c] = np.sum(np.abs(intensity_fit_v-intensity))
+            err[r][c] = np.sum((intensity_fit_v-intensity)**2)
+            ss_tot = np.sum((intensity-np.mean(intensity))**2)
+            r2[r][c] = 1 - (err[r][c]/ss_tot)
 
     display_image(err, "Fitting Error")
+    display_image(r2, "Fitting R^2")
     return err
 
 
@@ -112,6 +129,25 @@ def show_intensity(data: dict):
     theta_v = data.keys()
     for theta in theta_v:
         display_image(data[theta]["in"]/data[theta]["trans"], f"Intensity @THETA={theta}")
+
+
+def manual_patch_data(data: np.ndarray):
+    height, width = data.shape
+    directions = ((-1, -1), (-1, 0), (-1, 1), (0, 1), (0, -1), (-1, -1), (-1, 0), (-1, 1))
+    for r in range(0, height):
+        for c in range(0, width):
+            if data[r][c] < 0:
+                n = 0
+                sum = 0
+                for d in directions:
+                    r_n = r + d[0]
+                    c_n = c + d[1]
+                    if 0 <= r_n < height and 0 <= r_c < width:
+                        n += 1
+                        sum += data[r][c]
+                data[r][c] = sum / n
+
+    return data
 
 
 if __name__ == "__main__":
@@ -172,6 +208,12 @@ if __name__ == "__main__":
                 data_size == angle_data["trans"].shape):
                 raise ValueError(f"data size inconsistent for {polar_angle}")
 
+        # FIXME: for testing individual fitting
+        # theta = np.array([x for x in data_dict.keys()])
+        # intensity = np.array([data_dict[angle]["in"][39][12] / data_dict[angle]["trans"][39][12] for angle in theta])
+        # print(intensity_fit(theta, intensity))
+        # sys.exit(0)
+
         show_intensity(data_dict)
 
         if args.load and os.path.exists("m_beta_c.pickle"):
@@ -193,15 +235,17 @@ if __name__ == "__main__":
 
         fig_fit = None
         while True:
-            row = int(input("ROW? (-1) to break"))
-            if row == -1:
-                break
-            col = int(input("COL?"))
+            try:
+                row = int(input("ROW? (-1) to break "))
+                if row == -1:
+                    break
+                col = int(input("COL?"))
 
-            if fig_fit is not None:
-                plt.close(fig_fit)
-            fig_fit = show_fitting(data_dict, row, col, data_m, data_beta, data_cons)
-
+                if fig_fit is not None:
+                    plt.close(fig_fit)
+                fig_fit = show_fitting(data_dict, row, col, data_m, data_beta, data_cons)
+            except:
+                pass
 
         plt.pause(1)
         input('Enter to close')
