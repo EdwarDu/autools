@@ -18,8 +18,8 @@ def intensity_fit(theta, intensity):
     print(f"Fitting for {theta} and {intensity}")
     popt, pcov = curve_fit(intensity_func, theta, intensity,
                            p0=[0, 0, 0],
-                           bounds=([-np.inf, -360, -np.inf],
-                                   [np.inf, 360, np.inf]),
+                           bounds=([0, 0, 0],     # Lower bounds for M beta C
+                                   [np.inf, 360, np.inf]),    # Higher bounds
                            maxfev=2000)
     return popt
 
@@ -35,7 +35,7 @@ def intensity_para_fit(data: dict, data_size, n_workers: int = 4):
         for r in range(0, height):
             for c in range(0, width):
                 theta = np.array([x for x in data.keys()])
-                intensity = np.array([data[angle]["trans"][r][c] for angle in theta])
+                intensity = np.array([data[angle]["in"][r][c]/data[angle]["trans"][r][c] for angle in theta])
                 future_to_loc[executor.submit(intensity_fit, theta, intensity)] = (r, c)
 
         for future in concurrent.futures.as_completed(future_to_loc):
