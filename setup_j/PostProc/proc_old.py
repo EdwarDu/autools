@@ -7,6 +7,7 @@ from scipy.optimize import curve_fit, OptimizeWarning
 import concurrent.futures
 import matplotlib.pyplot as plt
 import traceback
+import pickle
 
 
 # Fitting function. I(x,y) = M(x,y)cos^2(Beta(x,y) - Theta) + C(x,y)
@@ -17,8 +18,8 @@ def intensity_func(theta, m, beta, c):
 def intensity_fit(theta, intensity):
     print(f"Fitting for {theta} and {intensity}")
     popt, pcov = curve_fit(intensity_func, theta, intensity,
-                           p0=[0, 0, 0],
-                           bounds=([0, 0, 0],     # Lower bounds for M beta C
+                           p0=[np.max(intensity)-np.min(intensity), 0, np.min(intensity)],
+                           bounds=([-np.inf, -360, -np.inf],     # Lower bounds for M beta C
                                    [np.inf, 360, np.inf]),    # Higher bounds
                            maxfev=2000)
     return popt
@@ -55,22 +56,58 @@ def intensity_para_fit(data: dict, data_size, n_workers: int = 4):
 
 
 # noinspection DuplicatedCode
-def display_image(data: np.ndarray, title: str = "Image"):
+def display_image(data: np.ndarray, title: str = "Image", with_arrow: bool = False):
     fig = plt.figure()
     axes: plt.Axes = fig.add_subplot(111, aspect='equal')
     hm_v = axes.imshow(data, cmap=plt.cm.rainbow)
     axes.set_title(title)
     fig.colorbar(hm_v, ax=axes)
 
-    # height, width = data.shape
-    # x, y = np.meshgrid(np.arange(0, width, 1), np.arange(0, height, 1))
-    # unit = np.ones(data.shape) * 2
-    # data_deg = (data - np.min(data)) / (np.max(data) - np.min(data)) * np.pi * 2
-    # # TODO: angle function needs to be fixed
-    # u = unit * np.sin(data_deg)
-    # v = unit * np.cos(data_deg)
-    # axes.quiver(x, y, u, v, units='dots', scale=2, scale_units='xy', width=1, headwidth=4, headlength=6)
+    if with_arrow:
+        height, width = data.shape
+        x, y = np.meshgrid(np.arange(0, width, 1), np.arange(0, height, 1))
+        unit = np.ones(data.shape) * 2
+        data_deg = (data - np.min(data)) / (np.max(data) - np.min(data)) * np.pi * 2
+        # TODO: angle function needs to be fixed
+        u = unit * np.sin(data_deg)
+        v = unit * np.cos(data_deg)
+        axes.quiver(x, y, u, v, units='dots', scale=2, scale_units='xy', width=1, headwidth=4, headlength=6)
+
     fig.show()
+    return fig
+
+
+def show_fitting(data: dict, r: int, c: int, m: np.ndarray, beta: np.ndarray, cons: np.ndarray):
+    fig = plt.figure()
+    axes: plt.Axes = fig.add_subplot(111, aspect="equal")
+    theta = np.array([x for x in data.keys()])
+    intensity = np.array([data[angle]["in"][r][c] / data[angle]["trans"][r][c] for angle in theta])
+    axes.scatter(theta, intensity)
+    theta_360 = np.linspace(-180, 180, 360)
+    intensity_360 = intensity_func(theta_360, m[r][c], beta[r][c], cons[r][c])
+    axes.plot(theta_360, intensity_360, '--r')
+    fig.show()
+    return fig
+
+
+def show_fitting_errors(data: dict, m: np.ndarray, beta: np.ndarray, cons: np.ndarray):
+    err = np.zeros(m.shape)
+    height, width = m.shape
+    for r in range(0, height):
+        for c in range(0, width):
+            theta = np.array([x for x in data.keys()])
+            intensity = np.array([data[angle]["in"][r][c] / data[angle]["trans"][r][c] for angle in theta])
+            intensity_fit_v = intensity_func(theta, m[r][c], beta[r][c], cons[r][c])
+            err[r][c] = np.sum(np.abs(intensity_fit_v-intensity))
+
+    display_image(err, "Fitting Error")
+    return err
+
+
+def show_intensity(data: dict):
+    theta_v = data.keys()
+    for theta in theta_v:
+        display_image(data[theta]["in"]/data[theta]["trans"], f"Intensity @THETA={theta}")
 
 
 if __name__ == "__main__":
@@ -78,6 +115,7 @@ if __name__ == "__main__":
     parser.add_argument('-i', '--input', help='input folder')
     parser.add_argument('-p', '--parallel_worker', type=int, default=4,
                         help='number of parallel workers for curve fitting')
+    parser.add_argument('-l', '--load', action="store_true", help="load pickle files")
     args = parser.parse_args()
 
     if args.parallel_worker <= 0:
@@ -130,10 +168,33 @@ if __name__ == "__main__":
                 data_size == angle_data["trans"].shape):
                 raise ValueError(f"data size inconsistent for {polar_angle}")
 
-        data_m, data_beta, data_cons = intensity_para_fit(data_dict, data_size, args.parallel_worker)
+        show_intensity(data_dict)
+
+        if args.load and os.path.exists("m_beta_c.pickle"):
+            with open("m_beta_c.pickle", "rb") as f_p:
+                data_m, data_beta, data_cons = pickle.load(f_p)
+        else:
+            data_m, data_beta, data_cons = intensity_para_fit(data_dict, data_size, args.parallel_worker)
+            with open("m_beta_c.pickle", "wb") as f_p:
+                pickle.dump([data_m, data_beta, data_cons], f_p)
+
         display_image(data_m, "M")
         display_image(data_beta, "BETA")
         display_image(data_cons, "C")
+
+        show_fitting_errors(data_dict, data_m, data_beta, data_cons)
+
+        fig_fit = None
+        while True:
+            row = int(input("ROW? (-1) to break"))
+            if row == -1:
+                break
+            col = int(input("COL?"))
+
+            if fig_fit is not None:
+                plt.close(fig_fit)
+            fig_fit = show_fitting(data_dict, row, col, data_m, data_beta, data_cons)
+
 
         plt.pause(1)
         input('Enter to close')
