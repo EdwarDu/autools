@@ -18,18 +18,18 @@ def intensity_fit(theta, intensity):
     print(f"Fitting for {theta} and {intensity}")
     popt, pcov = curve_fit(intensity_func, theta, intensity,
                            p0=[0, 0, 0],
-                           bounds=([0, -360, -np.inf],
+                           bounds=([-np.inf, -360, -np.inf],
                                    [np.inf, 360, np.inf]),
                            maxfev=2000)
     return popt
 
 
-def intensity_para_fit(data: dict, data_size):
+def intensity_para_fit(data: dict, data_size, n_workers: int = 4):
     m = np.zeros(data_size)
     beta = np.zeros(data_size)
     cons = np.zeros(data_size)
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=n_workers) as executor:
         height, width = data_size
         future_to_loc = {}
         for r in range(0, height):
@@ -76,7 +76,12 @@ def display_image(data: np.ndarray, title: str = "Image"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input', help='input folder')
+    parser.add_argument('-p', '--parallel_worker', type=int, default=4,
+                        help='number of parallel workers for curve fitting')
     args = parser.parse_args()
+
+    if args.parallel_worker <= 0:
+        args.parallel_worker = 4
 
     data_dict = {}
     if os.path.exists(args.input):
@@ -125,7 +130,7 @@ if __name__ == "__main__":
                 data_size == angle_data["trans"].shape):
                 raise ValueError(f"data size inconsistent for {polar_angle}")
 
-        data_m, data_beta, data_cons = intensity_para_fit(data_dict, data_size)
+        data_m, data_beta, data_cons = intensity_para_fit(data_dict, data_size, args.parallel_worker)
         display_image(data_m, "M")
         display_image(data_beta, "BETA")
         display_image(data_cons, "C")
