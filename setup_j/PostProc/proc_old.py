@@ -268,7 +268,8 @@ if __name__ == "__main__":
                 if 0 <= row < height:
                     axes.clear()
                     for c in range(0, width):
-                        show_fitting(data_dict, r, c, data_m, data_beta, data_cons, axes)
+                        show_fitting(data_dict, row, c, data_m, data_beta, data_cons, axes)
+                    plt.pause(1)
             except:
                 pass
 
