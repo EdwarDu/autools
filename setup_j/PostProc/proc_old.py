@@ -11,24 +11,25 @@ import pickle
 import warnings
 from lmfit import Model
 
+import matplotlib.style as mplstyle
+mplstyle.use('fast')
+
 warnings.simplefilter("error", OptimizeWarning)
+plt.ion()
 
 
 # Fitting function. I(x,y) = M(x,y)cos^2(Beta(x,y) - Theta) + C(x,y)
 def intensity_func(theta, m, beta, c):
-    return m* (np.cos(np.deg2rad(beta-theta))**2) + c
+    return m*(np.cos(np.deg2rad(beta-theta))**2) + c
 
 
 def intensity_fit(theta, intensity):
-    print(f"Fitting for {theta} and {intensity}")
-    intensity_a = np.max(intensity)-np.min(intensity)
-    con_up = np.min(intensity)
-    if con_up < 0:
-        con_up = np.mean(intensity)
+    intensity_a = (np.max(intensity)-np.min(intensity))
+    con_up = np.mean(intensity)
 
     popt, pcov = curve_fit(intensity_func, theta, intensity,
-                           # method='trf',
-                           p0=[intensity_a, 0, 0],
+                           method='trf',
+                           p0=[intensity_a * 2, 0, con_up/2],
                            # p0=[0, 0, 0],
                            bounds=([intensity_a, -90, 0],     # Lower bounds for M beta C
                                    [np.inf, 90, con_up]),    # Higher bounds
@@ -39,14 +40,11 @@ def intensity_fit(theta, intensity):
 
 
 def intensity_lmfit(theta, intensity):
-    print(f"(lm)Fitting for {theta} and {intensity}")
     imodel = Model(intensity_func)
-    intensity_a = np.max(intensity) - np.min(intensity)
-    con_up = np.min(intensity)
-    if con_up < 0:
-        con_up = np.mean(intensity)
+    intensity_a = (np.max(intensity) - np.min(intensity))
+    con_up = np.mean(intensity)
 
-    imodel.set_param_hint('m', value=intensity_a+1e-12, min=intensity_a, max=np.inf)
+    imodel.set_param_hint('m', value=intensity_a*2, min=intensity_a, max=np.inf)
     imodel.set_param_hint('beta', value=0, min=-90, max=90)
     imodel.set_param_hint('c', value=1e-12, min=0, max=con_up)
 
@@ -63,22 +61,34 @@ def intensity_para_fit(data: dict, data_size, n_workers: int = 4, fit_type: str 
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=n_workers) as executor:
         height, width = data_size
+
+        print(f"Fitting for H{height}xW{width}")
         future_to_loc = {}
         for r in range(0, height):
             for c in range(0, width):
-                theta = np.array([x for x in data.keys()])
-                intensity = np.array([data[angle]["in"][r][c]/data[angle]["trans"][r][c] for angle in theta])
+                theta = np.array([x for x in data.keys()],
+                                 dtype=np.float64)
+                intensity = np.array([data[angle]["in"][r][c]/data[angle]["trans"][r][c] for angle in theta],
+                                     dtype=np.float64)
                 if fit_type == "scipy":
                     future_to_loc[executor.submit(intensity_fit, theta, intensity)] = (r, c)
                 elif fit_type == "lmfit":
                     future_to_loc[executor.submit(intensity_lmfit, theta, intensity)] = (r, c)
                 else:
-                    raise ValueError(f"Unknown fit type {scipy}")
+                    raise ValueError(f"Unknown fit type {fit_type}")
 
+        res_count = 0
         for future in concurrent.futures.as_completed(future_to_loc):
             r, c = future_to_loc[future]
             try:
                 m_, beta_, con_ = future.result()
+                res_count += 1
+                if res_count % width == 0:
+                    print(".")
+                elif res_count % width == 1:
+                    print(f":{int(res_count/width):02d}:.", end='')
+                else:
+                    print(".", end='')
                 # print(f"{r}, {c}:", m_, beta_, con_)
             except Exception as exc:
                 print(f"Fitting for ({r},{c}) failed due to except")
@@ -97,7 +107,10 @@ def display_image(data: np.ndarray, title: str = "Image", with_arrow: bool = Fal
     axes: plt.Axes = fig.add_subplot(111, aspect='equal')
     hm_v = axes.imshow(data, cmap=plt.cm.rainbow)
     axes.set_title(title)
-    fig.colorbar(hm_v, ax=axes)
+    if not 0.001 <= np.max(data) <= 1000:
+        fig.colorbar(hm_v, ax=axes, format='%.0e')
+    else:
+        fig.colorbar(hm_v, ax=axes)
 
     if with_arrow:
         height, width = data.shape
@@ -123,17 +136,16 @@ def show_fitting(data: dict, r: int, c: int, m: np.ndarray, beta: np.ndarray, co
         axes.set_title(f"M:{m[r][c]}, Beta:{beta[r][c]}, C:{cons[r][c]}")
 
     theta = np.array([x for x in data.keys()])
-    intensity = np.array([data[angle]["in"][r][c] / data[angle]["trans"][r][c] for angle in theta])
-
-    print(intensity)
-
-    axes.scatter(theta, intensity, label="Measurement")
+    intensity = np.array([data[angle]["in"][r][c] / data[angle]["trans"][r][c] for angle in theta],
+                         dtype=np.float64)
+    axes.plot(theta, intensity, 'x', label="Measurement")
     theta_360 = np.linspace(-180, 180, 360)
     intensity_360 = intensity_func(theta_360, m[r][c], beta[r][c], cons[r][c])
     axes.plot(theta_360, intensity_360, '--', label="Curve fitting")
-
+    # axes.set_ylim(bottom=np.min(intensity, intensity_360)*0.8, top=1.2*np.max(intensity, intensity_360))
+    # axes.set_xlim(left=-180, right=180)
     axes.relim()
-    axes.autoscale(enable=True, axis='both')
+    axes.autoscale_view(tight=True)
 
     if axes is None:
         axes.legend()
@@ -207,7 +219,7 @@ if __name__ == "__main__":
             sub_folder_path = os.path.join(args.input, sub_folder)
             data_files = [x for x in os.listdir(sub_folder_path) if os.path.isfile(os.path.join(sub_folder_path, x))]
 
-            lockin_in_data, lockin_out_data, trans_data, polar_angle = None, None, None, None
+            lockin_in_data, lockin_out_data, trans_data, polar_angle, sensitivity = None, None, None, None, None
             for data_file in data_files:
                 file_path = os.path.join(sub_folder_path, data_file)
                 print(f"Loading information from {file_path}")
@@ -223,14 +235,17 @@ if __name__ == "__main__":
                                 sensitivity = int(line_parts[1])
                                 print(f"Sensitivity: {sensitivity} {line_parts[2]}")
                 elif file_path.endswith("_LockInIN.dat"):
-                    lockin_in_data = np.loadtxt(file_path) * 1e-6
+                    lockin_in_data = np.loadtxt(file_path, dtype=np.float64) * 1e-6
                     print(f"Loaded lockin IN data size: {lockin_in_data.shape}")
                 elif file_path.endswith("_LockInOUT.dat"):
-                    lockin_out_data = np.loadtxt(file_path) * 1e-6
+                    lockin_out_data = np.loadtxt(file_path, dtype=np.float64) * 1e-6
                     print(f"Loaded lockin OUT data size: {lockin_out_data.shape}")
                 elif file_path.endswith("_Transmission.dat"):
-                    trans_data = np.loadtxt(file_path)
+                    trans_data = np.loadtxt(file_path, dtype=np.float64)
                     print(f"Loaded transmission data size: {trans_data.shape}")
+
+            if polar_angle is None:
+                continue
 
             if sensitivity == 20:
                 lockin_in_data = lockin_in_data * 2
@@ -296,39 +311,38 @@ if __name__ == "__main__":
 
         show_fitting_errors(data_dict, data_m, data_beta, data_cons)
 
+        fig_fit = plt.figure("Fitting")
+        axes: plt.Axes = fig_fit.add_subplot(111)
+        fig_fit.show()
+        axes.autoscale(enable=True, axis='both')
+        height, width = data_size
+
         if args.check == 'row':
-            fig_all = plt.figure("ALL FIITTING")
-            fig_all.show()
-            axes: plt.Axes = fig_all.add_subplot(111)
-            axes.autoscale(enable=True, axis='both')
-
-            height, width = data_size
-
             while True:
                 try:
-                    row = int(input("ROW? (-1) to break "))
+                    row = int(input("ROW?(-1) to break "))
                     if row == -1:
                         break
                     if 0 <= row < height:
                         axes.clear()
                         for c in range(0, width):
                             show_fitting(data_dict, row, c, data_m, data_beta, data_cons, axes)
-                        plt.pause(1)
+                        fig_fit.canvas.draw_idle()
+                        fig_fit.canvas.flush_events()
                 except:
                     pass
         elif args.check == 'single':
-            fig_fit = None
             while True:
                 try:
-                    row = int(input("ROW? (-1) to break "))
+                    row = int(input("ROW?(-1) to break "))
                     if row == -1:
                         break
                     col = int(input("COL?"))
-
-                    if fig_fit is not None:
-                        plt.close(fig_fit)
-                    fig_fit = show_fitting(data_dict, row, col, data_m, data_beta, data_cons)
-                    plt.pause(1)
+                    if 0 <= row < height and 0 <= col < width:
+                        axes.clear()
+                        show_fitting(data_dict, row, col, data_m, data_beta, data_cons, axes)
+                        fig_fit.canvas.draw_idle()
+                        fig_fit.canvas.flush_events()
                 except:
                     pass
 
