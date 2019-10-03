@@ -413,11 +413,16 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
 
     @cross_hair_auto_hotspot.setter
     def cross_hair_auto_hotspot(self, b_auto_loc: bool):
-        self.__cross_hair_auto_hotspot = b_auto_loc
+        if b_auto_loc != self.__cross_hair_auto_hotspot:
+            self.__cross_hair_auto_hotspot = b_auto_loc
+            self.update_image_data(self.image_data)
 
     # specific function to allow lambda expression
     def set_cross_hair_auto_hotspot(self, b_auto_loc: bool):
-        self.__cross_hair_auto_hotspot = b_auto_loc
+        if b_auto_loc != self.__cross_hair_auto_hotspot:
+            self.__cross_hair_auto_hotspot = b_auto_loc
+            self.update_image_data(self.image_data)
+
 
     @property
     def gaussian_fit_force_peak(self):
@@ -426,6 +431,8 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
     @gaussian_fit_force_peak.setter
     def gaussian_fit_force_peak(self, b_force):
         self.__gaussian_fit_force_peak = b_force
+        self.update_h_profile()
+        self.update_v_profile()
 
     def set_gaussian_fit_force_peak(self, b_force: bool):
         self.__gaussian_fit_force_peak = b_force
