@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import traceback
 import pickle
 import warnings
-
+from lmfit import Model
 
 warnings.simplefilter("error", OptimizeWarning)
 
@@ -38,6 +38,24 @@ def intensity_fit(theta, intensity):
     return popt
 
 
+def intensity_lmfit(theta, intensity):
+    print(f"(lm)Fitting for {theta} and {intensity}")
+    imodel = Model(intensity_func)
+    intensity_a = np.max(intensity) - np.min(intensity)
+    con_up = np.min(intensity)
+    if con_up < 0:
+        con_up = np.mean(intensity)
+
+    imodel.set_param_hint('m', value=intensity_a+0.0001, min=intensity_a, max=np.inf)
+    imodel.set_param_hint('beta', value=0, min=-90, max=90)
+    imodel.set_param_hint('c', value=0.0001, min=0, max=con_up)
+
+    result = imodel.fit(intensity, theta=theta)
+    params = result.params
+    param_names = ('m', 'beta', 'c')
+    return [params[x].value for x in param_names]
+
+
 def intensity_para_fit(data: dict, data_size, n_workers: int = 4):
     m = np.zeros(data_size)
     beta = np.zeros(data_size)
@@ -50,12 +68,13 @@ def intensity_para_fit(data: dict, data_size, n_workers: int = 4):
             for c in range(0, width):
                 theta = np.array([x for x in data.keys()])
                 intensity = np.array([data[angle]["in"][r][c]/data[angle]["trans"][r][c] for angle in theta])
-                future_to_loc[executor.submit(intensity_fit, theta, intensity)] = (r, c)
+                future_to_loc[executor.submit(intensity_lmfit, theta, intensity)] = (r, c)
 
         for future in concurrent.futures.as_completed(future_to_loc):
             r, c = future_to_loc[future]
             try:
                 m_, beta_, con_ = future.result()
+                # print(f"{r}, {c}:", m_, beta_, con_)
             except Exception as exc:
                 print(f"Fitting for ({r},{c}) failed due to except")
                 # traceback.print_tb(exc.__traceback__)
@@ -89,22 +108,25 @@ def display_image(data: np.ndarray, title: str = "Image", with_arrow: bool = Fal
     return fig
 
 
-def show_fitting(data: dict, r: int, c: int, m: np.ndarray, beta: np.ndarray, cons: np.ndarray):
-    fig = plt.figure("Fitting")
-    axes: plt.Axes = fig.add_subplot(111, aspect="equal")
-    axes.set_xlabel("Degree (Theta)")
-    axes.set_ylabel("Intensity")
-    axes.set_title(f"M:{m[r][c]}, Beta:{beta[r][c]}, C:{cons[r][c]}")
+def show_fitting(data: dict, r: int, c: int, m: np.ndarray, beta: np.ndarray, cons: np.ndarray, axes: plt.Axes = None):
+    if axes is None:
+        fig = plt.figure("Fitting")
+        axes: plt.Axes = fig.add_subplot(111, aspect="equal")
+        axes.set_xlabel("Degree (Theta)")
+        axes.set_ylabel("Intensity")
+        axes.set_title(f"M:{m[r][c]}, Beta:{beta[r][c]}, C:{cons[r][c]}")
 
     theta = np.array([x for x in data.keys()])
     intensity = np.array([data[angle]["in"][r][c] / data[angle]["trans"][r][c] for angle in theta])
     axes.scatter(theta, intensity, label="Measurement")
     theta_360 = np.linspace(-180, 180, 360)
     intensity_360 = intensity_func(theta_360, m[r][c], beta[r][c], cons[r][c])
-    axes.plot(theta_360, intensity_360, '--r', label="Curve fitting")
-    axes.legend()
-    fig.show()
-    return fig
+    axes.plot(theta_360, intensity_360, '--', label="Curve fitting")
+
+    if axes is None:
+        axes.legend()
+        fig.show()
+        return fig
 
 
 def show_fitting_errors(data: dict, m: np.ndarray, beta: np.ndarray, cons: np.ndarray):
@@ -208,10 +230,10 @@ if __name__ == "__main__":
                 data_size == angle_data["trans"].shape):
                 raise ValueError(f"data size inconsistent for {polar_angle}")
 
-        # FIXME: for testing individual fitting
+        # # FIXME: for testing individual fitting
         # theta = np.array([x for x in data_dict.keys()])
         # intensity = np.array([data_dict[angle]["in"][39][12] / data_dict[angle]["trans"][39][12] for angle in theta])
-        # print(intensity_fit(theta, intensity))
+        # print(intensity_lmfit(theta, intensity))
         # sys.exit(0)
 
         show_intensity(data_dict)
@@ -233,19 +255,36 @@ if __name__ == "__main__":
 
         show_fitting_errors(data_dict, data_m, data_beta, data_cons)
 
-        fig_fit = None
+        fig_all = plt.figure("ALL FIITTING")
+        fig_all.show()
+        axes: plt.Axes = fig_all.add_subplot(111)
+
+        height, width = data_size
         while True:
             try:
                 row = int(input("ROW? (-1) to break "))
                 if row == -1:
                     break
-                col = int(input("COL?"))
-
-                if fig_fit is not None:
-                    plt.close(fig_fit)
-                fig_fit = show_fitting(data_dict, row, col, data_m, data_beta, data_cons)
+                if 0 <= row < height:
+                    axes.clear()
+                    for c in range(0, width):
+                        show_fitting(data_dict, r, c, data_m, data_beta, data_cons, axes)
             except:
                 pass
+
+        # fig_fit = None
+        # while True:
+        #     try:
+        #         row = int(input("ROW? (-1) to break "))
+        #         if row == -1:
+        #             break
+        #         col = int(input("COL?"))
+        #
+        #         if fig_fit is not None:
+        #             plt.close(fig_fit)
+        #         fig_fit = show_fitting(data_dict, row, col, data_m, data_beta, data_cons)
+        #     except:
+        #         pass
 
         plt.pause(1)
         input('Enter to close')
