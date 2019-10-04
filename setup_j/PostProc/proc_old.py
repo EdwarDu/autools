@@ -24,15 +24,14 @@ def intensity_func(theta, m, beta, c):
 
 
 def intensity_fit(theta, intensity):
-    intensity_a = (np.max(intensity)-np.min(intensity))
-    con_up = np.mean(intensity)
+    # intensity_a = (np.max(intensity)-np.min(intensity))
+    # con_up = np.mean(intensity)
 
     popt, pcov = curve_fit(intensity_func, theta, intensity,
                            method='trf',
-                           p0=[intensity_a * 2, 0, con_up/2],
                            # p0=[0, 0, 0],
-                           bounds=([intensity_a, -90, 0],     # Lower bounds for M beta C
-                                   [np.inf, 90, con_up]),    # Higher bounds
+                           bounds=([0, -90, 0],     # Lower bounds for M beta C
+                                   [np.inf, 90, np.inf]),    # Higher bounds
                            maxfev=200000
                           )
 
@@ -41,12 +40,12 @@ def intensity_fit(theta, intensity):
 
 def intensity_lmfit(theta, intensity):
     imodel = Model(intensity_func)
-    intensity_a = (np.max(intensity) - np.min(intensity))
+    # intensity_a = (np.max(intensity) - np.min(intensity))
     con_up = np.mean(intensity)
 
-    imodel.set_param_hint('m', value=intensity_a*2, min=intensity_a, max=np.inf)
+    imodel.set_param_hint('m', value=1e-14, min=0, max=np.inf)
     imodel.set_param_hint('beta', value=0, min=-90, max=90)
-    imodel.set_param_hint('c', value=1e-12, min=0, max=con_up)
+    imodel.set_param_hint('c', value=1e-14, min=0, max=con_up)
 
     result = imodel.fit(intensity, theta=theta)
     params = result.params
@@ -107,7 +106,7 @@ def display_image(data: np.ndarray, title: str = "Image", with_arrow: bool = Fal
     axes: plt.Axes = fig.add_subplot(111, aspect='equal')
     hm_v = axes.imshow(data, cmap=plt.cm.rainbow)
     axes.set_title(title)
-    if not 0.001 <= np.max(data) <= 1000:
+    if not 0.001 <= np.max(np.abs(data)) <= 1000:
         fig.colorbar(hm_v, ax=axes, format='%.0e')
     else:
         fig.colorbar(hm_v, ax=axes)
@@ -138,6 +137,7 @@ def show_fitting(data: dict, r: int, c: int, m: np.ndarray, beta: np.ndarray, co
     theta = np.array([x for x in data.keys()])
     intensity = np.array([data[angle]["in"][r][c] / data[angle]["trans"][r][c] for angle in theta],
                          dtype=np.float64)
+    print(f"Theta: {theta}, I: {intensity}: {m[r][c]}, {beta[r][c]}, {cons[r][c]}")
     axes.plot(theta, intensity, 'x', label="Measurement")
     theta_360 = np.linspace(-180, 180, 360)
     intensity_360 = intensity_func(theta_360, m[r][c], beta[r][c], cons[r][c])
@@ -293,13 +293,14 @@ if __name__ == "__main__":
 
         show_intensity(data_dict)
 
-        if args.load and os.path.exists("m_beta_c.pickle"):
-            with open("m_beta_c.pickle", "rb") as f_p:
+        pickle_path = os.path.join(args.input, "m_beta_c.pickle")
+        if args.load and os.path.exists(pickle_path):
+            with open(pickle_path, "rb") as f_p:
                 data_m, data_beta, data_cons = pickle.load(f_p)
         else:
             data_m, data_beta, data_cons = intensity_para_fit(data_dict, data_size, args.parallel_worker,
                                                               fit_type=args.fit_type)
-            with open("m_beta_c.pickle", "wb") as f_p:
+            with open(pickle_path, "wb") as f_p:
                 pickle.dump([data_m, data_beta, data_cons], f_p)
 
         display_image(data_m, "M")
