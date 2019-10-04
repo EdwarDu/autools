@@ -6,11 +6,11 @@ import numpy as np
 from scipy.optimize import curve_fit, OptimizeWarning
 import concurrent.futures
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import traceback
 import pickle
 import warnings
 from lmfit import Model
-
 import matplotlib.style as mplstyle
 mplstyle.use('fast')
 
@@ -101,10 +101,10 @@ def intensity_para_fit(data: dict, data_size, n_workers: int = 4, fit_type: str 
 
 
 # noinspection DuplicatedCode
-def display_image(data: np.ndarray, title: str = "Image", with_arrow: bool = False):
+def display_image(data: np.ndarray, title: str = "Image", with_arrow: bool = False, cbar_norm = None):
     fig = plt.figure(title)
     axes: plt.Axes = fig.add_subplot(111, aspect='equal')
-    hm_v = axes.imshow(data, cmap=plt.cm.rainbow)
+    hm_v = axes.imshow(data, cmap=plt.cm.rainbow, norm=cbar_norm)
     axes.set_title(title)
     if not 0.001 <= np.max(np.abs(data)) <= 1000:
         fig.colorbar(hm_v, ax=axes, format='%.0e')
@@ -167,7 +167,7 @@ def show_fitting_errors(data: dict, m: np.ndarray, beta: np.ndarray, cons: np.nd
             r2[r][c] = 1 - (err[r][c]/ss_tot)
 
     display_image(err, "Fitting Error")
-    display_image(r2, "Fitting R^2")
+    display_image(r2, "Fitting R^2",)  # cbar_norm=mpl.colors.Normalize(vmin=0, vmax=1))
     return err
 
 
