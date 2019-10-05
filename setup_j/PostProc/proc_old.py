@@ -114,14 +114,14 @@ def display_image(data: np.ndarray, title: str = "Image", with_arrow: bool = Fal
     if with_arrow:
         height, width = data.shape
         x, y = np.meshgrid(np.arange(0, width, 1), np.arange(0, height, 1))
-        x = x - 0.5
-        y = y + 0.5
-        unit = np.ones(data.shape) * 2
+        unit = np.ones(data.shape)
         data_deg = np.deg2rad(data)
         # TODO: angle function needs to be fixed
         u = unit * np.cos(data_deg)
         v = unit * np.sin(data_deg)
-        axes.quiver(x, y, u, v, units='dots', scale=1.414, scale_units='xy', width=1, headwidth=0, headlength=0)
+        axes.quiver(x, y, u, v, angles='xy', scale_units='xy', scale=1.,
+                    headwidth=0, headlength=0, headaxislength=0, pivot='mid',
+                    units='dots', width=2)
 
     fig.show()
     return fig
