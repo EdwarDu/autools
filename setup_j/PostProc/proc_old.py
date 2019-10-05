@@ -14,7 +14,7 @@ from lmfit import Model
 import matplotlib.style as mplstyle
 mplstyle.use('fast')
 
-warnings.simplefilter("error", OptimizeWarning)
+# warnings.simplefilter("error", OptimizeWarning)
 plt.ion()
 
 
@@ -67,7 +67,7 @@ def intensity_para_fit(data: dict, data_size, n_workers: int = 4, fit_type: str 
             for c in range(0, width):
                 theta = np.array([x for x in data.keys()],
                                  dtype=np.float64)
-                intensity = np.array([data[angle]["in"][r][c]/data[angle]["trans"][r][c] for angle in theta],
+                intensity = np.array([data[angle]["intensity"][r][c] for angle in theta],
                                      dtype=np.float64)
                 if fit_type == "scipy":
                     future_to_loc[executor.submit(intensity_fit, theta, intensity)] = (r, c)
@@ -135,7 +135,7 @@ def show_fitting(data: dict, r: int, c: int, m: np.ndarray, beta: np.ndarray, co
         axes.set_title(f"M:{m[r][c]}, Beta:{beta[r][c]}, C:{cons[r][c]}")
 
     theta = np.array([x for x in data.keys()])
-    intensity = np.array([data[angle]["in"][r][c] / data[angle]["trans"][r][c] for angle in theta],
+    intensity = np.array([data[angle]["intensity"][r][c] for angle in theta],
                          dtype=np.float64)
     print(f"Theta: {theta}, I: {intensity}: {m[r][c]}, {beta[r][c]}, {cons[r][c]}")
     axes.plot(theta, intensity, 'x', label="Measurement")
@@ -160,7 +160,7 @@ def show_fitting_errors(data: dict, m: np.ndarray, beta: np.ndarray, cons: np.nd
     for r in range(0, height):
         for c in range(0, width):
             theta = np.array([x for x in data.keys()])
-            intensity = np.array([data[angle]["in"][r][c] / data[angle]["trans"][r][c] for angle in theta])
+            intensity = np.array([data[angle]["intensity"][r][c] for angle in theta])
             intensity_fit_v = intensity_func(theta, m[r][c], beta[r][c], cons[r][c])
             err[r][c] = np.sum((intensity_fit_v-intensity)**2)
             ss_tot = np.sum((intensity-np.mean(intensity))**2)
@@ -174,7 +174,7 @@ def show_fitting_errors(data: dict, m: np.ndarray, beta: np.ndarray, cons: np.nd
 def show_intensity(data: dict):
     theta_v = data.keys()
     for theta in theta_v:
-        display_image(data[theta]["in"]/data[theta]["trans"], f"Intensity @THETA={theta}")
+        display_image(data[theta]["intensity"], f"Intensity @THETA={theta}")
 
 
 def manual_patch_data(data: np.ndarray):
@@ -206,6 +206,7 @@ if __name__ == "__main__":
                         help='Fitting type')
     parser.add_argument('-c', '--check', choices=['single', 'row'], required=False,
                         help='chekcing fitting')
+    parser.add_argument('-m', '--material', type=str, required=True, help='Material name to extract the angle')
     args = parser.parse_args()
 
     if args.parallel_worker <= 0:
@@ -215,6 +216,8 @@ if __name__ == "__main__":
     if os.path.exists(args.input):
         sub_folders = [x for x in os.listdir(args.input) if os.path.isdir(os.path.join(args.input, x)) and x not in (".", "..")]
         for sub_folder in sub_folders:
+            if sub_folder.startswith("_"):
+                continue
             print(f"Found dataset folder {sub_folder}")
             sub_folder_path = os.path.join(args.input, sub_folder)
             data_files = [x for x in os.listdir(sub_folder_path) if os.path.isfile(os.path.join(sub_folder_path, x))]
@@ -226,7 +229,7 @@ if __name__ == "__main__":
                 if file_path.endswith("_info.txt"):
                     with open(file_path, "r") as f_info:
                         for line in f_info:
-                            if line.startswith("DPPTTT"):
+                            if line.startswith(args.material):
                                 line_parts = [x for x in re.split("[ \t]", line) if x != ""]
                                 polar_angle = int(line_parts[1])
                                 print(f"Polar angle {polar_angle}")
@@ -272,6 +275,7 @@ if __name__ == "__main__":
             data_dict[polar_angle]["in"] = lockin_in_data
             data_dict[polar_angle]["out"] = lockin_out_data
             data_dict[polar_angle]["trans"] = trans_data
+            data_dict[polar_angle]["intensity"] = lockin_in_data / trans_data
 
         # Verify all data has the same size
         data_size = None
@@ -287,8 +291,9 @@ if __name__ == "__main__":
 
         # # FIXME: for testing individual fitting
         # theta = np.array([x for x in data_dict.keys()])
-        # intensity = np.array([data_dict[angle]["in"][39][12] / data_dict[angle]["trans"][39][12] for angle in theta])
-        # print(intensity_lmfit(theta, intensity))
+        # intensity = np.array([data_dict[angle]["in"][18][5] / data_dict[angle]["trans"][18][5] for angle in theta])
+        # print(theta, intensity)
+        # print(intensity_fit(theta, intensity))
         # sys.exit(0)
 
         show_intensity(data_dict)
