@@ -1,0 +1,25 @@
+Sample: 
+Measurement starts at: 6:29:13 PM
+Measurement stops at: 6:50:38 PM
+
+---------- USER NOTES ----------
+N2200 60 
+40+-20 degree 92 
+5mg/ml circular polarization
+
+---------- MAP PARAMETERS ----------
+Map center (um): (11.8, -14.5)
+Map dimensions (um):  (10, 10)
+#pixels: (20, 20)
+
+---------- SUPERK PARAMETERS ----------
+Probe wavelength (nm): 690
+Probe RF power: 10
+
+---------- LOCKIN PARAMETERS ----------
+Time constant: 1 s
+Filter slope: 24 dB/oct
+Sensitivity: 100 uV/pA
+Reserve: Normal
+Frequency (Hz): 988
+Harmonic: 1

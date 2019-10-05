@@ -104,7 +104,7 @@ def intensity_para_fit(data: dict, data_size, n_workers: int = 4, fit_type: str 
 def display_image(data: np.ndarray, title: str = "Image", with_arrow: bool = False, cbar_norm = None):
     fig = plt.figure(title)
     axes: plt.Axes = fig.add_subplot(111, aspect='equal')
-    hm_v = axes.imshow(data, cmap=plt.cm.rainbow, norm=cbar_norm)
+    hm_v = axes.imshow(data, cmap=plt.cm.jet, norm=cbar_norm)
     axes.set_title(title)
     if not 0.001 <= np.max(np.abs(data)) <= 1000:
         fig.colorbar(hm_v, ax=axes, format='%.0e')
@@ -114,12 +114,14 @@ def display_image(data: np.ndarray, title: str = "Image", with_arrow: bool = Fal
     if with_arrow:
         height, width = data.shape
         x, y = np.meshgrid(np.arange(0, width, 1), np.arange(0, height, 1))
+        x = x - 0.5
+        y = y + 0.5
         unit = np.ones(data.shape) * 2
         data_deg = np.deg2rad(data)
         # TODO: angle function needs to be fixed
         u = unit * np.cos(data_deg)
         v = unit * np.sin(data_deg)
-        axes.quiver(x, y, u, v, units='dots', scale=2, scale_units='xy', width=1, headwidth=4, headlength=6)
+        axes.quiver(x, y, u, v, units='dots', scale=1.414, scale_units='xy', width=1, headwidth=0, headlength=0)
 
     fig.show()
     return fig
@@ -309,7 +311,7 @@ if __name__ == "__main__":
                 pickle.dump([data_m, data_beta, data_cons], f_p)
 
         display_image(data_m, "M")
-        display_image(data_beta, "BETA", with_arrow=True)
+        display_image(data_beta, "BETA", with_arrow=True, cbar_norm=mpl.colors.Normalize(vmin=-90, vmax=90))
         display_image(data_cons, "C")
 
         data_a = data_m / (data_m + 2*data_cons)
