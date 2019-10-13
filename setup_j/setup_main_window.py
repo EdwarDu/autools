@@ -465,7 +465,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             power = 100
 
         self.lineEdit_LIM_PowerCurr.setText(f"{power:.2f}")
-        self.aotf_man.set_power_percent(power)
+        self.aotf_man.set_power_percent(power/100)
         setup_main_logger.info(f"Set power percent to {power:.2f}", extra={"component": "Main/LIM"})
         return power
 
@@ -480,7 +480,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             power = 100
 
         self.lineEdit_LIM_PowerCurr.setText(f"{power:.2f}")
-        self.aotf_man.set_power_percent(power)
+        self.aotf_man.set_power_percent(power/100)
         setup_main_logger.info(f"Set power percent to {power:.2f}", extra={"component": "Main/LIM"})
         return power
 
@@ -592,7 +592,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             power = 100
 
         self.lineEdit_PCaliPowerCurr.setText(f"{power:.2f}")
-        self.aotf_man.set_power_percent(power)
+        self.aotf_man.set_power_percent(power/100)
         setup_main_logger.info(f"Set power percent to {power:.2f}", extra={"component": "Main/PCali"})
         return power
 
@@ -614,7 +614,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
                 next_power = 100
 
         self.lineEdit_PCaliPowerCurr.setText(f"{next_power:.2f}")
-        self.aotf_man.set_power_percent(next_power)
+        self.aotf_man.set_power_percent(next_power/100)
         setup_main_logger.info(f"Set Wave Length to {next_power:.2f}", extra={"component": "Main/PCali"})
         return next_power
 
