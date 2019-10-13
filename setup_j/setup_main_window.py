@@ -681,9 +681,11 @@ class SetupMainWindow(Ui_SetupMainWindow):
                 for i in range(0, len(wl_map)-1):
                     if wl_map[i][1] == vol_target:
                         power_target = wl_map[i][0]
+                        break
                     elif wl_map[i][1] <= vol_target <= wl_map[i+1][1] or wl_map[i][1] >= vol_target >= wl_map[i+1][1]:
                         power_target = (vol_target - wl_map[i][1]) / (wl_map[i+1][1] - wl_map[i][1]) * powerstep + \
                                        wl_map[i][0]
+                        break
 
                 if power_target is None:
                     raise Exception(f"Unable to find target power for wavelength {wl}")
