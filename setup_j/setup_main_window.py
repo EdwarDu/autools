@@ -670,7 +670,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
                     p = self.pcali_setpower(p)
                     QtWidgets.qApp.processEvents()
                     time.sleep(measure_delay / 1000)
-                    vol = self.pcali_getvol()
+                    vol = np.average([self.pcali_getvol() for i in range(0, 5)])
                     wl_map.append((p, vol))
                     self.widget_PCaliPlot.add_data_ch2(p, vol)
                     p += powerstep
