@@ -1398,6 +1398,9 @@
               </item>
               <item row="1" column="2" colspan="2">
                <widget class="QDoubleSpinBox" name="doubleSpinBox_PCaliPower0Perc">
+                <property name="decimals">
+                 <number>3</number>
+                </property>
                 <property name="maximum">
                  <double>100.000000000000000</double>
                 </property>
@@ -1529,11 +1532,17 @@
               </item>
               <item row="1" column="7">
                <widget class="QDoubleSpinBox" name="doubleSpinBox_PCaliPowerSPerc">
+                <property name="decimals">
+                 <number>3</number>
+                </property>
                 <property name="minimum">
-                 <double>0.100000000000000</double>
+                 <double>0.001000000000000</double>
                 </property>
                 <property name="maximum">
                  <double>100.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>0.010000000000000</double>
                 </property>
                </widget>
               </item>
@@ -1559,6 +1568,9 @@
               </item>
               <item row="1" column="5">
                <widget class="QDoubleSpinBox" name="doubleSpinBox_PCaliPower1Perc">
+                <property name="decimals">
+                 <number>3</number>
+                </property>
                 <property name="maximum">
                  <double>100.000000000000000</double>
                 </property>
@@ -1641,6 +1653,9 @@
                <widget class="QDoubleSpinBox" name="doubleSpinBox_LIM_PowerPerc">
                 <property name="readOnly">
                  <bool>true</bool>
+                </property>
+                <property name="decimals">
+                 <number>3</number>
                 </property>
                 <property name="maximum">
                  <double>100.000000000000000</double>
@@ -1838,6 +1853,9 @@
                <widget class="QDoubleSpinBox" name="doubleSpinBox_LIM_CaliPowerPerc">
                 <property name="readOnly">
                  <bool>true</bool>
+                </property>
+                <property name="decimals">
+                 <number>3</number>
                 </property>
                 <property name="maximum">
                  <double>100.000000000000000</double>

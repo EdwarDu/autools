@@ -31,8 +31,8 @@ setup_main_logger_ch = logging.StreamHandler()
 setup_main_logger_ch.setFormatter(setup_main_logger_formatter)
 setup_main_logger.addHandler(setup_main_logger_ch)
 
-_AUTOZ_TEST = True
-_MAPM_TEST = True
+_AUTOZ_TEST = False
+_MAPM_TEST = False
 
 from ..SRS.SR830Man import SR830Man, float2str
 from ..Cameras.CVCameraMan import CVCameraMan
@@ -539,7 +539,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         self.lineEdit_PCaliWLCurr.setText(f"{wlen}")
 
-        b_a, = self.aotf_man.is_wavelength_available(wlen)
+        b_a, _ = self.aotf_man.is_wavelength_available(wlen)
         if not b_a:
             self.lineEdit_PCaliWLCurr.setStyleSheet("background: red")
             setup_main_logger.error(f"Wave Length {wlen} unavailable, check AOTF settings",
@@ -665,7 +665,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
                     p = self.pcali_setpower(p)
                     QtWidgets.qApp.processEvents()
                     time.sleep(measure_delay / 1000)
-                    vol = wl * p / 100 / 2200 * 10  # FIXME: For testing:  #self.pcali_getvol()
+                    vol = self.pcali_getvol()
                     wl_map.append((p, vol))
                     self.widget_PCaliPlot.add_data_ch2(p, vol)
                     p += powerstep

@@ -71,7 +71,7 @@ class FianiumAOTFMan(QObject):
         (1100, 2300, 5570),
     )
 
-    _FAKE_DEV = True
+    _FAKE_DEV = False
 
     opened = pyqtSignal()
     closed = pyqtSignal()

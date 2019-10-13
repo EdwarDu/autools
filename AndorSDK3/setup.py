@@ -5,7 +5,7 @@ from Cython.Compiler import Options
 
 Options.covert_range = True
 
-__FAKE_DEV = True
+__FAKE_DEV = False
 
 if not __FAKE_DEV:
     extensions = [
