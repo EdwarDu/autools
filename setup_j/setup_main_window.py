@@ -405,7 +405,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         self.lineEdit_LIM_WLCurr.setText(f"{wlen}")
 
-        b_a, = self.aotf_man.is_wavelength_available(wlen)
+        b_a, _ = self.aotf_man.is_wavelength_available(wlen)
 
         if not b_a:
             self.lineEdit_LIM_WLCurr.setStyleSheet("background: red")
@@ -433,7 +433,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             return None
 
         self.lineEdit_LIM_WLCurr.setText(f"{next_wlen}")
-        b_a, = self.aotf_man.is_wavelength_available(next_wlen)
+        b_a, _= self.aotf_man.is_wavelength_available(next_wlen)
         if not b_a:
             self.lineEdit_LIM_WLCurr.setStyleSheet("background: red")
             setup_main_logger.error(f"Wave Length {next_wlen} unavailable, check AOTF settings",
@@ -569,7 +569,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             return None
 
         self.lineEdit_PCaliWLCurr.setText(f"{next_wlen}")
-        b_a, = self.aotf_man.is_wavelength_available(next_wlen)
+        b_a, _= self.aotf_man.is_wavelength_available(next_wlen)
         if not b_a:
             self.lineEdit_PCaliWLCurr.setStyleSheet("background: red")
             setup_main_logger.error(f"Wave Length {next_wlen} unavailable, check AOTF settings",

@@ -259,7 +259,8 @@ class AOTFConfigWindow(Ui_AOTF_Config_Window):
 
     def wavelength_changed(self):
         wavel = self.spinBox_WaveLength.value()
-        if not self.aotf_man.is_wavelength_available(wavel):
+        b_a = self.aotf_man.is_wavelength_available(wavel)
+        if not b_a:
             self.spinBox_WaveLength.setStyleSheet("background: red")
         else:
             self.spinBox_WaveLength.setStyleSheet("")
