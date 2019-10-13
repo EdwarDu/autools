@@ -62,19 +62,19 @@ class LaserProfilerZDepthWidget(pg.GraphicsLayoutWidget):
                                                      # "angle": -180
                                                      },
                                           bounds=[0, self.image_width-0.001],
-                                          pen=pg.mkPen('g', width=1, style=QtCore.Qt.SolidLine))
+                                          pen=pg.mkPen('g', width=2, style=QtCore.Qt.SolidLine))
         self.map_h_line = pg.InfiniteLine(angle=0, movable=True,
                                           label="{value:.1f}",
                                           labelOpts={"position": 0.2, "color": (255, 0, 255)},
                                           bounds=[0, self.image_height - 0.001],
-                                          pen=pg.mkPen('g', width=1, style=QtCore.Qt.SolidLine))
+                                          pen=pg.mkPen('g', width=2, style=QtCore.Qt.SolidLine))
         self.p_map.addItem(self.map_v_line)
         self.p_map.addItem(self.map_h_line)
         self.map_v_line.setPos(0)
         self.map_h_line.setPos(0)
 
         self.p_v_hline = pg.InfiniteLine(angle=0, movable=False,
-                                         pen=pg.mkPen('g', width=1, style=QtCore.Qt.SolidLine))
+                                         pen=pg.mkPen('g', width=2, style=QtCore.Qt.SolidLine))
         self.p_vertical.addItem(self.p_v_hline)
         self.p_v_hline.setPos(0)
 
@@ -87,13 +87,13 @@ class LaserProfilerZDepthWidget(pg.GraphicsLayoutWidget):
                                                              "rotateAxis": (1, 0),
                                                              "angle": -180
                                                              },
-                                                  pen=pg.mkPen('w', width=1, style=QtCore.Qt.DashLine))
+                                                  pen=pg.mkPen('w', width=2, style=QtCore.Qt.DashLine))
         self.v_profile_bottomline = pg.InfiniteLine(angle=90, pos=0, movable=False,
                                                     label="{value:.4f}",
                                                     labelOpts={"position": 0.2,
                                                                "rotateAxis": (1, 0),
                                                                "angle": -180},
-                                                    pen=pg.mkPen('w', width=1, style=QtCore.Qt.DashLine))
+                                                    pen=pg.mkPen('w', width=2, style=QtCore.Qt.DashLine))
 
         self.p_vertical.addItem(self.v_profile_peakline)
         self.p_vertical.addItem(self.v_profile_bottomline)
@@ -102,24 +102,24 @@ class LaserProfilerZDepthWidget(pg.GraphicsLayoutWidget):
         self.map_h_line.sigPositionChanged.connect(lambda l: self.map_crosshair_h_moved(l))
 
         self.v_profile_fitline = self.p_vertical.plot(np.zeros(self.image_height), range(0, self.image_height),
-                                                      pen=pg.mkPen('y', width=1, style=QtCore.Qt.SolidLine))
+                                                      pen=pg.mkPen('y', width=2, style=QtCore.Qt.SolidLine))
 
         self.v_profile_peakline_fit = pg.InfiniteLine(angle=90, pos=1, movable=False,
                                                       label="{value:.4f}",
                                                       labelOpts={"position": 0.8, "color": (255, 255, 0),
                                                                  "rotateAxis": (1, 0),
                                                                  "angle": -180},
-                                                      pen=pg.mkPen('y', width=1, style=QtCore.Qt.DashLine))
+                                                      pen=pg.mkPen('y', width=2, style=QtCore.Qt.DashLine))
         self.v_profile_bottomline_fit = pg.InfiniteLine(angle=90, pos=0, movable=False,
                                                         label="{value:.4f}",
                                                         labelOpts={"position": 0.8,
                                                                    "color": (255, 255, 0),
                                                                    "rotateAxis": (1, 0),
                                                                    "angle": -180 },
-                                                        pen=pg.mkPen('y', width=1, style=QtCore.Qt.DashLine))
+                                                        pen=pg.mkPen('y', width=2, style=QtCore.Qt.DashLine))
 
         self.v_profile_mid_line = self.p_vertical.plot([0, 0, 0], [0, 1, 2],
-                                                       pen=pg.mkPen((255, 0, 255), width=1),
+                                                       pen=pg.mkPen((255, 0, 255), width=2),
                                                        symbolBrush=(255, 0, 0), symbolPen='w', symbol='o')
         self.v_profile_mid_line_point = pg.CurvePoint(self.v_profile_mid_line)
         self.v_profile_mid_note = pg.TextItem("", angle=90, anchor=(1, 1), color=(0, 255, 0))
