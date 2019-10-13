@@ -227,19 +227,20 @@ class FianiumAOTFMan(QObject):
         return
 
     def is_wavelength_available(self, wlen):
+        mods = []
         if FianiumAOTFMan.VIS_MIN <= wlen <= FianiumAOTFMan.VIS_MAX:
-            mod = "VIS"
-        elif FianiumAOTFMan.NIR1_MIN <= wlen <= FianiumAOTFMan.NIR1_MAX:
-            mod = "NIR1"
-        elif FianiumAOTFMan.NIR2_MIN <= wlen <= FianiumAOTFMan.NIR2_MAX:
-            mod = "NIR2"
-        else:
-            return False, None
+            mods.append("VIS")
 
-        if self.dev_modes[0] == mod:
+        if FianiumAOTFMan.NIR1_MIN <= wlen <= FianiumAOTFMan.NIR1_MAX:
+            mods.append("NIR1")
+
+        if FianiumAOTFMan.NIR2_MIN <= wlen <= FianiumAOTFMan.NIR2_MAX:
+            mods.append("NIR2")
+
+        if self.dev_modes[0] in mods:
             h_dev = self.h_devices[0]
             return True, 0
-        elif self.dev_modes[1] == mod:
+        elif self.dev_modes[1] in mods:
             h_dev = self.h_devices[1]
             return True, 1
         else:
