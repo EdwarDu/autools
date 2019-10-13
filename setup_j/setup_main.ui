@@ -670,7 +670,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>3</number>
+         <number>0</number>
         </property>
         <property name="tabsClosable">
          <bool>false</bool>
@@ -1352,6 +1352,9 @@
                 </property>
                 <property name="maximum">
                  <double>3.600000000000000</double>
+                </property>
+                <property name="value">
+                 <double>3.300000000000000</double>
                 </property>
                </widget>
               </item>

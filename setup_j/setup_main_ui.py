@@ -594,6 +594,7 @@ class Ui_SetupMainWindow(object):
         self.doubleSpinBox_PCaliMaxVol = QtWidgets.QDoubleSpinBox(self.tab_LaserCalibration)
         self.doubleSpinBox_PCaliMaxVol.setDecimals(4)
         self.doubleSpinBox_PCaliMaxVol.setMaximum(3.6)
+        self.doubleSpinBox_PCaliMaxVol.setProperty("value", 3.3)
         self.doubleSpinBox_PCaliMaxVol.setObjectName("doubleSpinBox_PCaliMaxVol")
         self.gridLayout_PCaliRun.addWidget(self.doubleSpinBox_PCaliMaxVol, 2, 7, 1, 1)
         self.comboBox_PCCaliNIDAQCh = QtWidgets.QComboBox(self.tab_LaserCalibration)
@@ -1070,7 +1071,7 @@ class Ui_SetupMainWindow(object):
         SetupMainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(SetupMainWindow)
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(0)
         self.comboBox_PDV_Interval.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(SetupMainWindow)
         SetupMainWindow.setTabOrder(self.pushButton_SR830_Config, self.pushButton_AOTF_Config)
