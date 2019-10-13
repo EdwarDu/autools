@@ -195,6 +195,9 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.pcali_wlen_power_tablewin = PCaliWLenPowerWindow()
         self.pushButton_PCaliShowRes.clicked.connect(lambda: self.pcali_wlen_power_tablewin.show())
         self.pcali_wlen_power_res = {}
+        # FIXME: the MaxVol should be verified
+        self.doubleSpinBox_PCaliVolTarget.valueChanged.connect(
+            lambda value: self.doubleSpinBox_PCaliMaxVol.setMinimum(value + 0.1))
 
         # Lock-In Measurement (LIM)
         self.pushButton_LIM_SetWL0.clicked.connect(lambda: self.lim_setwl())
@@ -642,12 +645,13 @@ class SetupMainWindow(Ui_SetupMainWindow):
         vol_ch = self.comboBox_PCCaliNIDAQCh.currentText()
         vol_target = self.doubleSpinBox_PCaliVolTarget.value()
         measure_delay = self.spinBox_PCaliMDelay.value()
+        vol_max = self.doubleSpinBox_PCaliMaxVol.value()
 
         self.pushButton_PCaliRun.setText("Running")
         self.pushButton_PCaliRun.setEnabled(False)
         setup_main_logger.info(f"Wave Length from {wl0} to {wl1} by {wls}, "
                                f"Power % from {power0:.2f} to {power1:.2f} by {powerstep:.2f},"
-                               f"Vol from {vol_ch} with target {vol_target:.4f},"
+                               f"Vol from {vol_ch} with target {vol_target:.4f} and max vol {vol_max:.4f},"
                                f"Measure Delay = {measure_delay} ms",
                                extra={"component": "Main/PCali"})
         self.pcali_clearplots()
@@ -661,7 +665,8 @@ class SetupMainWindow(Ui_SetupMainWindow):
                 self.widget_PCaliPlot.add_ch2_line(wl, wls)
                 p = power0
                 wl_map = []
-                while p < power1+powerstep:
+                vol = 0
+                while p < power1+powerstep and vol < vol_max:
                     p = self.pcali_setpower(p)
                     QtWidgets.qApp.processEvents()
                     time.sleep(measure_delay / 1000)

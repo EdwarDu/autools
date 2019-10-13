@@ -670,7 +670,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>3</number>
         </property>
         <property name="tabsClosable">
          <bool>false</bool>
@@ -1269,90 +1269,29 @@
            <layout class="QHBoxLayout" name="horizontalLayout_20" stretch="0,1">
             <item>
              <layout class="QGridLayout" name="gridLayout_PCaliRun">
-              <item row="1" column="10">
-               <widget class="QLabel" name="label_51">
-                <property name="text">
-                 <string>Power:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="11">
-               <widget class="QLineEdit" name="lineEdit_PCaliPowerCurr">
-                <property name="readOnly">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0" colspan="2">
-               <widget class="QLabel" name="label_23">
-                <property name="text">
-                 <string>WL0:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2" colspan="2">
-               <widget class="QSpinBox" name="spinBox_PCaliWL0">
-                <property name="keyboardTracking">
-                 <bool>false</bool>
-                </property>
-                <property name="minimum">
-                 <number>400</number>
+              <item row="1" column="5">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_PCaliPower1Perc">
+                <property name="decimals">
+                 <number>3</number>
                 </property>
                 <property name="maximum">
-                 <number>2200</number>
+                 <double>100.000000000000000</double>
                 </property>
-                <property name="singleStep">
+                <property name="value">
+                 <double>50.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="9">
+               <widget class="QSpinBox" name="spinBox_PCaliMDelay">
+                <property name="toolTip">
+                 <string>millisecond</string>
+                </property>
+                <property name="maximum">
+                 <number>5000</number>
+                </property>
+                <property name="value">
                  <number>10</number>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="8">
-               <widget class="QPushButton" name="pushButton_PCaliSetWL">
-                <property name="text">
-                 <string>Set WL0</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="10">
-               <widget class="QLabel" name="label_26">
-                <property name="text">
-                 <string>WL:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="4">
-               <widget class="QLabel" name="label_24">
-                <property name="text">
-                 <string>WL1:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="8">
-               <widget class="QPushButton" name="pushButton_PCaliSetPower">
-                <property name="text">
-                 <string>Set Power</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0" colspan="2">
-               <widget class="QLabel" name="label_27">
-                <property name="text">
-                 <string>Power0%:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
@@ -1366,67 +1305,17 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="12">
-               <widget class="QPushButton" name="pushButton_PCaliRun">
-                <property name="text">
-                 <string>Run Cali</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="8">
-               <widget class="QPushButton" name="pushButton_PCaliGetVol">
-                <property name="text">
-                 <string>Get Voltage</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="5">
-               <widget class="QSpinBox" name="spinBox_PCaliWL1">
-                <property name="keyboardTracking">
-                 <bool>false</bool>
-                </property>
-                <property name="minimum">
-                 <number>400</number>
-                </property>
-                <property name="maximum">
-                 <number>2200</number>
-                </property>
-                <property name="singleStep">
-                 <number>10</number>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2" colspan="2">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_PCaliPower0Perc">
-                <property name="decimals">
-                 <number>3</number>
-                </property>
-                <property name="maximum">
-                 <double>100.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="10">
-               <widget class="QLabel" name="label_55">
-                <property name="text">
-                 <string>Vol:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
               <item row="2" column="12">
-               <widget class="QPushButton" name="pushButton_PCaliShowRes">
-                <property name="text">
-                 <string>Show Result</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="11">
-               <widget class="QLineEdit" name="lineEdit_PCaliWLCurr">
+               <widget class="QLineEdit" name="lineEdit_PCaliVol">
                 <property name="readOnly">
                  <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="9">
+               <widget class="QPushButton" name="pushButton_PCaliNextPower">
+                <property name="text">
+                 <string>Next Power</string>
                 </property>
                </widget>
               </item>
@@ -1449,81 +1338,27 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="6">
-               <widget class="QLabel" name="label_25">
+              <item row="2" column="13">
+               <widget class="QPushButton" name="pushButton_PCaliShowRes">
                 <property name="text">
-                 <string>WLs:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 <string>Show Result</string>
                 </property>
                </widget>
               </item>
-              <item row="2" column="11">
-               <widget class="QLineEdit" name="lineEdit_PCaliVol">
-                <property name="readOnly">
-                 <bool>true</bool>
+              <item row="2" column="7">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_PCaliMaxVol">
+                <property name="decimals">
+                 <number>4</number>
                 </property>
-               </widget>
-              </item>
-              <item row="0" column="9">
-               <widget class="QPushButton" name="pushButton_PCaliNextWL">
-                <property name="text">
-                 <string>Next WL</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="9">
-               <widget class="QPushButton" name="pushButton_PCaliNextPower">
-                <property name="text">
-                 <string>Next Power</string>
+                <property name="maximum">
+                 <double>3.600000000000000</double>
                 </property>
                </widget>
               </item>
               <item row="2" column="2" colspan="2">
                <widget class="QComboBox" name="comboBox_PCCaliNIDAQCh"/>
               </item>
-              <item row="2" column="4">
-               <widget class="QLabel" name="label_54">
-                <property name="text">
-                 <string>Target Vol:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="5">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_PCaliVolTarget">
-                <property name="decimals">
-                 <number>4</number>
-                </property>
-                <property name="maximum">
-                 <double>12.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="6">
-               <widget class="QLabel" name="label_28">
-                <property name="text">
-                 <string>M. Delay (ms)</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="7">
-               <widget class="QSpinBox" name="spinBox_PCaliMDelay">
-                <property name="maximum">
-                 <number>5000</number>
-                </property>
-                <property name="value">
-                 <number>10</number>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="12">
+              <item row="0" column="13">
                <widget class="QPushButton" name="pushButton_PCaliClear">
                 <property name="text">
                  <string>Clear Plots</string>
@@ -1546,10 +1381,200 @@
                 </property>
                </widget>
               </item>
+              <item row="2" column="8">
+               <widget class="QLabel" name="label_28">
+                <property name="toolTip">
+                 <string>Measurement Delay</string>
+                </property>
+                <property name="text">
+                 <string>M. Delay</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
               <item row="1" column="6">
                <widget class="QLabel" name="label_52">
                 <property name="text">
                  <string>Power.s:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="10">
+               <widget class="QPushButton" name="pushButton_PCaliGetVol">
+                <property name="text">
+                 <string>Get Voltage</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="8">
+               <widget class="QPushButton" name="pushButton_PCaliSetWL">
+                <property name="text">
+                 <string>Set WL0</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="5">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_PCaliVolTarget">
+                <property name="decimals">
+                 <number>4</number>
+                </property>
+                <property name="maximum">
+                 <double>12.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="4">
+               <widget class="QLabel" name="label_24">
+                <property name="text">
+                 <string>WL1:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" colspan="2">
+               <widget class="QLabel" name="label_27">
+                <property name="text">
+                 <string>Power0%:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="11">
+               <widget class="QLabel" name="label_55">
+                <property name="text">
+                 <string>Vol:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="9">
+               <widget class="QPushButton" name="pushButton_PCaliNextWL">
+                <property name="text">
+                 <string>Next WL</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="11">
+               <widget class="QLabel" name="label_51">
+                <property name="text">
+                 <string>Power:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="4">
+               <widget class="QLabel" name="label_54">
+                <property name="toolTip">
+                 <string>Target Voltage:</string>
+                </property>
+                <property name="text">
+                 <string>T Vol:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2" colspan="2">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_PCaliPower0Perc">
+                <property name="decimals">
+                 <number>3</number>
+                </property>
+                <property name="maximum">
+                 <double>100.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="11">
+               <widget class="QLabel" name="label_26">
+                <property name="text">
+                 <string>WL:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0" colspan="2">
+               <widget class="QLabel" name="label_23">
+                <property name="text">
+                 <string>WL0:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="12">
+               <widget class="QLineEdit" name="lineEdit_PCaliWLCurr">
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2" colspan="2">
+               <widget class="QSpinBox" name="spinBox_PCaliWL0">
+                <property name="keyboardTracking">
+                 <bool>false</bool>
+                </property>
+                <property name="minimum">
+                 <number>400</number>
+                </property>
+                <property name="maximum">
+                 <number>2200</number>
+                </property>
+                <property name="singleStep">
+                 <number>10</number>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="5">
+               <widget class="QSpinBox" name="spinBox_PCaliWL1">
+                <property name="keyboardTracking">
+                 <bool>false</bool>
+                </property>
+                <property name="minimum">
+                 <number>400</number>
+                </property>
+                <property name="maximum">
+                 <number>2200</number>
+                </property>
+                <property name="singleStep">
+                 <number>10</number>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="12">
+               <widget class="QLineEdit" name="lineEdit_PCaliPowerCurr">
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="13">
+               <widget class="QPushButton" name="pushButton_PCaliRun">
+                <property name="text">
+                 <string>Run Cali</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="6">
+               <widget class="QLabel" name="label_25">
+                <property name="text">
+                 <string>WLs:</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1566,16 +1591,20 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="5">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_PCaliPower1Perc">
-                <property name="decimals">
-                 <number>3</number>
+              <item row="2" column="6">
+               <widget class="QLabel" name="label_66">
+                <property name="text">
+                 <string>Max V:</string>
                 </property>
-                <property name="maximum">
-                 <double>100.000000000000000</double>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
-                <property name="value">
-                 <double>50.000000000000000</double>
+               </widget>
+              </item>
+              <item row="1" column="8">
+               <widget class="QPushButton" name="pushButton_PCaliSetPower">
+                <property name="text">
+                 <string>Set Power</string>
                 </property>
                </widget>
               </item>
@@ -2456,15 +2485,9 @@
   <tabstop>comboBox_PDV_Interval</tabstop>
   <tabstop>spinBox_PCaliWL0</tabstop>
   <tabstop>spinBox_PCaliWL1</tabstop>
-  <tabstop>spinBox_PCaliWLs</tabstop>
-  <tabstop>pushButton_PCaliSetWL</tabstop>
-  <tabstop>pushButton_PCaliNextWL</tabstop>
   <tabstop>lineEdit_PCaliWLCurr</tabstop>
   <tabstop>doubleSpinBox_PCaliPower0Perc</tabstop>
   <tabstop>doubleSpinBox_PCaliPower1Perc</tabstop>
-  <tabstop>doubleSpinBox_PCaliPowerSPerc</tabstop>
-  <tabstop>pushButton_PCaliSetPower</tabstop>
-  <tabstop>pushButton_PCaliNextPower</tabstop>
   <tabstop>lineEdit_PCaliPowerCurr</tabstop>
   <tabstop>comboBox_PCCaliNIDAQCh</tabstop>
   <tabstop>doubleSpinBox_PCaliVolTarget</tabstop>
