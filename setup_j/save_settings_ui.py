@@ -30,7 +30,7 @@ class Ui_SaveSettingsDialog(object):
 
     def retranslateUi(self, SaveSettingsDialog):
         _translate = QtCore.QCoreApplication.translate
-        SaveSettingsDialog.setWindowTitle(_translate("SaveSettingsDialog", "Form"))
+        SaveSettingsDialog.setWindowTitle(_translate("SaveSettingsDialog", "Save settings..."))
         self.pushButton_Refresh.setText(_translate("SaveSettingsDialog", "Refresh"))
         self.pushButton_Save2File.setText(_translate("SaveSettingsDialog", "Save ..."))
 
