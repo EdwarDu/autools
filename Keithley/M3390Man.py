@@ -164,7 +164,7 @@ class M3390Man(QObject):
         if self.config_window is not None:
             return self.config_window.get_current_settings(with_header)
         else:
-            return None
+            return ""
 
 class M3390ConfigWindow(Ui_M3390_Config_Window):
     def __init__(self, m3390man: M3390Man):
@@ -299,7 +299,7 @@ class M3390ConfigWindow(Ui_M3390_Config_Window):
                           f"{self.comboBox_FrequencyUnit.currentText()}\n"
             return setting_str
         else:
-            return None
+            return ""
 
 
 if __name__ == '__main__':

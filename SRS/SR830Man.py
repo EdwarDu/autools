@@ -752,7 +752,7 @@ class SR830Man(QObject):
         if self.config_window is not None:
             return self.config_window.get_current_settings(with_header)
         else:
-            return None
+            return ""
 
 def ask_selection(choices, prompt_str: str = 'Select: ', allow_invalid=False):
     choice = None
@@ -1017,7 +1017,7 @@ class SR830ConfigWindow(Ui_SR830_Config_Window):
                           f"Harmony: {self.spinBox_Harmonic.value()}\n"
             return setting_str
         else:
-            return None
+            return ""
 
 if __name__ == '__main__':
     from PyQt5.QtWidgets import QApplication

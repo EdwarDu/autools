@@ -337,7 +337,7 @@ class FianiumAOTFMan(QObject):
         if self.config_window is not None:
             return self.config_window.get_current_settings(with_header)
         else:
-            return None
+            return ""
 
 
 class AOTFConfigWindow(Ui_AOTF_Config_Window):
@@ -506,7 +506,7 @@ class AOTFConfigWindow(Ui_AOTF_Config_Window):
                           f"Power(%): {self.doubleSpinBox_PowerPerc.value()}\n"
             return setting_str
         else:
-            return None
+            return ""
 
 if __name__ == '__main__':
     from PyQt5.QtWidgets import QApplication
