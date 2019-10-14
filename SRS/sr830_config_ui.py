@@ -398,9 +398,6 @@ class Ui_SR830_Config_Window(object):
         self.pushButton_SetFrequency.setToolTip("")
         self.pushButton_SetFrequency.setObjectName("pushButton_SetFrequency")
         self.gridLayout_5.addWidget(self.pushButton_SetFrequency, 5, 4, 1, 1)
-        self.pushButton_CopySettings = QtWidgets.QPushButton(self.groupBox_Settings)
-        self.pushButton_CopySettings.setObjectName("pushButton_CopySettings")
-        self.gridLayout_5.addWidget(self.pushButton_CopySettings, 12, 0, 1, 2)
         self.verticalLayout_6.addLayout(self.gridLayout_5)
         self.verticalLayout.addWidget(self.groupBox_Settings)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -548,6 +545,5 @@ class Ui_SR830_Config_Window(object):
         self.lineEdit_X.setToolTip(_translate("SR830_Config_Window", "SR830 Phase (float)"))
         self.lineEdit_Y.setToolTip(_translate("SR830_Config_Window", "SR830 Phase (float)"))
         self.pushButton_SetFrequency.setText(_translate("SR830_Config_Window", "Set"))
-        self.pushButton_CopySettings.setText(_translate("SR830_Config_Window", "Copy Settings"))
 
 
