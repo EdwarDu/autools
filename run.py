@@ -13,7 +13,7 @@ if ans.lower().startswith("y"):
 
 # Go up to parent folder
 os.chdir("..")
-python3_path = os.path.join(".", "setup_j_venv", "python3.exe")
+python3_path = os.path.join(".", "env_j", "python.exe")
 if os.path.exists(python3_path):
     ans = input(f"Found {python3_path}, use? [Y/n]")
     if ans.lower().startswith("n"):

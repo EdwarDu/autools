@@ -17,6 +17,9 @@ class Ui_PCali_WLenPowerTable(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
+        self.pushButton_SaveCSV = QtWidgets.QPushButton(PCali_WLenPowerTable)
+        self.pushButton_SaveCSV.setObjectName("pushButton_SaveCSV")
+        self.horizontalLayout.addWidget(self.pushButton_SaveCSV)
         self.pushButton_Copy = QtWidgets.QPushButton(PCali_WLenPowerTable)
         self.pushButton_Copy.setObjectName("pushButton_Copy")
         self.horizontalLayout.addWidget(self.pushButton_Copy)
@@ -44,6 +47,7 @@ class Ui_PCali_WLenPowerTable(object):
     def retranslateUi(self, PCali_WLenPowerTable):
         _translate = QtCore.QCoreApplication.translate
         PCali_WLenPowerTable.setWindowTitle(_translate("PCali_WLenPowerTable", "Form"))
+        self.pushButton_SaveCSV.setText(_translate("PCali_WLenPowerTable", "Save CSV"))
         self.pushButton_Copy.setText(_translate("PCali_WLenPowerTable", "Copy"))
         self.pushButton_Clear.setText(_translate("PCali_WLenPowerTable", "Clear Records"))
         self.tableWidget_WLen_Power.setSortingEnabled(True)

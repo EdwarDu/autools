@@ -211,6 +211,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.pushButton_LIM_ClearPlots.clicked.connect(self.lim_clearplots)
         self.lim_xy_tablewin = LIM_XYWindow()
         self.pushButton_LIM_ShowResult.clicked.connect(lambda: self.lim_xy_tablewin.show())
+        self.pushButton_LIM_LoadCaliPower.clicked.connect(self.lim_load_pcali_power)
 
         # Map Measurement
         self.doubleSpinBox_MapM_X0.valueChanged.connect(self.mapm_x_changed)
@@ -433,7 +434,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             return None
 
         self.lineEdit_LIM_WLCurr.setText(f"{next_wlen}")
-        b_a, _= self.aotf_man.is_wavelength_available(next_wlen)
+        b_a, _ = self.aotf_man.is_wavelength_available(next_wlen)
         if not b_a:
             self.lineEdit_LIM_WLCurr.setStyleSheet("background: red")
             setup_main_logger.error(f"Wave Length {next_wlen} unavailable, check AOTF settings",
@@ -490,6 +491,19 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.lineEdit_LIM_X.setText(float2str(x))
         self.lineEdit_LIM_Y.setText(float2str(y))
         return x, y
+
+    def lim_load_pcali_power(self):
+        fname, _a = QFileDialog.getOpenFileName(self.window, 'Load CSV file', '.', 'CSV (*.csv)')
+        if fname is not None and fname != '':
+            self.pcali_wlen_power_res.clear()
+            self.pcali_wlen_power_tablewin.clear()
+            with open(fname, 'r') as f_csv:
+                for line in f_csv:
+                    wl, power = [float(x) for x in re.split("[ \t,;]", line) if x != '']
+                    self.pcali_wlen_power_res[wl] = power
+                    self.pcali_wlen_power_tablewin.add_record(wl, power)
+
+            self.pcali_wlen_power_tablewin.show()
 
     def lim_clearplots(self):
         self.widget_LockInPlot.clear_data()
