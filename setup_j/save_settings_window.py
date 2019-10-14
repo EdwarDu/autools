@@ -7,6 +7,8 @@ class SaveSettingsWindow(Ui_SaveSettingsDialog):
     def __init__(self, *men):
         self.window = QWidget()
         Ui_SaveSettingsDialog.__init__(self)
+        self.setupUi(self.window)
+
         self._men = men
         self._s_str = ""
         self.pushButton_Refresh.clicked.connect(self.refresh)
