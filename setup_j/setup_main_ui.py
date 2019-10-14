@@ -756,7 +756,7 @@ class Ui_SetupMainWindow(object):
         self.spinBox_LIM_MeasureDelay = QtWidgets.QSpinBox(self.tab_LockInMeasurements)
         self.spinBox_LIM_MeasureDelay.setKeyboardTracking(False)
         self.spinBox_LIM_MeasureDelay.setMinimum(0)
-        self.spinBox_LIM_MeasureDelay.setMaximum(5000)
+        self.spinBox_LIM_MeasureDelay.setMaximum(50000)
         self.spinBox_LIM_MeasureDelay.setSingleStep(10)
         self.spinBox_LIM_MeasureDelay.setProperty("value", 10)
         self.spinBox_LIM_MeasureDelay.setObjectName("spinBox_LIM_MeasureDelay")
