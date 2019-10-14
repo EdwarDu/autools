@@ -144,9 +144,9 @@ class AOTFMan(QObject):
     @staticmethod
     def is_wavelength_available(wlen: int):
         if AOTFMan.RF1_MIN <= wlen <= AOTFMan.RF1_MAX or AOTFMan.RF2_MIN <= wlen <= AOTFMan.RF2_MAX:
-            return True
+            return True, None
         else:
-            return False
+            return False, None
 
     @staticmethod
     def calc_freq_from_wlen(wlen: int):
@@ -259,7 +259,7 @@ class AOTFConfigWindow(Ui_AOTF_Config_Window):
 
     def wavelength_changed(self):
         wavel = self.spinBox_WaveLength.value()
-        b_a = self.aotf_man.is_wavelength_available(wavel)
+        b_a, _ = self.aotf_man.is_wavelength_available(wavel)
         if not b_a:
             self.spinBox_WaveLength.setStyleSheet("background: red")
         else:

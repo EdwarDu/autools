@@ -24,8 +24,8 @@ class LIM_XYWindow(Ui_LIM_XYTable):
         self.tableWidget_XY.setRowCount(row_count + 1)
         self.tableWidget_XY.setItem(row_count, 0, QTableWidgetItem(f"{wlen:d}"))
         self.tableWidget_XY.setItem(row_count, 1, QTableWidgetItem(f"{power:.2f}"))
-        self.tableWidget_XY.setItem(row_count, 2, QTableWidgetItem(f"{x:.4f}"))
-        self.tableWidget_XY.setItem(row_count, 3, QTableWidgetItem(f"{y:.4f}"))
+        self.tableWidget_XY.setItem(row_count, 2, QTableWidgetItem(f"{x:.9f}"))
+        self.tableWidget_XY.setItem(row_count, 3, QTableWidgetItem(f"{y:.9f}"))
 
     def add_records(self, wlen_power: list):
         for wlen, power in wlen_power:
