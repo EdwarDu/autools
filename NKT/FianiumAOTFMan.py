@@ -333,6 +333,12 @@ class FianiumAOTFMan(QObject):
             self.config_window = AOTFConfigWindow(self)
         self.config_window.show()
 
+    def get_current_settings(self, with_header: bool = True):
+        if self.config_window is not None:
+            return self.config_window.get_current_settings(with_header)
+        else:
+            return None
+
 
 class AOTFConfigWindow(Ui_AOTF_Config_Window):
     """
@@ -485,6 +491,22 @@ class AOTFConfigWindow(Ui_AOTF_Config_Window):
     def close(self):
         self.window.hide()
 
+    def get_current_settings(self, with_header: bool = True):
+        if self.aotf_man.is_open():
+            if with_header:
+                setting_str = "--------NKT AOTF-------\n"
+            else:
+                setting_str = ""
+            setting_str = setting_str + f"AOTF1: [{self.lineEdit_AOTF1Serial.text()}], " \
+                                        f"{self.comboBox_AOTF1Mode.currentText()}\n" \
+                          f"AOTF1: [{self.lineEdit_AOTF2Serial.text()}], {self.comboBox_AOTF2Mode.currentText()}\n" \
+                          f"Wavelength: {self.spinBox_WaveLength.value()} nm\n" \
+                          f"Optimal Power: {self.lineEdit_OptimalPower.text()}\n" \
+                          f"Power: {self.lineEdit_Power.text()}\n" \
+                          f"Power(%): {self.doubleSpinBox_PowerPerc.value()}\n"
+            return setting_str
+        else:
+            return None
 
 if __name__ == '__main__':
     from PyQt5.QtWidgets import QApplication

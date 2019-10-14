@@ -25,4 +25,5 @@ done
 pyuic5 laser_alignment_z_dists.ui -o laser_alignment_z_dists_ui.py
 pyuic5 pcali_wlen_power.ui -o pcali_wlen_power_ui.py
 pyuic5 lim_xy.ui -o lim_xy_ui.py
+pyuic5 save_settings.ui -o save_settings_ui.py
 

@@ -160,6 +160,11 @@ class M3390Man(QObject):
 
         self.config_window.show()
 
+    def get_current_settings(self, with_header: bool = True):
+        if self.config_window is not None:
+            return self.config_window.get_current_settings(with_header)
+        else:
+            return None
 
 class M3390ConfigWindow(Ui_M3390_Config_Window):
     def __init__(self, m3390man: M3390Man):
@@ -278,6 +283,23 @@ class M3390ConfigWindow(Ui_M3390_Config_Window):
 
     def close(self):
         self.window.hide()
+
+    def get_current_settings(self, with_header: bool = True):
+        if self.m3390man.is_open():
+            if with_header:
+                setting_str = "--------Keithley 3390-------\n"
+            else:
+                setting_str = ""
+            setting_str = setting_str + f"Signal: {self.comboBox_Function.currentText()}\n" \
+                          f"Signal Amplitude: {self.doubleSpinBox_SigAmpValue.value()} " \
+                          f"{self.comboBox_SigAmpUnit.currentText()}\n" \
+                          f"Signal Offset: {self.doubleSpinBox_SigOffsetValue.value()} " \
+                          f"{self.comboBox_SigOffsetUnit.currentText()}\n" \
+                          f"Frequency: {self.doubleSpinBox_FrequencyValue.value()} " \
+                          f"{self.comboBox_FrequencyUnit.currentText()}\n"
+            return setting_str
+        else:
+            return None
 
 
 if __name__ == '__main__':

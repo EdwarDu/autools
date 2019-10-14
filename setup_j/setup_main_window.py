@@ -55,6 +55,7 @@ from ..Keithley.M3390Man import M3390Man
 from .laser_alignment_z_dists_window import LaserAlignmentZDistsWindow
 from .pcali_wlen_power_window import PCaliWLenPowerWindow
 from .lim_xy_window import LIM_XYWindow
+from .save_settings_window import SaveSettingsWindow
 
 
 # noinspection PyPep8Naming
@@ -232,6 +233,9 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.pushButton_MapM_Auto.clicked.connect(self.mapm_measure_auto)
         self.pushButton_MapM_Export.clicked.connect(self.mapm_export)
         self.pushButton_MapM_Load.clicked.connect(self.mapm_load_npraw)
+
+        self.save_settings_diag = SaveSettingsWindow(self.aotf_man, self.k3390man, self.sr830_man)
+        self.pushButton_SaveSettings.clicked.connect(lambda: self.save_settings_diag.show())
 
         self.all_cams = []
         self.window.show()
