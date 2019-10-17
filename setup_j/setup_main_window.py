@@ -330,6 +330,18 @@ class SetupMainWindow(Ui_SetupMainWindow):
                 i += 1
         raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
 
+    def pzt_goto_xy_ont(self, x: float, y: float, wait_10ms=300):
+        self.piezo_man.set_target_pos(["A", x], ["B", y])
+        i = 0
+        while i < wait_10ms:
+            ont = self.piezo_man.get_on_target_status("A", "B")
+            if ont["A"] and ont["B"]:
+                return
+            else:
+                time.sleep(0.01)
+                i += 1
+        raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
+
     def mapm_measure_auto(self):
         # TODO: Run Automeasure task
         # Pzt to X0, Y0
