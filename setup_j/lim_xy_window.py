@@ -1,4 +1,5 @@
 from .lim_xy_ui import Ui_LIM_XYTable
+from ..SRS.SR830Man import float2str
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem
 from PyQt5 import QtCore, QtGui
 
@@ -24,8 +25,10 @@ class LIM_XYWindow(Ui_LIM_XYTable):
         self.tableWidget_XY.setRowCount(row_count + 1)
         self.tableWidget_XY.setItem(row_count, 0, QTableWidgetItem(f"{wlen:d}"))
         self.tableWidget_XY.setItem(row_count, 1, QTableWidgetItem(f"{power:.2f}"))
-        self.tableWidget_XY.setItem(row_count, 2, QTableWidgetItem(f"{x:.4f}"))
-        self.tableWidget_XY.setItem(row_count, 3, QTableWidgetItem(f"{y:.4f}"))
+        # self.tableWidget_XY.setItem(row_count, 2, QTableWidgetItem(float2str(x)))
+        # self.tableWidget_XY.setItem(row_count, 3, QTableWidgetItem(float2str(y)))
+        self.tableWidget_XY.setItem(row_count, 2, QTableWidgetItem(f"{x:.6g}"))
+        self.tableWidget_XY.setItem(row_count, 3, QTableWidgetItem(f"{y:.6g}"))
 
     def add_records(self, wlen_power: list):
         for wlen, power in wlen_power:

@@ -1,4 +1,6 @@
 # Byte-compiled / optimized / DLL files
+*.dat
+*.pickle
 .idea/
 .vscode/
 __pycache__/

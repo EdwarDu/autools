@@ -240,7 +240,7 @@
            </size>
           </property>
           <property name="text">
-           <string>GPIB</string>
+           <string>&amp;GPIB</string>
           </property>
          </widget>
         </item>
@@ -253,7 +253,7 @@
            </size>
           </property>
           <property name="text">
-           <string>RS232</string>
+           <string>RS&amp;232</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -602,7 +602,7 @@
            </size>
           </property>
           <property name="text">
-           <string>External</string>
+           <string>E&amp;xternal</string>
           </property>
          </widget>
         </item>
@@ -950,7 +950,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Internal</string>
+           <string>I&amp;nternal</string>
           </property>
          </widget>
         </item>

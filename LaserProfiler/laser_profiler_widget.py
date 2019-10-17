@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 
+from PyQt5 import QtCore, QtGui
 import pyqtgraph as pg
 import pyqtgraph.exporters
 from matplotlib import cm
 import numpy as np
 import cv2
-from PyQt5 import QtCore, QtGui
 from scipy.optimize import curve_fit, OptimizeWarning
 import math
 import warnings
+
+# pg.setConfigOption('background', 'w')
+# pg.setConfigOption('foreground', 'k')
 
 
 def gaussian_saturated(x, a, x0, sigma, offset):
@@ -88,6 +91,21 @@ def get_middle_distance(frame_line_x, frame_line, forced=False, manual_mean=None
             return None, None, None, None, None, None
 
 
+# FIT_LINE_COLOR=pg.mkColor(0, 0, 255)
+# FRAME_LINE_COLOR=pg.mkColor(0, 0, 0)
+# NOTE_COLOR=pg.mkColor(0, 0, 255)
+# LINE_LABEL_COLOR=pg.mkColor(0, 0, 255)
+# CH_LINE_COLOR=pg.mkColor(0, 255, 0)
+# MID_LINE_COLOR=pg.mkColor(255, 0, 255)
+
+FIT_LINE_COLOR=pg.mkColor('y')
+FRAME_LINE_COLOR=pg.mkColor('w')
+NOTE_COLOR=pg.mkColor(0, 255, 0)
+LINE_LABEL_COLOR=pg.mkColor(255, 0, 255)
+CH_LINE_COLOR=pg.mkColor(0, 255, 0)
+MID_LINE_COLOR=pg.mkColor(255, 0, 255)
+
+
 class LaserProfilerWidget(pg.GraphicsLayoutWidget):
     def __init__(self, parent=None, **kargs):
         pg.GraphicsLayoutWidget.__init__(self, **kargs)
@@ -138,43 +156,45 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
         self.map_v_line = pg.InfiniteLine(angle=90, movable=True,
                                           label="{value:.1f}",
                                           labelOpts={"position": 0.05,
-                                                     "color": (255, 0, 255),
+                                                     "color": LINE_LABEL_COLOR,
                                                      "rotateAxis": (1, 0),
                                                      "angle": -180},
                                           bounds=[0, self.image_width-0.001],
-                                          pen=pg.mkPen('g', width=1, style=QtCore.Qt.SolidLine))
+                                          pen=pg.mkPen(CH_LINE_COLOR, width=1, style=QtCore.Qt.SolidLine))
         self.map_h_line = pg.InfiniteLine(angle=0, movable=True,
                                           label="{value:.1f}",
-                                          labelOpts={"position": 0.05, "color": (255, 0, 255)},
+                                          labelOpts={"position": 0.05, "color": LINE_LABEL_COLOR},
                                           bounds=[0, self.image_height-0.001],
-                                          pen=pg.mkPen('g', width=1, style=QtCore.Qt.SolidLine))
+                                          pen=pg.mkPen(CH_LINE_COLOR, width=1, style=QtCore.Qt.SolidLine))
         self.p_map.addItem(self.map_v_line)
         self.p_map.addItem(self.map_h_line)
         self.map_v_line.setPos(0)
         self.map_h_line.setPos(0)
 
         self.p_h_vline = pg.InfiniteLine(angle=90, movable=False,
-                                         pen=pg.mkPen('g', width=1, style=QtCore.Qt.SolidLine))
+                                         pen=pg.mkPen(CH_LINE_COLOR, width=1, style=QtCore.Qt.SolidLine))
         self.p_v_hline = pg.InfiniteLine(angle=0, movable=False,
-                                         pen=pg.mkPen('g', width=1, style=QtCore.Qt.SolidLine))
+                                         pen=pg.mkPen(CH_LINE_COLOR, width=1, style=QtCore.Qt.SolidLine))
         self.p_horizontal.addItem(self.p_h_vline)
         self.p_vertical.addItem(self.p_v_hline)
         self.p_v_hline.setPos(0)
         self.p_h_vline.setPos(0)
 
         self.h_profile_line = self.p_horizontal.plot(range(0, self.image_width),
-                                                     self.image_data[int(self.map_h_line.getPos()[1]), :])
+                                                     self.image_data[int(self.map_h_line.getPos()[1]), :],
+                                                     pen=pg.mkPen(FRAME_LINE_COLOR, width=2, style=QtCore.Qt.SolidLine))
         self.v_profile_line = self.p_vertical.plot(self.image_data[:, int(self.map_v_line.getPos()[0])],
-                                                   range(0, self.image_height))
+                                                   range(0, self.image_height),
+                                                   pen=pg.mkPen(FRAME_LINE_COLOR, width=2, style=QtCore.Qt.SolidLine))
 
         self.h_profile_peakline = pg.InfiniteLine(angle=0, pos=1, movable=False,
                                                   label="{value:.4f}",
-                                                  labelOpts={"position": 0.2},
-                                                  pen=pg.mkPen('w', width=1, style=QtCore.Qt.DashLine))
+                                                  labelOpts={"position": 0.2, 'color': FRAME_LINE_COLOR},
+                                                  pen=pg.mkPen(FRAME_LINE_COLOR, width=2, style=QtCore.Qt.DashLine))
         self.h_profile_bottomline = pg.InfiniteLine(angle=0, pos=0, movable=False,
                                                     label="{value:.4f}",
-                                                    labelOpts={"position": 0.2},
-                                                    pen=pg.mkPen('w', width=1, style=QtCore.Qt.DashLine))
+                                                    labelOpts={"position": 0.2, 'color': FRAME_LINE_COLOR},
+                                                    pen=pg.mkPen(FRAME_LINE_COLOR, width=2, style=QtCore.Qt.DashLine))
 
         self.p_horizontal.addItem(self.h_profile_peakline)
         self.p_horizontal.addItem(self.h_profile_bottomline)
@@ -183,15 +203,18 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
                                                   label="{value:.4f}",
                                                   labelOpts={"position": 0.2,
                                                              "rotateAxis": (1, 0),
-                                                             "angle": -180
+                                                             "angle": -180,
+                                                             'color': FRAME_LINE_COLOR
                                                              },
-                                                  pen=pg.mkPen('w', width=1, style=QtCore.Qt.DashLine))
+                                                  pen=pg.mkPen(FRAME_LINE_COLOR, width=2, style=QtCore.Qt.DashLine))
         self.v_profile_bottomline = pg.InfiniteLine(angle=90, pos=0, movable=False,
                                                     label="{value:.4f}",
                                                     labelOpts={"position": 0.2,
                                                                "rotateAxis": (1, 0),
-                                                               "angle": -180},
-                                                    pen=pg.mkPen('w', width=1, style=QtCore.Qt.DashLine))
+                                                               "angle": -180,
+                                                               'color': FRAME_LINE_COLOR
+                                                               },
+                                                    pen=pg.mkPen(FRAME_LINE_COLOR, width=2, style=QtCore.Qt.DashLine))
 
         self.p_vertical.addItem(self.v_profile_peakline)
         self.p_vertical.addItem(self.v_profile_bottomline)
@@ -200,23 +223,23 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
         self.map_h_line.sigPositionChanged.connect(lambda l: self.map_crosshair_h_moved(l))
 
         self.h_profile_fitline = self.p_horizontal.plot(range(0, self.image_width), np.zeros(self.image_width),
-                                                        pen=pg.mkPen('y', width=1, style=QtCore.Qt.SolidLine))
+                                                        pen=pg.mkPen(FIT_LINE_COLOR, width=2, style=QtCore.Qt.SolidLine))
         self.v_profile_fitline = self.p_vertical.plot(np.zeros(self.image_height), range(0, self.image_height),
-                                                      pen=pg.mkPen('y', width=1, style=QtCore.Qt.SolidLine))
+                                                      pen=pg.mkPen(FIT_LINE_COLOR, width=2, style=QtCore.Qt.SolidLine))
 
         self.h_profile_peakline_fit = pg.InfiniteLine(angle=0, pos=1, movable=False,
                                                       label="{value:.4f}",
-                                                      labelOpts={"position": 0.8, "color": (255, 255, 0)},
-                                                      pen=pg.mkPen('y', width=1, style=QtCore.Qt.DashLine))
+                                                      labelOpts={"position": 0.8, "color": FIT_LINE_COLOR},
+                                                      pen=pg.mkPen(FIT_LINE_COLOR, width=2, style=QtCore.Qt.DashLine))
         self.h_profile_bottomline_fit = pg.InfiniteLine(angle=0, pos=0, movable=False,
                                                         label="{value:.4f}",
-                                                        labelOpts={"position": 0.8, "color": (255, 255, 0)},
-                                                        pen=pg.mkPen('y', width=1, style=QtCore.Qt.DashLine))
+                                                        labelOpts={"position": 0.8, "color": FIT_LINE_COLOR},
+                                                        pen=pg.mkPen(FIT_LINE_COLOR, width=2, style=QtCore.Qt.DashLine))
         self.h_profile_mid_line = self.p_horizontal.plot([0, 1, 2], [0, 0, 0],
-                                                         pen=pg.mkPen((255, 0, 255), width=1),
+                                                         pen=pg.mkPen(MID_LINE_COLOR, width=2),
                                                          symbolBrush=(255, 0, 0), symbolPen='w', symbol='o')
         self.h_profile_mid_line_point = pg.CurvePoint(self.h_profile_mid_line)
-        self.h_profile_mid_note = pg.TextItem("", anchor=(1, 1), color=(0, 255, 0))
+        self.h_profile_mid_note = pg.TextItem("", anchor=(1, 1), color=NOTE_COLOR)
         self.h_profile_mid_note.setParentItem(self.h_profile_mid_line_point)
         self.p_horizontal.addItem(self.h_profile_mid_note, ignoreBounds=True)
 
@@ -225,24 +248,23 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
 
         self.v_profile_peakline_fit = pg.InfiniteLine(angle=90, pos=1, movable=False,
                                                       label="{value:.4f}",
-                                                      labelOpts={"position": 0.8, "color": (255, 255, 0),
+                                                      labelOpts={"position": 0.8, "color": FIT_LINE_COLOR,
                                                                  "rotateAxis": (1, 0),
                                                                  "angle": -180},
-                                                      pen=pg.mkPen('y', width=1, style=QtCore.Qt.DashLine))
+                                                      pen=pg.mkPen(FIT_LINE_COLOR, width=2, style=QtCore.Qt.DashLine))
         self.v_profile_bottomline_fit = pg.InfiniteLine(angle=90, pos=0, movable=False,
                                                         label="{value:.4f}",
                                                         labelOpts={"position": 0.8,
-                                                                   "color": (255, 255, 0),
+                                                                   "color": FIT_LINE_COLOR,
                                                                    "rotateAxis": (1, 0),
-                                                                    "angle": -180
-                                                                   },
-                                                        pen=pg.mkPen('y', width=1, style=QtCore.Qt.DashLine))
+                                                                   "angle": -180},
+                                                        pen=pg.mkPen(FIT_LINE_COLOR, width=2, style=QtCore.Qt.DashLine))
 
         self.v_profile_mid_line = self.p_vertical.plot([0, 0, 0], [0, 1, 2],
-                                                       pen=pg.mkPen((255, 0, 255), width=1),
+                                                       pen=pg.mkPen(MID_LINE_COLOR, width=2),
                                                        symbolBrush=(255, 0, 0), symbolPen='w', symbol='o')
         self.v_profile_mid_line_point = pg.CurvePoint(self.v_profile_mid_line)
-        self.v_profile_mid_note = pg.TextItem("", angle=90, anchor=(1, 1), color=(0, 255, 0))
+        self.v_profile_mid_note = pg.TextItem("", angle=90, anchor=(1, 1), color=NOTE_COLOR)
         self.v_profile_mid_note.setParentItem(self.v_profile_mid_line_point)
         self.p_vertical.addItem(self.v_profile_mid_note, ignoreBounds=True)
 
@@ -253,10 +275,59 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
         self.__cross_hair_auto_hotspot = True
         self.__gaussian_fit_manual_mean = False
 
+        self.p_horizontal.setMouseEnabled(x=True, y=False)
+        self.p_vertical.setMouseEnabled(x=False, y=True)
         self.update_image_data(self.image_data)
 
         self.h_dist = None
         self.v_dist = None
+        self.cross_markers = []
+        self.cross_marker_lines = []
+
+    def draw_cross_markers(self):
+        self.remove_all_cross_markers()
+
+        i = 0
+        for i in range(0, len(self.cross_markers)):
+            # if i != len(self.cross_markers) - 1:
+            #     line_color = (0, 255, 0, 0.5)
+            #     line_style = QtCore.Qt.DashDotLine
+            # else:
+            row, col = self.cross_markers[i]
+            self.add_cross_marker(row, col)
+
+    def add_cross_marker(self, row=None, col=None):
+        if row is None:
+            row = self.map_h_line.value()
+        if col is None:
+            col = self.map_v_line.value()
+
+        line_color = (0, 255, 0, 200)
+        line_style = QtCore.Qt.DashDotLine
+
+        v_line = pg.InfiniteLine(angle=90, pos=col, movable=False,
+                                 label="{value:.1f}",
+                                 labelOpts={"position": 0.2,
+                                            "color": (0, 255, 0),
+                                            "rotateAxis": (1, 0),
+                                            "angle": -180},
+                                 pen=pg.mkPen(line_color, width=1, style=line_style))
+        self.p_map.addItem(v_line)
+        self.cross_marker_lines.append(v_line)
+
+        h_line = pg.InfiniteLine(angle=0, pos=row, movable=False,
+                                 label="{value:.1f}",
+                                 labelOpts={"position": 0.2,
+                                            "color": (0, 255, 0)},
+                                 pen=pg.mkPen(line_color, width=1, style=line_style))
+        self.p_map.addItem(h_line)
+        self.cross_marker_lines.append(h_line)
+
+    def remove_all_cross_markers(self):
+        for line in self.cross_marker_lines:
+            self.p_map.removeItem(line)
+
+        self.cross_marker_lines = []
 
     def map_crosshair_v_moved(self, l: pg.InfiniteLine):
         self.p_h_vline.setPos(l.getPos())
@@ -367,11 +438,16 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
 
     @cross_hair_auto_hotspot.setter
     def cross_hair_auto_hotspot(self, b_auto_loc: bool):
-        self.__cross_hair_auto_hotspot = b_auto_loc
+        if b_auto_loc != self.__cross_hair_auto_hotspot:
+            self.__cross_hair_auto_hotspot = b_auto_loc
+            self.update_image_data(self.image_data)
 
     # specific function to allow lambda expression
     def set_cross_hair_auto_hotspot(self, b_auto_loc: bool):
-        self.__cross_hair_auto_hotspot = b_auto_loc
+        if b_auto_loc != self.__cross_hair_auto_hotspot:
+            self.__cross_hair_auto_hotspot = b_auto_loc
+            self.update_image_data(self.image_data)
+
 
     @property
     def gaussian_fit_force_peak(self):
@@ -380,6 +456,8 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
     @gaussian_fit_force_peak.setter
     def gaussian_fit_force_peak(self, b_force):
         self.__gaussian_fit_force_peak = b_force
+        self.update_h_profile()
+        self.update_v_profile()
 
     def set_gaussian_fit_force_peak(self, b_force: bool):
         self.__gaussian_fit_force_peak = b_force
@@ -412,12 +490,14 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
 
 def update_image(window, timer):
     import time
-    image = np.random.rand(2160, 2560)
-    t0 = time.time() * 1000
-    window.update_image_data(image)
-    t1 = time.time() * 1000
-    print(f"Update image cost {t1-t0}ms")
-    timer.singleShot(10000, lambda w=window, t=timer: update_image(w, t))
+    # image = np.random.rand(2160, 2560)
+    # t0 = time.time() * 1000
+    # window.update_image_data(image)
+    # t1 = time.time() * 1000
+    # print(f"Update image cost {t1-t0}ms")
+    # timer.singleShot(10000, lambda w=window, t=timer: update_image(w, t))
+    window.add_cross_marker()
+    timer.singleShot(5000, lambda w=window, t=timer: update_image(w, t))
 
 
 if __name__ == "__main__":
@@ -425,7 +505,7 @@ if __name__ == "__main__":
     win = LaserProfilerWidget()
     win.show()
     win.update_image_data(cv2.imread('/home/elio/ws/autools/tests/test.jpg', cv2.IMREAD_GRAYSCALE))
-    # update_timer = QtCore.QTimer(win)
-    # update_timer.singleShot(1000, lambda w=win, t=update_timer: update_image(w, t))
+    update_timer = QtCore.QTimer(win)
+    update_timer.singleShot(1000, lambda w=win, t=update_timer: update_image(w, t))
 
     QtGui.QApplication.instance().exec_()

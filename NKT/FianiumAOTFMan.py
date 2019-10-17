@@ -71,7 +71,7 @@ class FianiumAOTFMan(QObject):
         (1100, 2300, 5570),
     )
 
-    _FAKE_DEV = True
+    _FAKE_DEV = False
 
     opened = pyqtSignal()
     closed = pyqtSignal()
@@ -227,19 +227,20 @@ class FianiumAOTFMan(QObject):
         return
 
     def is_wavelength_available(self, wlen):
+        mods = []
         if FianiumAOTFMan.VIS_MIN <= wlen <= FianiumAOTFMan.VIS_MAX:
-            mod = "VIS"
-        elif FianiumAOTFMan.NIR1_MIN <= wlen <= FianiumAOTFMan.NIR1_MAX:
-            mod = "NIR1"
-        elif FianiumAOTFMan.NIR2_MIN <= wlen <= FianiumAOTFMan.NIR2_MAX:
-            mod = "NIR2"
-        else:
-            return False, None
+            mods.append("VIS")
 
-        if self.dev_modes[0] == mod:
+        if FianiumAOTFMan.NIR1_MIN <= wlen <= FianiumAOTFMan.NIR1_MAX:
+            mods.append("NIR1")
+
+        if FianiumAOTFMan.NIR2_MIN <= wlen <= FianiumAOTFMan.NIR2_MAX:
+            mods.append("NIR2")
+
+        if self.dev_modes[0] in mods:
             h_dev = self.h_devices[0]
             return True, 0
-        elif self.dev_modes[1] == mod:
+        elif self.dev_modes[1] in mods:
             h_dev = self.h_devices[1]
             return True, 1
         else:
@@ -331,6 +332,12 @@ class FianiumAOTFMan(QObject):
         if self.config_window is None:
             self.config_window = AOTFConfigWindow(self)
         self.config_window.show()
+
+    def get_current_settings(self, with_header: bool = True):
+        if self.config_window is not None:
+            return self.config_window.get_current_settings(with_header)
+        else:
+            return ""
 
 
 class AOTFConfigWindow(Ui_AOTF_Config_Window):
@@ -484,6 +491,22 @@ class AOTFConfigWindow(Ui_AOTF_Config_Window):
     def close(self):
         self.window.hide()
 
+    def get_current_settings(self, with_header: bool = True):
+        if self.aotf_man.is_open():
+            if with_header:
+                setting_str = "--------NKT AOTF-------\n"
+            else:
+                setting_str = ""
+            setting_str = setting_str + f"AOTF1: [{self.lineEdit_AOTF1Serial.text()}], " \
+                                        f"{self.comboBox_AOTF1Mode.currentText()}\n" \
+                          f"AOTF1: [{self.lineEdit_AOTF2Serial.text()}], {self.comboBox_AOTF2Mode.currentText()}\n" \
+                          f"Wavelength: {self.spinBox_WaveLength.value()} nm\n" \
+                          f"Optimal Power: {self.lineEdit_OptimalPower.text()}\n" \
+                          f"Power: {self.lineEdit_Power.text()}\n" \
+                          f"Power(%): {self.doubleSpinBox_PowerPerc.value()}\n"
+            return setting_str
+        else:
+            return ""
 
 if __name__ == '__main__':
     from PyQt5.QtWidgets import QApplication

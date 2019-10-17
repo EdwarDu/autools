@@ -64,21 +64,30 @@ np.savetxt("c.dat", c_v)
 
 o_v = m_v / (m_v + 2*c_v)
 
-fig = plt.figure()
 
-fig_gs = GridSpec(1, 4, figure=fig, wspace=0.1, width_ratios=[1, 0.1, 1, 0.1])
+def show_fig(data: np.ndarray):
+    fig = plt.figure()
+    axes = fig.add_subplot(111, aspect='equal')
+    hm_v = axes.imshow(data, cmap=plt.cm.rainbow)
+    fig.colorbar(hm_v, ax=axes)
 
-ax_b_v = fig.add_subplot(fig_gs[0,0], aspect='equal')
-ax_o_v = fig.add_subplot(fig_gs[0,2], aspect='equal')
-ax_b_v_cbar = fig.add_subplot(fig_gs[0,1])
-ax_o_v_cbar = fig.add_subplot(fig_gs[0,3])
+    height, width = data.shape
+    x, y = np.meshgrid(np.arange(0, width, 1), np.arange(0, height, 1))
+    unit = np.ones(data.shape) * 2
+    data_deg = (data - np.min(data)) / (np.max(data) - np.min(data))*np.pi*2
+    # TODO: angle function needs to be fixed
+    u = unit * np.sin(data_deg)
+    v = unit * np.cos(data_deg)
+    axes.quiver(x, y, u, v, units='dots', scale=2, scale_units='xy', width=1, headwidth=4, headlength=6)
+    fig.show()
 
-hm_b_v = ax_b_v.imshow(b_v, cmap=plt.cm.rainbow)
-hm_o_v = ax_o_v.imshow(o_v, cmap=plt.cm.rainbow)
+beta = np.loadtxt('beta_data')
 
-fig.colorbar(hm_b_v, cax=ax_b_v_cbar)
-fig.colorbar(hm_o_v, cax=ax_o_v_cbar)
+show_fig(b_v)
+show_fig(o_v)
 
-fig.show()
+show_fig(beta)
 
-plt.pause(1000)
+plt.pause(1)
+input('Enter to close')
+plt.close()

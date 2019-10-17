@@ -32,7 +32,7 @@ setup_main_logger_ch.setFormatter(setup_main_logger_formatter)
 setup_main_logger.addHandler(setup_main_logger_ch)
 
 _AUTOZ_TEST = False
-_MAPM_TEST = True
+_MAPM_TEST = False
 
 from ..SRS.SR830Man import SR830Man, float2str
 from ..Cameras.CVCameraMan import CVCameraMan
@@ -55,6 +55,7 @@ from ..Keithley.M3390Man import M3390Man
 from .laser_alignment_z_dists_window import LaserAlignmentZDistsWindow
 from .pcali_wlen_power_window import PCaliWLenPowerWindow
 from .lim_xy_window import LIM_XYWindow
+from .save_settings_window import SaveSettingsWindow
 
 
 # noinspection PyPep8Naming
@@ -63,14 +64,16 @@ def get_available_COMs():
     return {com.device: f'{com.manufacturer} {com.description}' for com in com_port_list}
 
 
-def gen_2d_gaussian(width, height, sx=1, sy=1):
+def gen_2d_gaussian(width, height, sx=1, sy=1, mx=None, my=None):
     x = np.linspace(0, width, num=width)
     y = np.linspace(0, height, num=height)
 
     x, y = np.meshgrid(x, y)
 
-    mx = width / 2
-    my = height / 2
+    if mx is None:
+        mx = width / 2
+    if my is None:
+        my = height / 2
 
     z = 1 / (2. * np.pi * sx * sy) * np.exp(-((x - mx) ** 2. / (2. * sx ** 2.) + (y - my) ** 2. / (2. * sy ** 2.)))
 
@@ -95,6 +98,8 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.current_cam = None
         self.pushButton_Single.clicked.connect(self.cam_single_clicked)
         self.pushButton_FreeRun.clicked.connect(self.cam_freerun_clicked)
+        self.pushButton_LP_AddMarker.clicked.connect(lambda: self.widget_LaserProfiler.add_cross_marker())
+        self.pushButton_LP_ClearMarkers.clicked.connect(lambda: self.widget_LaserProfiler.remove_all_cross_markers())
 
         self.checkBox_LP_auto_crosshair.setChecked(self.widget_LaserProfiler.cross_hair_auto_hotspot)
         self.checkBox_LP_gaussian_force.setChecked(self.widget_LaserProfiler.gaussian_fit_force_peak)
@@ -191,6 +196,9 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.pcali_wlen_power_tablewin = PCaliWLenPowerWindow()
         self.pushButton_PCaliShowRes.clicked.connect(lambda: self.pcali_wlen_power_tablewin.show())
         self.pcali_wlen_power_res = {}
+        # FIXME: the MaxVol should be verified
+        self.doubleSpinBox_PCaliVolTarget.valueChanged.connect(
+            lambda value: self.doubleSpinBox_PCaliMaxVol.setMinimum(value + 0.1))
 
         # Lock-In Measurement (LIM)
         self.pushButton_LIM_SetWL0.clicked.connect(lambda: self.lim_setwl())
@@ -204,6 +212,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.pushButton_LIM_ClearPlots.clicked.connect(self.lim_clearplots)
         self.lim_xy_tablewin = LIM_XYWindow()
         self.pushButton_LIM_ShowResult.clicked.connect(lambda: self.lim_xy_tablewin.show())
+        self.pushButton_LIM_LoadCaliPower.clicked.connect(self.lim_load_pcali_power)
 
         # Map Measurement
         self.doubleSpinBox_MapM_X0.valueChanged.connect(self.mapm_x_changed)
@@ -224,6 +233,9 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.pushButton_MapM_Auto.clicked.connect(self.mapm_measure_auto)
         self.pushButton_MapM_Export.clicked.connect(self.mapm_export)
         self.pushButton_MapM_Load.clicked.connect(self.mapm_load_npraw)
+
+        self.save_settings_diag = SaveSettingsWindow(self.aotf_man, self.k3390man, self.sr830_man)
+        self.pushButton_SaveSettings.clicked.connect(lambda: self.save_settings_diag.show())
 
         self.all_cams = []
         self.window.show()
@@ -398,7 +410,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         self.lineEdit_LIM_WLCurr.setText(f"{wlen}")
 
-        b_a, = self.aotf_man.is_wavelength_available(wlen)
+        b_a, _ = self.aotf_man.is_wavelength_available(wlen)
 
         if not b_a:
             self.lineEdit_LIM_WLCurr.setStyleSheet("background: red")
@@ -426,7 +438,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             return None
 
         self.lineEdit_LIM_WLCurr.setText(f"{next_wlen}")
-        b_a, = self.aotf_man.is_wavelength_available(next_wlen)
+        b_a, _ = self.aotf_man.is_wavelength_available(next_wlen)
         if not b_a:
             self.lineEdit_LIM_WLCurr.setStyleSheet("background: red")
             setup_main_logger.error(f"Wave Length {next_wlen} unavailable, check AOTF settings",
@@ -458,7 +470,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             power = 100
 
         self.lineEdit_LIM_PowerCurr.setText(f"{power:.2f}")
-        self.aotf_man.set_power_percent(power)
+        self.aotf_man.set_power_percent(power/100)
         setup_main_logger.info(f"Set power percent to {power:.2f}", extra={"component": "Main/LIM"})
         return power
 
@@ -473,7 +485,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             power = 100
 
         self.lineEdit_LIM_PowerCurr.setText(f"{power:.2f}")
-        self.aotf_man.set_power_percent(power)
+        self.aotf_man.set_power_percent(power/100)
         setup_main_logger.info(f"Set power percent to {power:.2f}", extra={"component": "Main/LIM"})
         return power
 
@@ -483,6 +495,19 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.lineEdit_LIM_X.setText(float2str(x))
         self.lineEdit_LIM_Y.setText(float2str(y))
         return x, y
+
+    def lim_load_pcali_power(self):
+        fname, _a = QFileDialog.getOpenFileName(self.window, 'Load CSV file', '.', 'CSV (*.csv)')
+        if fname is not None and fname != '':
+            self.pcali_wlen_power_res.clear()
+            self.pcali_wlen_power_tablewin.clear()
+            with open(fname, 'r') as f_csv:
+                for line in f_csv:
+                    wl, power = [float(x) for x in re.split("[ \t,;]", line) if x != '']
+                    self.pcali_wlen_power_res[wl] = power
+                    self.pcali_wlen_power_tablewin.add_record(wl, power)
+
+            self.pcali_wlen_power_tablewin.show()
 
     def lim_clearplots(self):
         self.widget_LockInPlot.clear_data()
@@ -535,7 +560,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         self.lineEdit_PCaliWLCurr.setText(f"{wlen}")
 
-        b_a, = self.aotf_man.is_wavelength_available(wlen)
+        b_a, _ = self.aotf_man.is_wavelength_available(wlen)
         if not b_a:
             self.lineEdit_PCaliWLCurr.setStyleSheet("background: red")
             setup_main_logger.error(f"Wave Length {wlen} unavailable, check AOTF settings",
@@ -562,7 +587,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             return None
 
         self.lineEdit_PCaliWLCurr.setText(f"{next_wlen}")
-        b_a, = self.aotf_man.is_wavelength_available(next_wlen)
+        b_a, _= self.aotf_man.is_wavelength_available(next_wlen)
         if not b_a:
             self.lineEdit_PCaliWLCurr.setStyleSheet("background: red")
             setup_main_logger.error(f"Wave Length {next_wlen} unavailable, check AOTF settings",
@@ -585,7 +610,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             power = 100
 
         self.lineEdit_PCaliPowerCurr.setText(f"{power:.2f}")
-        self.aotf_man.set_power_percent(power)
+        self.aotf_man.set_power_percent(power/100)
         setup_main_logger.info(f"Set power percent to {power:.2f}", extra={"component": "Main/PCali"})
         return power
 
@@ -607,7 +632,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
                 next_power = 100
 
         self.lineEdit_PCaliPowerCurr.setText(f"{next_power:.2f}")
-        self.aotf_man.set_power_percent(next_power)
+        self.aotf_man.set_power_percent(next_power/100)
         setup_main_logger.info(f"Set Wave Length to {next_power:.2f}", extra={"component": "Main/PCali"})
         return next_power
 
@@ -638,12 +663,13 @@ class SetupMainWindow(Ui_SetupMainWindow):
         vol_ch = self.comboBox_PCCaliNIDAQCh.currentText()
         vol_target = self.doubleSpinBox_PCaliVolTarget.value()
         measure_delay = self.spinBox_PCaliMDelay.value()
+        vol_max = self.doubleSpinBox_PCaliMaxVol.value()
 
         self.pushButton_PCaliRun.setText("Running")
         self.pushButton_PCaliRun.setEnabled(False)
         setup_main_logger.info(f"Wave Length from {wl0} to {wl1} by {wls}, "
                                f"Power % from {power0:.2f} to {power1:.2f} by {powerstep:.2f},"
-                               f"Vol from {vol_ch} with target {vol_target:.4f},"
+                               f"Vol from {vol_ch} with target {vol_target:.4f} and max vol {vol_max:.4f},"
                                f"Measure Delay = {measure_delay} ms",
                                extra={"component": "Main/PCali"})
         self.pcali_clearplots()
@@ -657,11 +683,12 @@ class SetupMainWindow(Ui_SetupMainWindow):
                 self.widget_PCaliPlot.add_ch2_line(wl, wls)
                 p = power0
                 wl_map = []
-                while p < power1+powerstep:
+                vol = 0
+                while p < power1+powerstep and vol < vol_max:
                     p = self.pcali_setpower(p)
                     QtWidgets.qApp.processEvents()
                     time.sleep(measure_delay / 1000)
-                    vol = wl * p / 100 / 2200 * 10  # FIXME: For testing:  #self.pcali_getvol()
+                    vol = np.average([self.pcali_getvol() for i in range(0, 5)])
                     wl_map.append((p, vol))
                     self.widget_PCaliPlot.add_data_ch2(p, vol)
                     p += powerstep
@@ -672,9 +699,11 @@ class SetupMainWindow(Ui_SetupMainWindow):
                 for i in range(0, len(wl_map)-1):
                     if wl_map[i][1] == vol_target:
                         power_target = wl_map[i][0]
+                        break
                     elif wl_map[i][1] <= vol_target <= wl_map[i+1][1] or wl_map[i][1] >= vol_target >= wl_map[i+1][1]:
                         power_target = (vol_target - wl_map[i][1]) / (wl_map[i+1][1] - wl_map[i][1]) * powerstep + \
                                        wl_map[i][0]
+                        break
 
                 if power_target is None:
                     raise Exception(f"Unable to find target power for wavelength {wl}")
@@ -859,7 +888,10 @@ class SetupMainWindow(Ui_SetupMainWindow):
             self.laser_align_z_task_goto(z)
             # FIXME: AUTOZ Test
             if _AUTOZ_TEST:
-                frame = gen_2d_gaussian(640, 480, sx=(z-z0)/(z1-z0)*image_width/2+0.1, sy=(z-z0)/(z1-z0)*image_height/2+0.1)
+                frame = gen_2d_gaussian(640, 480, sx=(z-z0)/(z1-z0)*image_width/2+0.1,
+                                        sy=(z-z0)/(z1-z0)*image_height/3+0.1,
+                                        mx=320,
+                                        my=200)
                 self.widget_LaserProfiler.update_image_data(frame)
                 QtWidgets.qApp.processEvents()
             else:

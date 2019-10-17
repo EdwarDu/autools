@@ -748,6 +748,11 @@ class SR830Man(QObject):
 
         self.config_window.show()
 
+    def get_current_settings(self, with_header: bool = True):
+        if self.config_window is not None:
+            return self.config_window.get_current_settings(with_header)
+        else:
+            return ""
 
 def ask_selection(choices, prompt_str: str = 'Select: ', allow_invalid=False):
     choice = None
@@ -999,6 +1004,20 @@ class SR830ConfigWindow(Ui_SR830_Config_Window):
     def close(self):
         self.window.hide()
 
+    def get_current_settings(self, with_header: bool = True):
+        if self.sr830man.is_open():
+            if with_header:
+                setting_str = "--------SRS SR830-------\n"
+            else:
+                setting_str = ""
+            setting_str = setting_str + f"Time constant: {self.comboBox_TimeConstant.currentText()}\n" \
+                          f"Sensitivity: {self.comboBox_Sensitivity.currentText()}\n" \
+                          f"Filter Slope: {self.comboBox_FilterSlope.currentText()}\n" \
+                          f"Frequency: {self.lineEdit_Frequency.text()}\n" \
+                          f"Harmony: {self.spinBox_Harmonic.value()}\n"
+            return setting_str
+        else:
+            return ""
 
 if __name__ == '__main__':
     from PyQt5.QtWidgets import QApplication
