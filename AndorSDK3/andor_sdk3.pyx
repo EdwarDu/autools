@@ -5,13 +5,13 @@ from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
 import numpy as np
 import logging
 
-_SPLIT_LOG = True
+_SPLIT_LOG = False
 
 if _SPLIT_LOG:
     andor3_logger = logging.getLogger("andor3")
     andor3_logger.setLevel(logging.DEBUG)
     andor3_fh = logging.FileHandler("andor3.log")
-    andor3_formatter = logging.Formatter('%(asctime)s [%(name)s] - %(levelname)s - %(message)s')
+    andor3_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')
     andor3_fh.setFormatter(andor3_formatter)
     andor3_logger.addHandler(andor3_fh)
 
@@ -28,7 +28,7 @@ feature_callback_table = {}
 # Warning: 32bit Python build will crash
 cdef int feature_cb(andor3.AT_H handle, const andor3.AT_WC* feature, void* context) with gil:
     global feature_callback_table
-    andor3_logger.info(f"{feature} notified")
+    andor3_logger.info(f"{feature} notified", extra={"component": "Andor3"})
     if handle in feature_callback_table.keys():
         if feature in feature_callback_table[handle].keys():
             for cb in feature_callback_table[handle][feature]:
@@ -109,10 +109,10 @@ cdef class Andor3Man:
         self._buffer_map = {}
         ret = andor3.AT_InitialiseLibrary()
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to initialise andor3 library, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to initialise andor3 library, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to initialise andor3 library, {error_code_to_str(ret)}")
         else:
-            andor3_logger.info(f"Andor3 Library initialized")
+            andor3_logger.info(f"Andor3 Library initialized", extra={"component": "Andor3"})
 
     def __del__(self):
         andor3.AT_FinaliseLibrary()
@@ -128,15 +128,15 @@ cdef class Andor3Man:
 
     def open_dev(self,  dev_id: int):
         if self._c_dev_h != -1:
-            andor3_logger.error(f"Already with an open device ID:{self._c_dev_id} H:{self._c_dev_h}")
+            andor3_logger.error(f"Already with an open device ID:{self._c_dev_id} H:{self._c_dev_h}", extra={"component": "Andor3"})
             raise Exception(f"Already with an open device ID:{self._c_dev_id} H:{self._c_dev_h}")
         self._c_dev_id = dev_id
         ret = andor3.AT_Open(self._c_dev_id, &self._c_dev_h)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to open dev {self._c_dev_id}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to open dev {self._c_dev_id}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to open dev {self._c_dev_id}, {error_code_to_str(ret)}")
 
-        andor3_logger.info(f"Andor3 device {self._c_dev_id} opened")
+        andor3_logger.info(f"Andor3 device {self._c_dev_id} opened", extra={"component": "Andor3"})
 
     def is_open(self):
         return self._c_dev_h != -1
@@ -144,9 +144,9 @@ cdef class Andor3Man:
     def close(self):
         ret = andor3.AT_Close(self._c_dev_h)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to close dev ID:{self._c_dev_id} H:{self._c_dev_h}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to close dev ID:{self._c_dev_id} H:{self._c_dev_h}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to close dev ID:{self._c_dev_id} H:{self._c_dev_h}, {error_code_to_str(ret)}")
-        andor3_logger.info(f"Andor3 device ID:{self._c_dev_id} H:{self._c_dev_h} closed")
+        andor3_logger.info(f"Andor3 device ID:{self._c_dev_id} H:{self._c_dev_h} closed", extra={"component": "Andor3"})
         self._c_dev_h = -1
 
     def is_sys_feature(self, feature: str):
@@ -163,15 +163,15 @@ cdef class Andor3Man:
             feature_callback_table[self._c_dev_h][feature] = set()
 
         feature_callback_table[self._c_dev_h][feature].add(cb)
-        andor3_logger.debug(f"Register callback (Python) {cb} for {feature}")
+        andor3_logger.debug(f"Register callback (Python) {cb} for {feature}", extra={"component": "Andor3"})
 
         if feature not in self._feature_cb_list:
             ret = andor3.AT_RegisterFeatureCallback(self._c_dev_h, feature, feature_cb, NULL)
             if ret != andor3.AT_SUCCESS:
-                andor3_logger.error(f"Failed to register callback for {feature}, {error_code_to_str(ret)}")
+                andor3_logger.error(f"Failed to register callback for {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
                 raise Exception(f"Failed to register callback for {feature}, {error_code_to_str(ret)}")
 
-            andor3_logger.info(f"Register callback (relay) for {feature}")
+            andor3_logger.info(f"Register callback (relay) for {feature}", extra={"component": "Andor3"})
 
     def unregister_feature_cb(self, feature, cb):
         global feature_callback_table
@@ -179,11 +179,11 @@ cdef class Andor3Man:
             if feature in feature_callback_table[self._c_dev_h].keys():
                 if cb in feature_callback_table[self._c_dev_h][feature]:
                     feature_callback_table[self._c_dev_h][feature].remove(cb)
-                    andor3_logger.debug(f"UnRegister callback (Python) {cb} for {feature}")
+                    andor3_logger.debug(f"UnRegister callback (Python) {cb} for {feature}", extra={"component": "Andor3"})
 
                 if len(feature_callback_table[self._c_dev_h][feature]) == 0:
                     ret = andor3.AT_UnregisterFeatureCallback(self._c_dev_h, feature, feature_cb, NULL)
-                    andor3_logger.info(f"UnRegister callback (relay&Python) for {feature}")
+                    andor3_logger.info(f"UnRegister callback (relay&Python) for {feature}", extra={"component": "Andor3"})
                     del feature_callback_table[self._c_dev_h][feature]
 
     def clear_feature_cb(self, feature):
@@ -191,7 +191,7 @@ cdef class Andor3Man:
         if self._c_dev_h in feature_callback_table.keys():
             if feature in feature_callback_table[self._c_dev_h].keys():
                 ret = andor3.AT_UnregisterFeatureCallback(self._c_dev_h, feature, feature_cb, NULL)
-                andor3_logger.info(f"UnRegister callback (relay&Python) for {feature}")
+                andor3_logger.info(f"UnRegister callback (relay&Python) for {feature}", extra={"component": "Andor3"})
                 del feature_callback_table[self._c_dev_h][feature]
 
     def _is_feature_what(self, feature: str, what: str):
@@ -209,9 +209,9 @@ cdef class Andor3Man:
             return False
 
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to check {what} for {feature}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to check {what} for {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to check {what} for {feature}, {error_code_to_str(ret)}")
-        andor3_logger.debug(f"{feature} is {'not' if b!=andor3.AT_TRUE else ''} {what}")
+        andor3_logger.debug(f"{feature} is {'not' if b!=andor3.AT_TRUE else ''} {what}", extra={"component": "Andor3"})
         return b == andor3.AT_TRUE
 
     def is_feature_implemented(self, feature: str):
@@ -246,11 +246,11 @@ cdef class Andor3Man:
             ret = andor3.AT_ERR_NODATA  # causing Exception
 
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to get({'i' if is_int else 'f'}) {what} "
-                                f"for {feature}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to get({'i' if is_int else 'f'}), {what} "
+                                f"for {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to get({'i' if is_int else 'f'}) {what} "
                             f"for {feature}, {error_code_to_str(ret)}")
-        andor3_logger.debug(f"{feature}({'i' if is_int else 'f'}) {what} = {i_value if is_int else f_value}")
+        andor3_logger.debug(f"{feature}({'i' if is_int else 'f'}) {what} = {i_value if is_int else f_value}", extra={"component": "Andor3"})
         return i_value if is_int else f_value
 
     def get_i_feature_max(self, feature: str):
@@ -267,9 +267,9 @@ cdef class Andor3Man:
         handle = 1 if self.is_sys_feature(feature) else self._c_dev_h
         ret = andor3.AT_SetInt(handle, feature, i_value)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to set(i) for {feature}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to set(i) for {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to set(i) for {feature}, {error_code_to_str(ret)}")
-        andor3_logger.debug(f"{feature}(i) set to {feature_value}")
+        andor3_logger.debug(f"{feature}(i) set to {feature_value}", extra={"component": "Andor3"})
 
     def get_f_feature_max(self, feature: str):
         return self._get_i_f_feature_what(feature, is_int=False, what="max")
@@ -285,18 +285,18 @@ cdef class Andor3Man:
         handle = 1 if self.is_sys_feature(feature) else self._c_dev_h
         ret = andor3.AT_SetFloat(handle, feature, f_value)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to set(f) for {feature}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to set(f) for {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to set(f) for {feature}, {error_code_to_str(ret)}")
-        andor3_logger.debug(f"{feature}(f) set to {feature_value}")
+        andor3_logger.debug(f"{feature}(f) set to {feature_value}", extra={"component": "Andor3"})
 
     def get_b_feature(self, feature: str):
         cdef andor3.AT_BOOL b_value
         handle = 1 if self.is_sys_feature(feature) else self._c_dev_h
         ret = andor3.AT_GetBool(handle, feature, &b_value)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to get(b) for {feature}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to get(b) for {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to get(b) for {feature}, {error_code_to_str(ret)}")
-        andor3_logger.debug(f"{feature}(b) = {b_value}")
+        andor3_logger.debug(f"{feature}(b) = {b_value}", extra={"component": "Andor3"})
         return b_value == andor3.AT_TRUE
 
     def set_b_feature(self, feature: str, feature_value: bool):
@@ -304,18 +304,18 @@ cdef class Andor3Man:
         handle = 1 if self.is_sys_feature(feature) else self._c_dev_h
         ret = andor3.AT_SetBool(handle, feature, b_value)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to set(b) for {feature}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to set(b) for {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to set(b) for {feature}, {error_code_to_str(ret)}")
-        andor3_logger.debug(f"{feature}(b) set to {feature_value}")
+        andor3_logger.debug(f"{feature}(b) set to {feature_value}", extra={"component": "Andor3"})
 
     def get_e_feature_count(self, feature: str):
         cdef int i_count
         handle = 1 if self.is_sys_feature(feature) else self._c_dev_h
         ret = andor3.AT_GetEnumCount(handle, feature, &i_count)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to get(e) count for {feature}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to get(e) count for {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to get(e) count for {feature}, {error_code_to_str(ret)}")
-        andor3_logger.debug(f"{feature}(e) count = {i_count}")
+        andor3_logger.debug(f"{feature}(e) count = {i_count}", extra={"component": "Andor3"})
         return i_count
 
     def is_e_feature_index_implemented(self, feature: str, index: int):
@@ -323,11 +323,10 @@ cdef class Andor3Man:
         handle = 1 if self.is_sys_feature(feature) else self._c_dev_h
         ret = andor3.AT_IsEnumIndexImplemented(handle, feature, index, &b)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to check(e) implemented for {feature} "
-                                f"index={index}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to check(e) implemented for {feature} index={index}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to check(e) implemented for {feature} "
                             f"index={index}, {error_code_to_str(ret)}")
-        andor3_logger.debug(f"{index}@{feature}(e) implemented = {b}")
+        andor3_logger.debug(f"{index}@{feature}(e) implemented = {b}", extra={"component": "Andor3"})
         return b == andor3.AT_TRUE
 
     def is_e_feature_index_available(self, feature: str, index: int):
@@ -335,11 +334,10 @@ cdef class Andor3Man:
         handle = 1 if self.is_sys_feature(feature) else self._c_dev_h
         ret = andor3.AT_IsEnumIndexAvailable(handle, feature, index, &b)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to check(e) available for {feature} "
-                                f"index={index}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to check(e) available for {feature} index={index}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to check(e) available for {feature} "
                             f"index={index}, {error_code_to_str(ret)}")
-        andor3_logger.debug(f"{index}@{feature}(e) available = {b}")
+        andor3_logger.debug(f"{index}@{feature}(e) available = {b}", extra={"component": "Andor3"})
         return b == andor3.AT_TRUE
 
     def get_e_feature_str_at(self, feature: str, index: int):
@@ -349,9 +347,9 @@ cdef class Andor3Man:
         py_str = str_buf[:]
         PyMem_Free(str_buf)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to get(e) string {feature} index={index}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to get(e) string {feature} index={index}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to get(e) string {feature} index={index}, {error_code_to_str(ret)}")
-        andor3_logger.debug(f"{index}@{feature}(e) str = {py_str}")
+        andor3_logger.debug(f"{index}@{feature}(e) str = {py_str}", extra={"component": "Andor3"})
         return py_str
 
     def get_e_feature_index(self, feature: str):
@@ -359,9 +357,9 @@ cdef class Andor3Man:
         handle = 1 if self.is_sys_feature(feature) else self._c_dev_h
         ret = andor3.AT_GetEnumIndex(handle, feature, &i_value)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to get(e) for {feature}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to get(e) for {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to get(e) for {feature}, {error_code_to_str(ret)}")
-        andor3_logger.debug(f"{feature}(e) index = {i_value}")
+        andor3_logger.debug(f"{feature}(e) index = {i_value}", extra={"component": "Andor3"})
         return i_value
 
     def get_e_feature_str(self, feature: str):
@@ -374,9 +372,9 @@ cdef class Andor3Man:
         else:  # type(index) is str
             ret = andor3.AT_SetEnumString(handle, feature, value)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to set(e) for {feature}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to set(e) for {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to set(e) for {feature}, {error_code_to_str(ret)}")
-        andor3_logger.debug(f"{feature}(e) (index/str) = {value}")
+        andor3_logger.debug(f"{feature}(e) (index/str) = {value}", extra={"component": "Andor3"})
 
     def set_e_feature_check(self, feature: str, value: int or str):
         try:
@@ -392,16 +390,16 @@ cdef class Andor3Man:
         handle = 1 if self.is_sys_feature(cmd_feature) else self._c_dev_h
         ret = andor3.AT_Command(handle, cmd_feature)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to send command {cmd_feature}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to send command {cmd_feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to send command {cmd_feature}, {error_code_to_str(ret)}")
-        andor3_logger.info(f"Command = {cmd_feature}")
+        andor3_logger.info(f"Command = {cmd_feature}", extra={"component": "Andor3"})
 
     def get_s_feature(self, feature: str):
         cdef int str_len
         handle = 1 if self.is_sys_feature(feature) else self._c_dev_h
         ret = andor3.AT_GetStringMaxLength(handle, feature, &str_len)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to get max length of {feature}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to get max length of {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to get max length of {feature}, {error_code_to_str(ret)}")
 
         cdef andor3.AT_WC* str_buf = <andor3.AT_WC*> PyMem_Malloc(str_len*sizeof(andor3.AT_WC))
@@ -409,31 +407,31 @@ cdef class Andor3Man:
         py_str = str_buf[:]
         PyMem_Free(str_buf)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to get(s) {feature}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to get(s) {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to get(s) {feature}, {error_code_to_str(ret)}")
-        andor3_logger.debug(f"{feature}(s) = {py_str}")
+        andor3_logger.debug(f"{feature}(s) = {py_str}", extra={"component": "Andor3"})
         return py_str
 
     def set_s_feature(self, feature: str, feature_value: str):
         handle = 1 if self.is_sys_feature(feature) else self._c_dev_h
         ret = andor3.AT_SetString(handle, feature, feature_value)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to set(s) {feature}, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to set(s) {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to set(s) {feature}, {error_code_to_str(ret)}")
-        andor3_logger.debug(f"{feature}(s) set to {feature_value}")
+        andor3_logger.debug(f"{feature}(s) set to {feature_value}", extra={"component": "Andor3"})
 
     def flush(self):
         ret = andor3.AT_Flush(self._c_dev_h)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to flush, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to flush, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to flush, {error_code_to_str(ret)}")
-        andor3_logger.info(f"Flushed")
+        andor3_logger.info(f"Flushed", extra={"component": "Andor3"})
 
     def create_buffer(self, buffersize: int):
         cdef long buffer_aligned_size = buffersize + (8 - buffersize % 8)
         cdef andor3.AT_U8* buffer = <andor3.AT_U8*> PyMem_Malloc(buffer_aligned_size)
         if buffer is None:
-            andor3_logger.error(f"Failed to allocate memory size = {buffer_aligned_size}")
+            andor3_logger.error(f"Failed to allocate memory size = {buffer_aligned_size}", extra={"component": "Andor3"})
             raise MemoryError()
 
         cdef andor3.AT_U8* buffer_aligned = <andor3.AT_U8*> &(buffer[8- (<unsigned long long>buffer)%8])
@@ -441,7 +439,7 @@ cdef class Andor3Man:
                                              PyCapsule_New(<void*>buffer_aligned, "buffer_aligned", NULL),
                                              buffersize)
         self._buffer_id += 1
-        andor3_logger.info(f"Buffer id {self._buffer_id-1} created")
+        andor3_logger.info(f"Buffer id {self._buffer_id-1} created", extra={"component": "Andor3"})
         return self._buffer_id-1
 
     def get_buffer_size(self, buffer_id):
@@ -457,11 +455,11 @@ cdef class Andor3Man:
         cdef andor3.AT_U8* buffer = <andor3.AT_U8*> PyCapsule_GetPointer(self._buffer_map[buffer_id][0], "buffer")
         PyMem_Free(buffer)
         del self._buffer_map[buffer_id]
-        andor3_logger.info(f"Buffer id {buffer_id} freed")
+        andor3_logger.info(f"Buffer id {buffer_id} freed", extra={"component": "Andor3"})
 
     def queue_buffer(self, buffer_id: int):
         if buffer_id not in self._buffer_map.keys():
-            andor3_logger.error(f"Invalid buffer id {buffer_id}")
+            andor3_logger.error(f"Invalid buffer id {buffer_id}", extra={"component": "Andor3"})
             raise ValueError(f"Invalid buffer id {buffer_id}")
 
         cdef andor3.AT_U8* buffer_aligned = <andor3.AT_U8*> PyCapsule_GetPointer(
@@ -474,7 +472,7 @@ cdef class Andor3Man:
                                 f"@>{<unsigned long>buffer_aligned:016X}, {error_code_to_str(ret)}")
             raise Exception(f"Failed to queue buffer {buffer_id}:{buffer_size}"
                             f"@>{<unsigned long>buffer_aligned:016X}, {error_code_to_str(ret)}")
-        andor3_logger.info(f"Buffer {buffer_id} queued")
+        andor3_logger.info(f"Buffer {buffer_id} queued", extra={"component": "Andor3"})
 
     def wait_buffer(self, timeout_ms: int):
         cdef andor3.AT_U8* buffer_pointer
@@ -482,22 +480,22 @@ cdef class Andor3Man:
         cdef unsigned int timeout = timeout_ms
         ret = andor3.AT_WaitBuffer(self._c_dev_h, &buffer_pointer, &buffer_readout_size, timeout)
         if ret != andor3.AT_SUCCESS:
-            andor3_logger.error(f"Failed to wait buffer, {error_code_to_str(ret)}")
+            andor3_logger.error(f"Failed to wait buffer, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to wait buffer, {error_code_to_str(ret)}")
 
         for buffer_id in self._buffer_map.keys():
             # print(f'{<unsigned int>PyCapsule_GetPointer(self._buffer_map[buffer_id][1], "buffer_aligned"):016X} '
             #       f'?? {<unsigned int>buffer_pointer:016X}')
             if PyCapsule_GetPointer(self._buffer_map[buffer_id][1], "buffer_aligned") == <void*>buffer_pointer:
-                andor3_logger.info(f"Buffer {buffer_id} ready with size {buffer_readout_size}")
+                andor3_logger.info(f"Buffer {buffer_id} ready with size {buffer_readout_size}", extra={"component": "Andor3"})
                 return buffer_id, buffer_readout_size
 
-        andor3_logger.error(f"Failed to find buffer in internal map")
+        andor3_logger.error(f"Failed to find buffer in internal map", extra={"component": "Andor3"})
         raise Exception(f"Failed to find buffer in internal map")
 
     def get_data_from_buffer(self, buffer_id: int, actual_size: int):
         if buffer_id not in self._buffer_map.keys():
-            andor3_logger.error(f"Invalid buffer id {buffer_id}")
+            andor3_logger.error(f"Invalid buffer id {buffer_id}", extra={"component": "Andor3"})
             raise ValueError(f"Invalid buffer id {buffer_id}")
 
         cdef andor3.AT_U8* buffer_aligned = <andor3.AT_U8*> PyCapsule_GetPointer(
@@ -517,10 +515,10 @@ cdef class Andor3Man:
 
         if len(buffer) < stride * height:
             buffer_fixed = buffer + "\0"*(stride*height - len(buffer))
-            andor3_logger.warning(f"Buffer size {len(buffer)} is less than excepted size {stride*height}, padding 0")
+            andor3_logger.warning(f"Buffer size {len(buffer)} is less than excepted size {stride*height}, padding 0", extra={"component": "Andor3"})
         elif len(buffer) > stride * height:
             buffer_fixed = buffer[:stride * height]
-            andor3_logger.warning(f"Buffer size {len(buffer)} is larger than excepted size {stride*height}, truncating")
+            andor3_logger.warning(f"Buffer size {len(buffer)} is larger than excepted size {stride*height}, truncating", extra={"component": "Andor3"})
         else:
             buffer_fixed = buffer
 

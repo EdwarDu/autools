@@ -112,6 +112,7 @@ class PiezoConfigWindow(Ui_Piezo_Config_Window):
 
         if self.piezo_man.b_closedloop:
             self.piezo_man.set_drift_compensation_mode(['A', 1], ['B', 1], ['C', 1])
+            self.piezo_man.set_velocity_control_mode(["A", 1], ["B", 1], ["C", 1])
 
         self.sync_current_axis_status()
 

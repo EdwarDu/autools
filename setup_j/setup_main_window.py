@@ -21,7 +21,7 @@ import logging
 
 setup_main_logger = logging.getLogger("autools_setup_main")
 
-setup_main_logger.setLevel(logging.DEBUG)
+setup_main_logger.setLevel(logging.INFO)
 setup_main_logger_fh = logging.FileHandler("autools_setup_main.log")
 setup_main_logger_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')
 setup_main_logger_fh.setFormatter(setup_main_logger_formatter)
@@ -330,6 +330,23 @@ class SetupMainWindow(Ui_SetupMainWindow):
                 i += 1
         raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
 
+    def pzt_goto_xy_ont(self, x: float, y: float, wait_10ms=300):
+        self.piezo_man.set_target_pos(["A", x], ["B", y])
+        time.sleep(0.01)
+        i = 0
+        while i < wait_10ms:
+            ont = self.piezo_man.get_on_target_status("A", "B")
+            if ont["A"] and ont["B"]:
+                pos = self.piezo_man.get_real_position("A", "B")
+                pos_x, pos_y = pos["A"], pos["B"]
+                setup_main_logger.info(f"Target: {x}, {y}; Real Pos:{pos_x}, {pos_y}",
+                                       extra={"component": "Main/MAPM"})
+                return
+            else:
+                time.sleep(0.01)
+                i += 1
+        raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
+
     def mapm_measure_auto(self):
         # TODO: Run Automeasure task
         # Pzt to X0, Y0
@@ -353,7 +370,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         try:
             if not _MAPM_TEST:
-                self.pzt_goto_xy(x0, y0)
+                self.pzt_goto_xy_ont(x0, y0)
         except TimeoutError as te:
             setup_main_logger.error(te, extra={"component": "Main/MAPM"})
             return
@@ -371,7 +388,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             for x in x_values:
                 # Go to x, y
                 if not _MAPM_TEST:
-                    self.pzt_goto_xy(x, y)
+                    self.pzt_goto_xy_ont(x, y)
                 QtWidgets.qApp.processEvents()
                 time.sleep(measure_delay_ms/1000)
                 if not _MAPM_TEST:

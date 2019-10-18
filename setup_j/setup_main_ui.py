@@ -1031,7 +1031,7 @@ class Ui_SetupMainWindow(object):
         self.spinBox_MapM_MeasureDelay = QtWidgets.QSpinBox(self.tab_MapMeasurements)
         self.spinBox_MapM_MeasureDelay.setKeyboardTracking(False)
         self.spinBox_MapM_MeasureDelay.setMinimum(10)
-        self.spinBox_MapM_MeasureDelay.setMaximum(5000)
+        self.spinBox_MapM_MeasureDelay.setMaximum(50000)
         self.spinBox_MapM_MeasureDelay.setSingleStep(100)
         self.spinBox_MapM_MeasureDelay.setProperty("value", 1000)
         self.spinBox_MapM_MeasureDelay.setObjectName("spinBox_MapM_MeasureDelay")
