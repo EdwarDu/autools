@@ -5,7 +5,7 @@ from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
 import numpy as np
 import logging
 
-_SPLIT_LOG = True
+_SPLIT_LOG = False
 
 if _SPLIT_LOG:
     andor3_logger = logging.getLogger("andor3")
