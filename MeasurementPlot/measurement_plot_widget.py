@@ -115,7 +115,7 @@ class MeasurementPlotWidget(pg.GraphicsLayoutWidget):
         self.map_h_line.setBounds([0, self.image_height-0.01])
         self.p_h_xdata = np.array(xlist)
         self.p_h_ydata = np.zeros(self.p_h_xdata.shape)
-
+        self.h_profile_line.setData(x=self.p_h_xdata, y=self.p_h_ydata)
         self.map_crosshair_h_moved(self.map_h_line)
 
     def set_point_value(self, r: int, c: int, value: float):
