@@ -1,5 +1,6 @@
 # This is the entry point to setup_j
 import os
+import platform
 import sys
 
 project_root = os.path.dirname(os.path.realpath(__file__))
@@ -13,7 +14,11 @@ if ans.lower().startswith("y"):
 
 # Go up to parent folder
 os.chdir("..")
-python3_path = os.path.join(".", "env_j", "python.exe")
+if platform.system() == "Windows":
+    python3_path = os.path.join(".", "env_j", "python.exe")
+else:
+    python3_path = "/usr/bin/python3"
+
 if os.path.exists(python3_path):
     ans = input(f"Found {python3_path}, use? [Y/n]")
     if ans.lower().startswith("n"):

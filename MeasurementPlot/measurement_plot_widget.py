@@ -16,7 +16,7 @@ class MeasurementPlotWidget(pg.GraphicsLayoutWidget):
         pg.GraphicsLayoutWidget.__init__(self, **kargs)
         self.setParent(parent)
         self.setWindowTitle("Measurement Plot")
-        self.p_horizontal = self.addPlot()
+        self.p_horizontal: pg.PlotItem = self.addPlot()
         self.nextRow()
         self.p_map = self.addPlot()
 
@@ -88,14 +88,26 @@ class MeasurementPlotWidget(pg.GraphicsLayoutWidget):
 
     def update_h_profile(self, c: int):
         h_index = int(self.map_h_line.getPos()[1])
-        self.h_profile_line.setData(y=self.image_data[h_index, :])
+        self.p_h_ydata = self.image_data[h_index, :]
+        self.h_profile_line.setData(y=self.p_h_ydata)
         self.move_h_note(c)
 
     def move_h_note(self, which: int):
         self.h_profile_curve_point = pg.CurvePoint(self.h_profile_line, pos=which/(len(self.p_h_xdata) - 1))
+        y_mid = sum(self.p_horizontal.getAxis("left").range) / 2
+        if which < len(self.p_h_xdata) / 2:
+            if self.p_h_ydata[which] < y_mid:
+                self.h_profile_data_note.setAnchor((0, 1))
+            else:
+                self.h_profile_data_note.setAnchor((0, 0))
+        else:
+            if self.p_h_ydata[which] > y_mid:
+                self.h_profile_data_note.setAnchor((1, 0))
+            else:
+                self.h_profile_data_note.setAnchor((1, 1))
+
         self.h_profile_data_note.setParentItem(self.h_profile_curve_point)
         self.h_profile_data_note.setText(f"X:{self.xlist[which]:.6f}\n"
-                                         f"Y:{self.ylist[int(self.map_h_line.value())]:.6f}\n"
                                          f"{self.p_h_ydata[which]:.6f}")
 
     def set_map_size(self, width: int, height: int):
@@ -113,7 +125,7 @@ class MeasurementPlotWidget(pg.GraphicsLayoutWidget):
         self.image_data = np.zeros((self.image_height, self.image_width))
         self.map_img.setImage(self.image_data)
         self.map_h_line.setBounds([0, self.image_height-0.01])
-        self.p_h_xdata = np.array(xlist)
+        self.p_h_xdata = np.array(range(0, self.image_width))
         self.p_h_ydata = np.zeros(self.p_h_xdata.shape)
         self.h_profile_line.setData(x=self.p_h_xdata, y=self.p_h_ydata)
         self.map_crosshair_h_moved(self.map_h_line)
