@@ -347,6 +347,35 @@ class SetupMainWindow(Ui_SetupMainWindow):
                 i += 1
         raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
 
+    def pzt_goto_xy_combined(self, x: float, y: float, wait_10ms=300):
+        self.piezo_man.set_target_pos(["A", x], ["B", y])
+        time.sleep(0.01)
+        i = 0
+        while i < wait_10ms / 2:
+            ont = self.piezo_man.get_on_target_status("A", "B")
+            if ont["A"] and ont["B"]:
+                pos = self.piezo_man.get_real_position("A", "B")
+                pos_x, pos_y = pos["A"], pos["B"]
+                setup_main_logger.info(f"Target: {x}, {y}; Real Pos:{pos_x}, {pos_y}",
+                                       extra={"component": "Main/MAPM"})
+                return
+            else:
+                time.sleep(0.01)
+                i += 1
+        setup_main_logger.info(f"On target status not working, switch to margin checking (0.07)",
+                               extra={"component": "Main/MAPM"})
+        i = 0
+        while i < wait_10ms / 2:
+            pos = self.piezo_man.get_real_position("A", "B")
+            pos_x, pos_y = pos["A"], pos["B"]
+            if abs(pos_x - x) <= 0.07 and abs(pos_y - y) <= 0.07:
+                return
+            else:
+                time.sleep(0.01)
+                i += 1
+
+        raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
+
     def mapm_measure_auto(self):
         # TODO: Run Automeasure task
         # Pzt to X0, Y0
@@ -370,7 +399,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         try:
             if not _MAPM_TEST:
-                self.pzt_goto_xy_ont(x0, y0)
+                self.pzt_goto_xy_combined(x0, y0)
         except TimeoutError as te:
             setup_main_logger.error(te, extra={"component": "Main/MAPM"})
             return
@@ -388,7 +417,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             for x in x_values:
                 # Go to x, y
                 if not _MAPM_TEST:
-                    self.pzt_goto_xy_ont(x, y)
+                    self.pzt_goto_xy_combined(x, y)
                 QtWidgets.qApp.processEvents()
                 time.sleep(measure_delay_ms/1000)
                 if not _MAPM_TEST:
