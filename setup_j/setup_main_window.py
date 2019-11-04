@@ -200,6 +200,22 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.doubleSpinBox_PCaliVolTarget.valueChanged.connect(
             lambda value: self.doubleSpinBox_PCaliMaxVol.setMinimum(value + 0.1))
 
+        # FocusCali
+        self.pushButton_FocusCali_PztGotoX.clicked.connect(
+            lambda: self.piezo_man.set_target_pos(['A', self.doubleSpinBox_FocusCali_PztX.value()]))
+        self.pushButton_FocusCali_PztGotoZ.clicked.connect(
+            lambda: self.piezo_man.set_target_pos(['C', self.doubleSpinBox_FocusCali_PztZ.value()]))
+        self.pushButton_FocusCali_PztGotoY0.clicked.connect(
+            lambda: self.piezo_man.set_target_pos(['B', self.doubleSpinBox_FocusCali_PztY0.value()]))
+        self.comboBox_FocusCali_ZLines.currentTextChanged.connect(
+            lambda: self.widget_FocusCaliPlot.highlight_ch_line(self.comboBox_FocusCali_ZLines.currentData()))
+        self.pushButton_FocusCali_ClearPlot.clicked.connect(self.focuscali_clear_plot)
+        self.pushButton_FocusCali_RemoveZLine.clicked.connect(self.focuscali_removezline)
+        self.doubleSpinBox_FocusCali_PztY0.valueChanged.connect(self.focuscali_y_changed)
+        self.doubleSpinBox_FocusCali_PztY1.valueChanged.connect(self.focuscali_y_changed)
+        self.spinBox_FocusCali_PztYSamples.valueChanged.connect(self.focuscali_y_changed)
+        self.pushButton_FocusCali_Measure.clicked.connect(self.focuscali_measure)
+
         # Lock-In Measurement (LIM)
         self.pushButton_LIM_SetWL0.clicked.connect(lambda: self.lim_setwl())
         self.lineEdit_LIM_WLCurr.textChanged.connect(lambda: self.lim_wl_changed())
@@ -272,6 +288,52 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.label_AOTF_Power.setText(f"{power}")
         max_power = FianiumAOTFMan.MAX_POWER if self.radioButton_AOTF_Fianium.isChecked() else YSLAOTFMan.MAX_POWER
         self.label_AOTF_PowerPerc.setText(f"{power / max_power * 100:.2f}")
+
+    def focuscali_clear_plot(self):
+        self.widget_FocusCaliPlot.clear_ch_lines()
+        self.comboBox_FocusCali_ZLines.clear()
+
+    def focuscali_removezline(self):
+        if self.comboBox_FocusCali_ZLines.currentIndex() != -1:
+            z = self.comboBox_FocusCali_ZLines.currentData()
+            self.comboBox_FocusCali_ZLines.removeItem(self.comboBox_FocusCali_ZLines.currentIndex())
+            self.widget_FocusCaliPlot.remove_ch_line(z)
+
+    def focuscali_y_changed(self):
+        y0 = self.doubleSpinBox_FocusCali_PztY0.value()
+        self.doubleSpinBox_FocusCali_PztY1.setMinimum(y0)
+        y1 = self.doubleSpinBox_FocusCali_PztY1.value()
+        n_y = self.spinBox_FocusCali_PztYSamples.value()
+        y_step = (y1-y0) / (n_y-1)
+        self.lineEdit_FocusCali_PztYStep.setText(f"{y_step:.6f}")
+
+    def focuscali_measure(self):
+        x = self.doubleSpinBox_FocusCali_PztX.value()
+        z = self.doubleSpinBox_FocusCali_PztZ.value()
+        y0 = self.doubleSpinBox_FocusCali_PztY0.value()
+        y1 = self.doubleSpinBox_FocusCali_PztY1.value()
+        n_y = self.spinBox_FocusCali_PztYSamples.value()
+        ni_ch = self.comboBox_FocusCali_NidaqCh.currentText()
+        measure_delay_ms = self.spinBox_FocusCali_MDelay.value() / 1000
+
+        setup_main_logger.info(f"Focus Cali. scan from {x:.6f},{y0:.6f} to {x:.6f},{y1:.6f} z={z:.6f}"
+                               f"#Samples Y={n_y} "
+                               f"With NIDAQ ch {ni_ch} "
+                               f"Measure delay {measure_delay_ms} ms", extra={"component": "Main/FocusCali"})
+
+        self.pzt_goto_xyz_combined(x=x, y=y0, z=z)
+        self.widget_FocusCaliPlot.add_ch_line(z)
+        self.comboBox_FocusCali_ZLines.addItem(f"{z:.6f}", z)
+
+        y_values = np.linspace(y0, y1, n_y)
+
+        for y in y_values:
+            self.pzt_goto_xyz_combined(y=y)
+            QtWidgets.qApp.processEvents()
+            time.sleep(measure_delay_ms)
+            vol = self.nidaq_man.read_ai_channels()[self.comboBox_FocusCali_NidaqCh.currentText()]
+            self.widget_FocusCaliPlot.add_data(y, vol)
+            QtWidgets.qApp.processEvents()
 
     def mapm_export(self):
         folder = os.path.normpath(QFileDialog.getExistingDirectory(
@@ -347,16 +409,33 @@ class SetupMainWindow(Ui_SetupMainWindow):
                 i += 1
         raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
 
-    def pzt_goto_xy_combined(self, x: float, y: float, wait_10ms=300):
-        self.piezo_man.set_target_pos(["A", x], ["B", y])
+    # TODO: merge functions
+    def pzt_goto_xyz_combined(self,
+                              x: float or None = None,
+                              y: float or None = None,
+                              z: float or None = None,
+                              wait_10ms=300):
+        args = []
+        if x is not None:
+            args.append(["A", x])
+        if y is not None:
+            args.append(["B", y])
+        if z is not None:
+            args.append(["C", z])
+
+        if len(args) == 0:
+            return
+
+        self.piezo_man.set_target_pos(*args)
         time.sleep(0.01)
         i = 0
+        ont = {"A": False, "B": False, "C": False}
         while i < wait_10ms / 2:
-            ont = self.piezo_man.get_on_target_status("A", "B")
-            if ont["A"] and ont["B"]:
-                pos = self.piezo_man.get_real_position("A", "B")
-                pos_x, pos_y = pos["A"], pos["B"]
-                setup_main_logger.info(f"Target: {x}, {y}; Real Pos:{pos_x}, {pos_y}",
+            ont = self.piezo_man.get_on_target_status("A", "B", "C")
+            if ont["A"] and ont["B"] and ont["C"]:
+                pos = self.piezo_man.get_real_position("A", "B", "C")
+                pos_x, pos_y, pos_z = pos["A"], pos["B"], pos["C"]
+                setup_main_logger.info(f"Target: {x}, {y}, {z}; Real Pos:{pos_x}, {pos_y}, {pos_z}",
                                        extra={"component": "Main/MAPM"})
                 return
             else:
@@ -366,9 +445,17 @@ class SetupMainWindow(Ui_SetupMainWindow):
                                extra={"component": "Main/MAPM"})
         i = 0
         while i < wait_10ms / 2:
-            pos = self.piezo_man.get_real_position("A", "B")
-            pos_x, pos_y = pos["A"], pos["B"]
-            if abs(pos_x - x) <= 0.07 and abs(pos_y - y) <= 0.07:
+            moving_x, moving_y, moving_z = self.piezo_man.is_axes_moving()
+            if moving_x or moving_y or moving_z:
+                time.sleep(0.01)
+                i += 1
+                continue
+
+            pos = self.piezo_man.get_real_position("A", "B", "C")
+            pos_x, pos_y, pos_z = pos["A"], pos["B"], pos["C"]
+            if (x is None or abs(pos_x - x) <= 0.07 or ont["A"]) and \
+                    (y is None or abs(pos_y - y) <= 0.07 or ont["B"]) and \
+                    (z is None or abs(pos_z - z) <= 0.07 or ont["C"]):
                 return
             else:
                 time.sleep(0.01)
@@ -399,7 +486,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         try:
             if not _MAPM_TEST:
-                self.pzt_goto_xy_combined(x0, y0)
+                self.pzt_goto_xyz_combined(x=x0, y=y0, z=None)
         except TimeoutError as te:
             setup_main_logger.error(te, extra={"component": "Main/MAPM"})
             return
@@ -417,7 +504,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             for x in x_values:
                 # Go to x, y
                 if not _MAPM_TEST:
-                    self.pzt_goto_xy_combined(x, y)
+                    self.pzt_goto_xyz_combined(x=x, y=y, z=None)
                 QtWidgets.qApp.processEvents()
                 time.sleep(measure_delay_ms/1000)
                 if not _MAPM_TEST:
@@ -980,6 +1067,9 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         self.comboBox_MapM_NIDAQCh.clear()
         self.comboBox_MapM_NIDAQCh.addItems(nidaq_ai_chs)
+
+        self.comboBox_FocusCali_NidaqCh.clear()
+        self.comboBox_FocusCali_NidaqCh.addItems(nidaq_ai_chs)
 
     def nidaq_ai_values_changed(self, values):
         # TODO

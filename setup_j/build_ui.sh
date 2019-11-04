@@ -2,6 +2,7 @@
 pyuic5 setup_main.ui -o setup_main_ui.py
 
 declare -a replace_strings=(
+    "s/from focuscali_plot_widget/from .focuscali_plot_widget/g"
     "s/from sr830_plot_widget/from ..SRS.sr830_plot_widget/g"
     "s/from laser_profiler_widget/from ..LaserProfiler.laser_profiler_widget/g"
     "s/from laser_profiler_zdepth_widget/from ..LaserProfiler.laser_profiler_zdepth_widget/g"
