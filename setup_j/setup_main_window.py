@@ -500,8 +500,10 @@ class SetupMainWindow(Ui_SetupMainWindow):
         if not _MAPM_TEST:
             self.k3390man.turn_output(True)
 
+        row_index = 0
         for y in y_values:
-            for x in x_values:
+            x_track = x_values if row_index % 2 == 0 else np.flip(x_values)
+            for x in x_track:
                 # Go to x, y
                 if not _MAPM_TEST:
                     self.pzt_goto_xyz_combined(x=x, y=y, z=None)
@@ -515,6 +517,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
                 self.widget_MeasurementPlot2.set_xy_value(x, y, lockin_y)
                 self.widget_MeasurementPlot3.set_xy_value(x, y, vol)
                 QtWidgets.qApp.processEvents()
+            row_index += 1
 
         # Sig gen OFF
         if not _MAPM_TEST:
