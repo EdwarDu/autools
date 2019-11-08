@@ -59,8 +59,7 @@ class Ui_SetupMainWindow(object):
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
         self.label_SR830_Conn_Status = QtWidgets.QLabel(self.groupBox_SR830)
-        self.label_SR830_Conn_Status.setStyleSheet("background: red\n"
-"")
+        self.label_SR830_Conn_Status.setStyleSheet("background: red\n")
         self.label_SR830_Conn_Status.setText("")
         self.label_SR830_Conn_Status.setObjectName("label_SR830_Conn_Status")
         self.horizontalLayout_5.addWidget(self.label_SR830_Conn_Status)

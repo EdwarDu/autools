@@ -4,7 +4,7 @@ import sys
 import traceback
 import re
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget
 from PyQt5.QtCore import QTimer, QDir
 import os
 import time
@@ -21,7 +21,7 @@ import logging
 
 setup_main_logger = logging.getLogger("autools_setup_main")
 
-setup_main_logger.setLevel(logging.INFO)
+setup_main_logger.setLevel(logging.DEBUG)
 setup_main_logger_fh = logging.FileHandler("autools_setup_main.log")
 setup_main_logger_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')
 setup_main_logger_fh.setFormatter(setup_main_logger_formatter)
@@ -33,10 +33,13 @@ setup_main_logger.addHandler(setup_main_logger_ch)
 
 _AUTOZ_TEST = False
 _MAPM_TEST = False
+_HAS_ANDOR = True
 
 from ..SRS.SR830Man import SR830Man, float2str
 from ..Cameras.CVCameraMan import CVCameraMan
-from ..Cameras.AndorCameraMan import AndorCameraMan
+
+if _HAS_ANDOR:
+    from ..Cameras.AndorCameraMan import AndorCameraMan
 
 
 try:
@@ -175,7 +178,8 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.k3390man.output_state_changed.connect(self.k3390_output_state_changed)
 
         # AndorCam
-        self.andor_man = AndorCameraMan(0)
+        if _HAS_ANDOR:
+            self.andor_man = AndorCameraMan(0)
 
         # PDV plot
         self.laser_align_z_dists_tablewin = LaserAlignmentZDistsWindow()
@@ -254,6 +258,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.pushButton_SaveSettings.clicked.connect(lambda: self.save_settings_diag.show())
 
         self.all_cams = []
+
         self.window.show()
 
     def aotf_selected(self):
@@ -1121,20 +1126,21 @@ class SetupMainWindow(Ui_SetupMainWindow):
                 self.comboBox_CamSource.addItem(f"FlyCap Cam: {cam.get_dev_id()}")
                 self.all_cams.append(cam)
 
-        try:
-            n_andor_cams = self.andor_man.get_device_count()
-            print(n_andor_cams)
-            for i in range(0, n_andor_cams):
-                print(i)
-                if i == 0:
-                    self.comboBox_CamSource.addItem(f"Andor Cam: 0", self.andor_man)
-                    self.all_cams.append(self.andor_man)
-                else:
-                    andor_cam = AndorCameraMan(i)
-                    self.comboBox_CamSource.addItem(f"Andor Cam: {andor_cam.get_dev_id()}", andor_cam)
-                    self.all_cams.append(andor_cam)
-        except Exception as e:
-            pass
+        if _HAS_ANDOR:
+            try:
+                n_andor_cams = self.andor_man.get_device_count()
+                print(n_andor_cams)
+                for i in range(0, n_andor_cams):
+                    print(i)
+                    if i == 0:
+                        self.comboBox_CamSource.addItem(f"Andor Cam: 0", self.andor_man)
+                        self.all_cams.append(self.andor_man)
+                    else:
+                        andor_cam = AndorCameraMan(i)
+                        self.comboBox_CamSource.addItem(f"Andor Cam: {andor_cam.get_dev_id()}", andor_cam)
+                        self.all_cams.append(andor_cam)
+            except Exception as e:
+                pass
 
         try:
             self.comboBox_CamSource.setCurrentIndex(0)
@@ -1251,8 +1257,12 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.label_Keithley3390_Output.setText(f"{'ON' if on_off else 'OFF'}")
         self.label_Mapm_SigGenOutput.setText(f"{'ON' if on_off else 'OFF'}")
 
+
 if __name__ == '__main__':
+    # import pdb
+    # pdb.set_trace()
     app = QApplication(sys.argv)
     main_control = SetupMainWindow()
 
-    sys.exit(app.exec_())
+    app.exec_()
+
