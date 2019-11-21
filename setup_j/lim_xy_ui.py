@@ -2,9 +2,10 @@
 
 # Form implementation generated from reading ui file 'lim_xy.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.1
+# Created by: PyQt5 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
+
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -47,5 +48,3 @@ class Ui_LIM_XYTable(object):
         self.pushButton_Copy.setText(_translate("LIM_XYTable", "Copy"))
         self.pushButton_Clear.setText(_translate("LIM_XYTable", "Clear Records"))
         self.tableWidget_XY.setSortingEnabled(True)
-
-

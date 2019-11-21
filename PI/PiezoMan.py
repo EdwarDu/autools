@@ -12,7 +12,7 @@ _SPLIT_LOG = False
 if _SPLIT_LOG:
     piezo_logger = logging.getLogger("piezo")
 
-    piezo_logger.setLevel(logging.DEBUG)
+    piezo_logger.setLevel(logging.INFO)
     piezo_fh = logging.FileHandler("piezo.log")
     piezo_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')
     piezo_fh.setFormatter(piezo_formatter)
@@ -95,6 +95,8 @@ class PiezoConfigWindow(Ui_Piezo_Config_Window):
         self.radioButton_Offline.toggled.connect(self.switch_online_mode)
 
         self.pushButton_Sync.clicked.connect(self.sync_current_axis_status)
+        self.pushButton_GetVel.clicked.connect(self.sync_current_axis_velctrl)
+        self.pushButton_SetVel.clicked.connect(self.set_current_axis_velctrl)
 
         self.refresh_comlist()
 
@@ -112,9 +114,13 @@ class PiezoConfigWindow(Ui_Piezo_Config_Window):
 
         if self.piezo_man.b_closedloop:
             self.piezo_man.set_drift_compensation_mode(['A', 1], ['B', 1], ['C', 1])
-            self.piezo_man.set_velocity_control_mode(["A", 1], ["B", 1], ["C", 1])
+            # self.piezo_man.set_velocity_control_mode(["A", 1], ["B", 1], ["C", 1])
+            self.label_VelUnit.setText("um/s")
+        else:
+            self.label_VelUnit.setText("V/s")
 
         self.sync_current_axis_status()
+        self.sync_current_axis_velctrl()
 
     def switch_online_mode(self):
         if self.radioButton_Online.isChecked() and not self.piezo_man.b_online:
@@ -238,6 +244,27 @@ class PiezoConfigWindow(Ui_Piezo_Config_Window):
         self.label_YCurrentPos_C.setText(f"{current_pos['B']:.6f}")
         self.label_ZCurrentPos_C.setText(f"{current_pos['C']:.6f}")
 
+    def sync_current_axis_velctrl(self):
+        velctrls = self.piezo_man.get_velocity_control_mode("A", "B", "C")
+        self.checkBox_VelCtrlX.setChecked(velctrls['A'] == 1)
+        self.checkBox_VelCtrlY.setChecked(velctrls['B'] == 1)
+        self.checkBox_VelCtrlZ.setChecked(velctrls['C'] == 1)
+
+        vels = self.piezo_man.get_closedloop_velocity("A", "B", "C")
+        self.doubleSpinBox_XVel.setValue(vels['A'])
+        self.doubleSpinBox_YVel.setValue(vels['B'])
+        self.doubleSpinBox_ZVel.setValue(vels['C'])
+
+    def set_current_axis_velctrl(self):
+        self.piezo_man.set_velocity_control_mode(["A", 1 if self.checkBox_VelCtrlX.isChecked() else 0],
+                                                 ["B", 1 if self.checkBox_VelCtrlY.isChecked() else 0],
+                                                 ["C", 1 if self.checkBox_VelCtrlZ.isChecked() else 0])
+        self.piezo_man.set_closedloop_velocity(["A", self.doubleSpinBox_XVel.value()],
+                                               ["B", self.doubleSpinBox_XVel.value()],
+                                               ["C", self.doubleSpinBox_XVel.value()])
+        self.sync_current_axis_velctrl()
+
+
     def open_conn_clicked(self, state):
         if not state:  # post event state
             self.close_ser_conn()
@@ -246,7 +273,6 @@ class PiezoConfigWindow(Ui_Piezo_Config_Window):
             self.open_ser_conn()
 
     def open_ser_conn(self):
-        global piezo_logger
         try:
             self.piezo_man.open()
             self.pushButton_COM_Open.setText("Close")

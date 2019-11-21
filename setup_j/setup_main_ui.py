@@ -2,9 +2,10 @@
 
 # Form implementation generated from reading ui file 'setup_main.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.1
+# Created by: PyQt5 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
+
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -12,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_SetupMainWindow(object):
     def setupUi(self, SetupMainWindow):
         SetupMainWindow.setObjectName("SetupMainWindow")
-        SetupMainWindow.resize(1768, 1006)
+        SetupMainWindow.resize(2006, 1177)
         self.centralwidget = QtWidgets.QWidget(SetupMainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_16 = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -59,7 +60,8 @@ class Ui_SetupMainWindow(object):
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
         self.label_SR830_Conn_Status = QtWidgets.QLabel(self.groupBox_SR830)
-        self.label_SR830_Conn_Status.setStyleSheet("background: red\n")
+        self.label_SR830_Conn_Status.setStyleSheet("background: red\n"
+"")
         self.label_SR830_Conn_Status.setText("")
         self.label_SR830_Conn_Status.setObjectName("label_SR830_Conn_Status")
         self.horizontalLayout_5.addWidget(self.label_SR830_Conn_Status)
@@ -1134,6 +1136,9 @@ class Ui_SetupMainWindow(object):
         self.doubleSpinBox_MapM_Y0.setObjectName("doubleSpinBox_MapM_Y0")
         self.gridLayout_MapM_Run.addWidget(self.doubleSpinBox_MapM_Y0, 1, 2, 1, 2)
         self.horizontalLayout_17.addLayout(self.gridLayout_MapM_Run)
+        self.pushButton_MapM_CheckPzt = QtWidgets.QPushButton(self.tab_MapMeasurements)
+        self.pushButton_MapM_CheckPzt.setObjectName("pushButton_MapM_CheckPzt")
+        self.horizontalLayout_17.addWidget(self.pushButton_MapM_CheckPzt)
         spacerItem11 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_17.addItem(spacerItem11)
         self.verticalLayout_10.addLayout(self.horizontalLayout_17)
@@ -1166,6 +1171,15 @@ class Ui_SetupMainWindow(object):
         self.lineEdit_MapM_NiVol.setReadOnly(True)
         self.lineEdit_MapM_NiVol.setObjectName("lineEdit_MapM_NiVol")
         self.horizontalLayout_15.addWidget(self.lineEdit_MapM_NiVol)
+        self.label_30 = QtWidgets.QLabel(self.tab_MapMeasurements)
+        self.label_30.setObjectName("label_30")
+        self.horizontalLayout_15.addWidget(self.label_30)
+        self.spinBox_MapM_nAvgSamples = QtWidgets.QSpinBox(self.tab_MapMeasurements)
+        self.spinBox_MapM_nAvgSamples.setMinimum(1)
+        self.spinBox_MapM_nAvgSamples.setMaximum(100)
+        self.spinBox_MapM_nAvgSamples.setProperty("value", 1)
+        self.spinBox_MapM_nAvgSamples.setObjectName("spinBox_MapM_nAvgSamples")
+        self.horizontalLayout_15.addWidget(self.spinBox_MapM_nAvgSamples)
         self.label_65 = QtWidgets.QLabel(self.tab_MapMeasurements)
         self.label_65.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_65.setObjectName("label_65")
@@ -1216,7 +1230,7 @@ class Ui_SetupMainWindow(object):
         SetupMainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(SetupMainWindow)
-        self.tabWidget.setCurrentIndex(4)
+        self.tabWidget.setCurrentIndex(0)
         self.comboBox_PDV_Interval.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(SetupMainWindow)
         SetupMainWindow.setTabOrder(self.pushButton_SR830_Config, self.pushButton_AOTF_Config)
@@ -1455,16 +1469,16 @@ class Ui_SetupMainWindow(object):
         self.label_70.setText(_translate("SetupMainWindow", "X Step:"))
         self.label_71.setText(_translate("SetupMainWindow", "Y Step:"))
         self.label_47.setText(_translate("SetupMainWindow", "Y1:"))
+        self.pushButton_MapM_CheckPzt.setText(_translate("SetupMainWindow", "Check PZT"))
         self.label_48.setText(_translate("SetupMainWindow", "Sine Input:"))
         self.label_64.setText(_translate("SetupMainWindow", "NIDAQ Ch:"))
+        self.label_30.setText(_translate("SetupMainWindow", "Avg:"))
         self.label_65.setText(_translate("SetupMainWindow", "M Delay (ms):"))
         self.pushButton_MapM_Measure.setText(_translate("SetupMainWindow", "Measure"))
         self.pushButton_MapM_Auto.setText(_translate("SetupMainWindow", "Auto Measure"))
         self.pushButton_MapM_Export.setText(_translate("SetupMainWindow", "Export"))
         self.pushButton_MapM_Load.setText(_translate("SetupMainWindow", "Load Raw"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_MapMeasurements), _translate("SetupMainWindow", "Map Measurements"))
-
-
 from .focuscali_plot_widget import FocusCaliPlotWidget
 from ..LaserProfiler.laser_profiler_widget import LaserProfilerWidget
 from ..LaserProfiler.laser_profiler_zdepth_widget import LaserProfilerZDepthWidget

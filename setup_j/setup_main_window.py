@@ -4,10 +4,11 @@ import sys
 import traceback
 import re
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QMessageBox
 from PyQt5.QtCore import QTimer, QDir
 import os
 import time
+import platform
 import numpy as np
 
 import threading
@@ -21,7 +22,7 @@ import logging
 
 setup_main_logger = logging.getLogger("autools_setup_main")
 
-setup_main_logger.setLevel(logging.DEBUG)
+setup_main_logger.setLevel(logging.INFO)
 setup_main_logger_fh = logging.FileHandler("autools_setup_main.log")
 setup_main_logger_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')
 setup_main_logger_fh.setFormatter(setup_main_logger_formatter)
@@ -243,14 +244,16 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.spinBox_MapM_YSamples.valueChanged.connect(self.mapm_y_changed)
         self.mapm_x_changed()
         self.mapm_y_changed()
+        self.pushButton_MapM_CheckPzt.clicked.connect(lambda: self.mapm_measure_auto(b_only_check_pzt=True))
 
         self.pushButton_MapM_GoX0.clicked.connect(
             lambda: self.piezo_man.set_target_pos(["A", self.doubleSpinBox_MapM_X0.value()]))
         self.pushButton_MapM_GoY0.clicked.connect(
             lambda: self.piezo_man.set_target_pos(["B", self.doubleSpinBox_MapM_Y0.value()]))
 
-        self.pushButton_MapM_Measure.clicked.connect(self.mapm_measure)
-        self.pushButton_MapM_Auto.clicked.connect(self.mapm_measure_auto)
+        self.pushButton_MapM_Measure.clicked.connect(
+            lambda: self.mapm_measure(n_avg=self.spinBox_MapM_nAvgSamples.value()))
+        self.pushButton_MapM_Auto.clicked.connect(lambda: self.mapm_measure_auto(b_only_check_pzt=False))
         self.pushButton_MapM_Export.clicked.connect(self.mapm_export)
         self.pushButton_MapM_Load.clicked.connect(self.mapm_load_npraw)
 
@@ -374,13 +377,18 @@ class SetupMainWindow(Ui_SetupMainWindow):
             setup_main_logger.error(f"No file {vol_filename} to load",
                                     extra={"component": "Main/MAPM"})
 
-    def mapm_measure(self):
-        # Lock In
-        x, y = self.sr830_man.get_parameters_value(SR830Man.GET_PARAMETER_X, SR830Man.GET_PARAMETER_Y)
+    def mapm_measure(self, n_avg: int = 1):
+        x_l, y_l, vol_l = [np.zeros(n_avg, dtype=np.float) for i in range(0, 3)]
+
+        for i in range(0, n_avg):
+            # Lock In
+            x_l[i], y_l[i] = self.sr830_man.get_parameters_value(SR830Man.GET_PARAMETER_X, SR830Man.GET_PARAMETER_Y)
+            # NI DAQ
+            vol_l[i] = self.nidaq_man.read_ai_channels()[self.comboBox_MapM_NIDAQCh.currentText()]
+
+        x, y, vol = np.average(x_l), np.average(y_l), np.average(vol_l)
         self.lineEdit_MapM_LockInX.setText(float2str(x))
         self.lineEdit_MapM_LockInY.setText(float2str(y))
-        # NI DAQ
-        vol = self.nidaq_man.read_ai_channels()[self.comboBox_MapM_NIDAQCh.currentText()]
         self.lineEdit_MapM_NiVol.setText(float2str(vol))
         return x, y, vol
 
@@ -468,7 +476,24 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
 
-    def mapm_measure_auto(self):
+    def save_pzt_location_map(self, loc_table: list, auto_open: bool = False):
+        fname, _ = QFileDialog.getSaveFileName(self.window, "Save as CSV file ...", ".", "CSV (*.csv)")
+        if fname is not None and fname != '':
+            with open(fname, 'w') as f_csv:
+                f_csv.write(f"# Target X, Target Y, Real X, Real Y, Real Z\n")
+                for loc in loc_table:
+                    f_csv.write(",".join([f"{x:.6f}" for x in loc]) + "\n")
+
+            if auto_open:
+                if platform.system() == "Linux":
+                    os.system(f"xdg-open {fname}")
+                elif platform.system() == "Windows":
+                    os.startfile(f"{fname}")
+            return fname
+        else:
+            return None
+
+    def mapm_measure_auto(self, b_only_check_pzt : bool = False):
         # TODO: Run Automeasure task
         # Pzt to X0, Y0
         x0 = self.doubleSpinBox_MapM_X0.value()
@@ -483,50 +508,92 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         ni_ch = self.comboBox_MapM_NIDAQCh.currentText()
         measure_delay_ms = self.spinBox_MapM_MeasureDelay.value()
+        n_avg = self.spinBox_MapM_nAvgSamples.value()
 
-        setup_main_logger.info(f"Map scan from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
-                               f"#Samples X={x_samples}, Y={y_samples} "
-                               f"With NIDAQ ch {ni_ch} "
-                               f"Measure delay {measure_delay_ms} ms", extra={"component": "Main/MAPM"})
+        if b_only_check_pzt:
+            setup_main_logger.info(f"Checking PZT move from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
+                                   f"#Samples X={x_samples}, Y={y_samples} ",
+                                   extra={"component": "Main/MAPM"})
+        else:
+            setup_main_logger.info(f"Map scan from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
+                                   f"#Samples X={x_samples}, Y={y_samples} "
+                                   f"With NIDAQ ch {ni_ch}, #Avg={n_avg}"
+                                   f"Measure delay {measure_delay_ms} ms", extra={"component": "Main/MAPM"})
 
         try:
             if not _MAPM_TEST:
                 self.pzt_goto_xyz_combined(x=x0, y=y0, z=None)
         except TimeoutError as te:
             setup_main_logger.error(te, extra={"component": "Main/MAPM"})
+            pos = self.piezo_man.get_real_position("A", "B", "C")
+            pos_x, pos_y, pos_z = pos["A"], pos["B"], pos["C"]
+            QMessageBox.information(self.window, "Failed to move PZT to (0, 0)",
+                                    f"Current location: X,Y,Z {pos_x:.6f}, {pos_y:.6f} {pos_z:.6f}",
+                                    QMessageBox.Ok)
             return
 
+        # if not b_only_check_pzt:
         # Set up plots
         self.widget_MeasurementPlot1.set_xy_list(x_values, y_values)
         self.widget_MeasurementPlot2.set_xy_list(x_values, y_values)
         self.widget_MeasurementPlot3.set_xy_list(x_values, y_values)
 
-        # Sig gen ON
-        if not _MAPM_TEST:
-            self.k3390man.turn_output(True)
+        if not b_only_check_pzt:
+            # Sig gen ON
+            if not _MAPM_TEST:
+                self.k3390man.turn_output(True)
 
+        location_table = []
         row_index = 0
         for y in y_values:
             x_track = x_values if row_index % 2 == 0 else np.flip(x_values)
             for x in x_track:
                 # Go to x, y
                 if not _MAPM_TEST:
-                    self.pzt_goto_xyz_combined(x=x, y=y, z=None)
-                QtWidgets.qApp.processEvents()
-                time.sleep(measure_delay_ms/1000)
-                if not _MAPM_TEST:
-                    lockin_x, lockin_y, vol = self.mapm_measure()
-                else:
-                    lockin_x, lockin_y, vol = x, y, x+y
-                self.widget_MeasurementPlot1.set_xy_value(x, y, lockin_x)
-                self.widget_MeasurementPlot2.set_xy_value(x, y, lockin_y)
-                self.widget_MeasurementPlot3.set_xy_value(x, y, vol)
-                QtWidgets.qApp.processEvents()
-            row_index += 1
+                    try:
+                        self.pzt_goto_xyz_combined(x=x, y=y, z=None)
+                        pos = self.piezo_man.get_real_position("A", "B", "C")
+                        pos_x, pos_y, pos_z = pos["A"], pos["B"], pos["C"]
+                    except:
+                        pos = self.piezo_man.get_real_position("A", "B", "C")
+                        pos_x, pos_y, pos_z = pos["A"], pos["B"], pos["C"]
+                        ans = QMessageBox.information(self.window, f"Failed to move PZT to {x:.6f}, {y:.6f}",
+                                                      f"Current location: X,Y,Z {pos_x:.6f}, {pos_y:.6f} {pos_z:.6f}.\n"
+                                                      f"Continue to next location?",
+                                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+                        if ans == QMessageBox.No:
+                            break
 
-        # Sig gen OFF
-        if not _MAPM_TEST:
-            self.k3390man.turn_output(False)
+                    location_table.append([x, y, pos_x, pos_y, pos_z])
+
+                    if not b_only_check_pzt:
+                        QtWidgets.qApp.processEvents()
+                        time.sleep(measure_delay_ms/1000)
+                        lockin_x, lockin_y, vol = self.mapm_measure(n_avg=n_avg)
+                        self.widget_MeasurementPlot1.set_xy_value(x, y, lockin_x)
+                        self.widget_MeasurementPlot2.set_xy_value(x, y, lockin_y)
+                        self.widget_MeasurementPlot3.set_xy_value(x, y, vol)
+                    else:
+                        self.widget_MeasurementPlot1.set_xy_value(x, y, pos_x - x)
+                        self.widget_MeasurementPlot2.set_xy_value(x, y, pos_y - y)
+                    QtWidgets.qApp.processEvents()
+                else:  # _MAPM_TEST
+                    lockin_x, lockin_y, vol = x, y, x + y
+                    self.widget_MeasurementPlot1.set_xy_value(x, y, lockin_x)
+                    self.widget_MeasurementPlot2.set_xy_value(x, y, lockin_y)
+                    self.widget_MeasurementPlot3.set_xy_value(x, y, vol)
+                    QtWidgets.qApp.processEvents()
+            else:
+                row_index += 1
+                continue
+            break
+
+        if not b_only_check_pzt:
+            # Sig gen OFF
+            if not _MAPM_TEST:
+                self.k3390man.turn_output(False)
+
+        self.save_pzt_location_map(location_table, auto_open=True)
 
     def mapm_x_changed(self):
         x0 = self.doubleSpinBox_MapM_X0.value()

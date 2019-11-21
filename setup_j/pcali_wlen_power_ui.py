@@ -2,9 +2,10 @@
 
 # Form implementation generated from reading ui file 'pcali_wlen_power.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.1
+# Created by: PyQt5 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
+
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -51,5 +52,3 @@ class Ui_PCali_WLenPowerTable(object):
         self.pushButton_Copy.setText(_translate("PCali_WLenPowerTable", "Copy"))
         self.pushButton_Clear.setText(_translate("PCali_WLenPowerTable", "Clear Records"))
         self.tableWidget_WLen_Power.setSortingEnabled(True)
-
-
