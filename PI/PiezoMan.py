@@ -6,6 +6,7 @@ import logging
 from .piezo_config_ui import Ui_Piezo_Config_Window
 from PyQt5.QtWidgets import QWidget
 import traceback
+import time
 
 _SPLIT_LOG = False
 
@@ -34,6 +35,90 @@ class PiezoMan(PiezoGCSCom):
         self.config_window = None
         self.b_online = False
         self.b_closedloop = False
+        self.x_em = 0.07
+        self.y_em = 0.07
+        self.z_em = 0.07
+
+    def goto_xy(self, x, y, wait_10ms=300):
+        self.set_target_pos(["A", x], ["B", y])
+        i = 0
+        while i < wait_10ms:
+            pos = self.get_real_position("A", "B")
+            pos_x, pos_y = pos["A"], pos["B"]
+            if abs(pos_x - x) <= 0.01 and abs(pos_y - y) <= 0.01:
+                return
+            else:
+                time.sleep(0.01)
+                i += 1
+        raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
+
+    def goto_xy_ont(self, x: float, y: float, wait_10ms=300):
+        self.set_target_pos(["A", x], ["B", y])
+        time.sleep(0.01)
+        i = 0
+        while i < wait_10ms:
+            ont = self.get_on_target_status("A", "B")
+            if ont["A"] and ont["B"]:
+                pos = self.get_real_position("A", "B")
+                pos_x, pos_y = pos["A"], pos["B"]
+                piezo_logger.info(f"Target: {x}, {y}; Real Pos:{pos_x}, {pos_y}",
+                                  extra={"component": "Piezo"})
+                return
+            else:
+                time.sleep(0.01)
+                i += 1
+        raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
+
+    # TODO: merge functions
+    def goto_xyz_combined(self, x: float or None = None, y: float or None = None, z: float or None = None,
+                          wait_10ms=300):
+        args = []
+        if x is not None:
+            args.append(["A", x])
+        if y is not None:
+            args.append(["B", y])
+        if z is not None:
+            args.append(["C", z])
+
+        if len(args) == 0:
+            return
+
+        self.set_target_pos(*args)
+        time.sleep(0.01)
+        i = 0
+        ont = {"A": False, "B": False, "C": False}
+        while i < wait_10ms / 2:
+            ont = self.get_on_target_status("A", "B", "C")
+            if ont["A"] and ont["B"] and ont["C"]:
+                pos = self.get_real_position("A", "B", "C")
+                pos_x, pos_y, pos_z = pos["A"], pos["B"], pos["C"]
+                piezo_logger.info(f"Target: {x}, {y}, {z}; Real Pos:{pos_x}, {pos_y}, {pos_z}",
+                                  extra={"component": "Piezo"})
+                return
+            else:
+                time.sleep(0.01)
+                i += 1
+        piezo_logger.info(f"On target status not working, switch to margin checking {x_em}, {y_em}, {z_em}",
+                          extra={"component": "Piezo"})
+        i = 0
+        while i < wait_10ms / 2:
+            moving_x, moving_y, moving_z = self.is_axes_moving()
+            if moving_x or moving_y or moving_z:
+                time.sleep(0.01)
+                i += 1
+                continue
+
+            pos = self.get_real_position("A", "B", "C")
+            pos_x, pos_y, pos_z = pos["A"], pos["B"], pos["C"]
+            if (x is None or abs(pos_x - x) <= self.x_em or ont["A"]) and \
+                    (y is None or abs(pos_y - y) <= self.y_em or ont["B"]) and \
+                    (z is None or abs(pos_z - z) <= self.z_em or ont["C"]):
+                return
+            else:
+                time.sleep(0.01)
+                i += 1
+
+        raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
 
     def show_config_window(self):
         if self.config_window is None:
@@ -98,7 +183,19 @@ class PiezoConfigWindow(Ui_Piezo_Config_Window):
         self.pushButton_GetVel.clicked.connect(self.sync_current_axis_velctrl)
         self.pushButton_SetVel.clicked.connect(self.set_current_axis_velctrl)
 
+        self.doubleSpinBox_Xem.valueChanged.connect(self.axis_em_changed)
+        self.doubleSpinBox_Yem.valueChanged.connect(self.axis_em_changed)
+        self.doubleSpinBox_Zem.valueChanged.connect(self.axis_em_changed)
+        self.doubleSpinBox_Xem.setValue(self.piezo_man.x_em)
+        self.doubleSpinBox_Yem.setValue(self.piezo_man.y_em)
+        self.doubleSpinBox_Zem.setValue(self.piezo_man.z_em)
+
         self.refresh_comlist()
+
+    def axis_em_changed(self):
+        self.piezo_man.x_em = self.doubleSpinBox_Xem.value()
+        self.piezo_man.y_em = self.doubleSpinBox_Yem.value()
+        self.piezo_man.z_em = self.doubleSpinBox_Zem.value()
 
     def switch_loop_mode(self):
         if self.radioButton_ClosedLoop.isChecked() and not self.piezo_man.b_closedloop:
@@ -263,7 +360,6 @@ class PiezoConfigWindow(Ui_Piezo_Config_Window):
                                                ["B", self.doubleSpinBox_XVel.value()],
                                                ["C", self.doubleSpinBox_XVel.value()])
         self.sync_current_axis_velctrl()
-
 
     def open_conn_clicked(self, state):
         if not state:  # post event state

@@ -260,6 +260,8 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.save_settings_diag = SaveSettingsWindow(self.aotf_man, self.k3390man, self.sr830_man)
         self.pushButton_SaveSettings.clicked.connect(lambda: self.save_settings_diag.show())
 
+        self.mapm_last_incomplete_scan = None
+
         self.all_cams = []
 
         self.window.show()
@@ -392,90 +394,6 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.lineEdit_MapM_NiVol.setText(float2str(vol))
         return x, y, vol
 
-    def pzt_goto_xy(self, x, y, wait_10ms=300):
-        self.piezo_man.set_target_pos(["A", x], ["B", y])
-        i = 0
-        while i < wait_10ms:
-            pos = self.piezo_man.get_real_position("A", "B")
-            pos_x, pos_y = pos["A"], pos["B"]
-            if abs(pos_x - x) <= 0.01 and abs(pos_y - y) <= 0.01:
-                return
-            else:
-                time.sleep(0.01)
-                i += 1
-        raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
-
-    def pzt_goto_xy_ont(self, x: float, y: float, wait_10ms=300):
-        self.piezo_man.set_target_pos(["A", x], ["B", y])
-        time.sleep(0.01)
-        i = 0
-        while i < wait_10ms:
-            ont = self.piezo_man.get_on_target_status("A", "B")
-            if ont["A"] and ont["B"]:
-                pos = self.piezo_man.get_real_position("A", "B")
-                pos_x, pos_y = pos["A"], pos["B"]
-                setup_main_logger.info(f"Target: {x}, {y}; Real Pos:{pos_x}, {pos_y}",
-                                       extra={"component": "Main/MAPM"})
-                return
-            else:
-                time.sleep(0.01)
-                i += 1
-        raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
-
-    # TODO: merge functions
-    def pzt_goto_xyz_combined(self,
-                              x: float or None = None,
-                              y: float or None = None,
-                              z: float or None = None,
-                              wait_10ms=300):
-        args = []
-        if x is not None:
-            args.append(["A", x])
-        if y is not None:
-            args.append(["B", y])
-        if z is not None:
-            args.append(["C", z])
-
-        if len(args) == 0:
-            return
-
-        self.piezo_man.set_target_pos(*args)
-        time.sleep(0.01)
-        i = 0
-        ont = {"A": False, "B": False, "C": False}
-        while i < wait_10ms / 2:
-            ont = self.piezo_man.get_on_target_status("A", "B", "C")
-            if ont["A"] and ont["B"] and ont["C"]:
-                pos = self.piezo_man.get_real_position("A", "B", "C")
-                pos_x, pos_y, pos_z = pos["A"], pos["B"], pos["C"]
-                setup_main_logger.info(f"Target: {x}, {y}, {z}; Real Pos:{pos_x}, {pos_y}, {pos_z}",
-                                       extra={"component": "Main/MAPM"})
-                return
-            else:
-                time.sleep(0.01)
-                i += 1
-        setup_main_logger.info(f"On target status not working, switch to margin checking (0.07)",
-                               extra={"component": "Main/MAPM"})
-        i = 0
-        while i < wait_10ms / 2:
-            moving_x, moving_y, moving_z = self.piezo_man.is_axes_moving()
-            if moving_x or moving_y or moving_z:
-                time.sleep(0.01)
-                i += 1
-                continue
-
-            pos = self.piezo_man.get_real_position("A", "B", "C")
-            pos_x, pos_y, pos_z = pos["A"], pos["B"], pos["C"]
-            if (x is None or abs(pos_x - x) <= 0.07 or ont["A"]) and \
-                    (y is None or abs(pos_y - y) <= 0.07 or ont["B"]) and \
-                    (z is None or abs(pos_z - z) <= 0.07 or ont["C"]):
-                return
-            else:
-                time.sleep(0.01)
-                i += 1
-
-        raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
-
     def save_pzt_location_map(self, loc_table: list, auto_open: bool = False):
         fname, _ = QFileDialog.getSaveFileName(self.window, "Save as CSV file ...", ".", "CSV (*.csv)")
         if fname is not None and fname != '':
@@ -522,7 +440,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         try:
             if not _MAPM_TEST:
-                self.pzt_goto_xyz_combined(x=x0, y=y0, z=None)
+                self.piezo_man.goto_xyz_combined(x=x0, y=y0, z=None)
         except TimeoutError as te:
             setup_main_logger.error(te, extra={"component": "Main/MAPM"})
             pos = self.piezo_man.get_real_position("A", "B", "C")
@@ -531,6 +449,13 @@ class SetupMainWindow(Ui_SetupMainWindow):
                                     f"Current location: X,Y,Z {pos_x:.6f}, {pos_y:.6f} {pos_z:.6f}",
                                     QMessageBox.Ok)
             return
+
+        # TODO: Add the feature to be able to resume previous incomplete scan
+        self.mapm_last_incomplete_scan = {
+            "x0": x0, "y0": y0, "x1": x1, "y1": y1, "x_samples": x_samples, "y_samples": y_samples,
+            "x_values": x_values, "y_values": y_values, "ni_ch": ni_ch, "measure_delay_ms": measure_delay_ms,
+            "n_avg": n_avg, "scanned_data": {}
+        }
 
         # if not b_only_check_pzt:
         # Set up plots
@@ -549,9 +474,10 @@ class SetupMainWindow(Ui_SetupMainWindow):
             x_track = x_values if row_index % 2 == 0 else np.flip(x_values)
             for x in x_track:
                 # Go to x, y
+                setup_main_logger.info(f"Piezo going to {x:.6f}, {y:.6f}", extra={"component": "Main/MAPM"})
                 if not _MAPM_TEST:
                     try:
-                        self.pzt_goto_xyz_combined(x=x, y=y, z=None)
+                        self.piezo_man.goto_xyz_combined(x=x, y=y, z=None)
                         pos = self.piezo_man.get_real_position("A", "B", "C")
                         pos_x, pos_y, pos_z = pos["A"], pos["B"], pos["C"]
                     except:
@@ -560,7 +486,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
                         ans = QMessageBox.information(self.window, f"Failed to move PZT to {x:.6f}, {y:.6f}",
                                                       f"Current location: X,Y,Z {pos_x:.6f}, {pos_y:.6f} {pos_z:.6f}.\n"
                                                       f"Continue to next location?",
-                                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+                                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
                         if ans == QMessageBox.No:
                             break
 
