@@ -2,9 +2,10 @@
 
 # Form implementation generated from reading ui file 'nidaq_config.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.1
+# Created by: PyQt5 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
+
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -12,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_NIDAQ_Config_Window(object):
     def setupUi(self, NIDAQ_Config_Window):
         NIDAQ_Config_Window.setObjectName("NIDAQ_Config_Window")
-        NIDAQ_Config_Window.resize(1067, 577)
+        NIDAQ_Config_Window.resize(1116, 577)
         self.verticalLayout_6 = QtWidgets.QVBoxLayout(NIDAQ_Config_Window)
         self.verticalLayout_6.setObjectName("verticalLayout_6")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
@@ -94,14 +95,15 @@ class Ui_NIDAQ_Config_Window(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 255, 418))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 254, 366))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
         self.gridLayout_AiChs = QtWidgets.QGridLayout()
         self.gridLayout_AiChs.setObjectName("gridLayout_AiChs")
         self.verticalLayout.addLayout(self.gridLayout_AiChs)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 337, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem1)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.gridLayout.addWidget(self.scrollArea, 1, 0, 2, 2)
         self.label = QtWidgets.QLabel(self.groupBox_Control)
@@ -115,45 +117,45 @@ class Ui_NIDAQ_Config_Window(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollArea_2.setObjectName("scrollArea_2")
         self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 254, 418))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 266, 366))
         self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_2)
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.gridLayout_AoChs = QtWidgets.QGridLayout()
         self.gridLayout_AoChs.setObjectName("gridLayout_AoChs")
         self.verticalLayout_2.addLayout(self.gridLayout_AoChs)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 337, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_2.addItem(spacerItem2)
         self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_2)
         self.gridLayout.addWidget(self.scrollArea_2, 1, 2, 2, 2)
         self.scrollArea_3 = QtWidgets.QScrollArea(self.groupBox_Control)
         self.scrollArea_3.setWidgetResizable(True)
         self.scrollArea_3.setObjectName("scrollArea_3")
         self.scrollAreaWidgetContents_3 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 255, 418))
+        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 266, 366))
         self.scrollAreaWidgetContents_3.setObjectName("scrollAreaWidgetContents_3")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_3)
-        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_3.setSpacing(0)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.gridLayout_DiChs = QtWidgets.QGridLayout()
         self.gridLayout_DiChs.setObjectName("gridLayout_DiChs")
         self.verticalLayout_3.addLayout(self.gridLayout_DiChs)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 337, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_3.addItem(spacerItem3)
         self.scrollArea_3.setWidget(self.scrollAreaWidgetContents_3)
         self.gridLayout.addWidget(self.scrollArea_3, 1, 4, 2, 2)
         self.scrollArea_4 = QtWidgets.QScrollArea(self.groupBox_Control)
         self.scrollArea_4.setWidgetResizable(True)
         self.scrollArea_4.setObjectName("scrollArea_4")
         self.scrollAreaWidgetContents_4 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 256, 418))
+        self.scrollAreaWidgetContents_4.setGeometry(QtCore.QRect(0, 0, 278, 366))
         self.scrollAreaWidgetContents_4.setObjectName("scrollAreaWidgetContents_4")
-        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_4)
-        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_4.setSpacing(0)
-        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.verticalLayout_8 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_4)
+        self.verticalLayout_8.setObjectName("verticalLayout_8")
         self.gridLayout_DoChs = QtWidgets.QGridLayout()
         self.gridLayout_DoChs.setObjectName("gridLayout_DoChs")
-        self.verticalLayout_4.addLayout(self.gridLayout_DoChs)
+        self.verticalLayout_8.addLayout(self.gridLayout_DoChs)
+        spacerItem4 = QtWidgets.QSpacerItem(20, 337, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_8.addItem(spacerItem4)
         self.scrollArea_4.setWidget(self.scrollAreaWidgetContents_4)
         self.gridLayout.addWidget(self.scrollArea_4, 1, 6, 2, 2)
         self.verticalLayout_5.addLayout(self.gridLayout)
@@ -181,5 +183,3 @@ class Ui_NIDAQ_Config_Window(object):
         self.pushButton_WriteAo.setText(_translate("NIDAQ_Config_Window", "Write"))
         self.label.setText(_translate("NIDAQ_Config_Window", "Analog Input:"))
         self.pushButton_WriteDo.setText(_translate("NIDAQ_Config_Window", "Write"))
-
-

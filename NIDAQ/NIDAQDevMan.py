@@ -58,7 +58,7 @@ class NIDAQDevMan(QObject):
             self.dev_name = dev_name
             self.device = self._ni_sys.devices[self.dev_name]
         for ch_type in self.ch_dict.keys():
-            self.ch_dict[ch_type] = {'task': None, 'chs': []}
+            self.ch_dict[ch_type] = {'task': nidaqmx.Task(), 'chs': []}
         self.opened.emit()
         return self._ni_sys.driver_version
 
@@ -71,6 +71,9 @@ class NIDAQDevMan(QObject):
                 self.ch_dict[ch_type]['task'].close()
                 self.ch_dict[ch_type]['task'] = None
         self.closed.emit()
+
+    def __del__(self):
+        self.close()
 
     def get_ai_channels(self):
         return [ch.name for ch in self.device.ai_physical_chans]
@@ -106,7 +109,7 @@ class NIDAQDevMan(QObject):
                 self.ch_dict[ch_type]['task'].di_channels.add_di_chan(ch, line_grouping=LineGrouping.CHAN_PER_LINE)
             else:  # if ch_type == 'do':
                 self.ch_dict[ch_type]['task'].do_channels.add_do_chan(ch, line_grouping=LineGrouping.CHAN_PER_LINE)
-            self.ch_dcit[ch_type]['chs'].append(ch)
+            self.ch_dict[ch_type]['chs'].append(ch)
 
         self.task_channels_changed.emit(ch_type, self.ch_dict[ch_type]['chs'])
 
@@ -149,7 +152,7 @@ class NIDAQDevMan(QObject):
         elif len(self.ch_dict[ch_type]['chs']) == 1:
             res = {self.ch_dict[ch_type]['chs'][0]: self.ch_dict[ch_type]['task'].read()}
         else:
-            res = {c:v for c, v in zip(self.ch_dict[ch_type]['chs'], self.ch_dict[ch_type]['task'].read())}
+            res = {c: v for c, v in zip(self.ch_dict[ch_type]['chs'], self.ch_dict[ch_type]['task'].read())}
 
         self.ai_values_changed.emit(res)
         return res
@@ -159,14 +162,14 @@ class NIDAQDevMan(QObject):
             nidaq_logger.error(f"Can't write {ch_type}", extra={"component": "NIDAQ"})
             return {}
 
-        default_values = {c: 0 for c in self.ch_dict[ch_type]['chs']}
+        default_values = {c: 0 if ch_type == 'ao' else False for c in self.ch_dict[ch_type]['chs']}
         for key, value in ch_value_dict.items():
             if key in default_values.keys():
                 default_values[key] = value
 
         values = [default_values[key] for key in self.ch_dict[ch_type]['chs']]
         nidaq_logger.debug(f"Writing {ch_type} {ch_value_dict}", extra={"component": "NIDAQ"})
-        self._ao_task.write(values, auto_start=True)
+        self.ch_dict[ch_type]['task'].write(values, auto_start=True)
 
     @staticmethod
     def get_nidaq_devices():
@@ -235,7 +238,7 @@ class NIDAQConfigWindow(Ui_NIDAQ_Config_Window):
         for c, v in ch_dict.items():
             if c in self.chs_widget_dict['di']['chs_dict'].keys():
                 spin_box: QtWidgets.QSpinBox = self.chs_widget_dict['di']['chs_dict'][c][3]
-                spin_box.setValue(v)
+                spin_box.setValue(1 if v else 0)
 
     def sync_ao_values(self):
         ch_value_dict = {}
@@ -250,7 +253,7 @@ class NIDAQConfigWindow(Ui_NIDAQ_Config_Window):
         ch_value_dict = {}
         for channel_name, (ch_type, ch_w_label, ch_w_enable, ch_w_value) in self.chs_widget_dict['do']['chs_dict'].items():
             if ch_w_enable.isChecked():
-                ch_value = ch_w_value.value()
+                ch_value = ch_w_value.value() == 1
                 ch_value_dict[channel_name] = ch_value
 
         self.nidaq_man.write_task_channels('do', ch_value_dict)
@@ -260,9 +263,9 @@ class NIDAQConfigWindow(Ui_NIDAQ_Config_Window):
             parent_widget: QtWidgets.QGridLayout = self.chs_widget_dict[ch_type]['parent']
             widget_dict = self.chs_widget_dict[ch_type]['chs_dict']
             for ch_name, (ch_type, ch_w_label, ch_w_enable, ch_w_value) in widget_dict.items():
-                parent_widget.removeItem(ch_w_label)
-                parent_widget.removeItem(ch_w_enable)
-                parent_widget.removeItem(ch_w_value)
+                parent_widget.removeWidget(ch_w_label)
+                parent_widget.removeWidget(ch_w_enable)
+                parent_widget.removeWidget(ch_w_value)
 
             widget_dict.clear()
 
@@ -322,7 +325,7 @@ class NIDAQConfigWindow(Ui_NIDAQ_Config_Window):
 
                 parent_widget.addWidget(ctrl_w, row_index, 2, 1, 1)
                 widget_dict[ch] = (ch_type, label, chbox_enable, ctrl_w)
-            row_index += 1
+                row_index += 1
 
     def show(self):
         self.window.show()

@@ -137,7 +137,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.pushButton_SR830_Config.clicked.connect(lambda: self.sr830_man.show_config_window())
         self.sr830_man.opened.connect(lambda: self.label_SR830_Conn_Status.setStyleSheet("background: green"))
         self.sr830_man.closed.connect(lambda: self.label_SR830_Conn_Status.setStyleSheet("background: red"))
-        self.sr830_man.axisValueChanged.connect(self.sr830_axis_value_changed)
+        self.sr830_man.axis_value_changed.connect(self.sr830_axis_value_changed)
 
         self.f_aotfman: FianiumAOTFMan = FianiumAOTFMan()
         self.y_aotfman: YSLAOTFMan = YSLAOTFMan()
@@ -330,17 +330,17 @@ class SetupMainWindow(Ui_SetupMainWindow):
                                f"With NIDAQ ch {ni_ch} "
                                f"Measure delay {measure_delay_ms} ms", extra={"component": "Main/FocusCali"})
 
-        self.pzt_goto_xyz_combined(x=x, y=y0, z=z)
+        self.piezo_man.goto_xyz_combined(x=x, y=y0, z=z)
         self.widget_FocusCaliPlot.add_ch_line(z)
         self.comboBox_FocusCali_ZLines.addItem(f"{z:.6f}", z)
 
         y_values = np.linspace(y0, y1, n_y)
 
         for y in y_values:
-            self.pzt_goto_xyz_combined(y=y)
+            self.piezo_man.goto_xyz_combined(y=y)
             QtWidgets.qApp.processEvents()
             time.sleep(measure_delay_ms)
-            vol = self.nidaq_man.read_ai_channels()[self.comboBox_FocusCali_NidaqCh.currentText()]
+            vol = self.nidaq_man.read_task_channels('ai')[self.comboBox_FocusCali_NidaqCh.currentText()]
             self.widget_FocusCaliPlot.add_data(y, vol)
             QtWidgets.qApp.processEvents()
 
@@ -385,7 +385,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             # Lock In
             x_l[i], y_l[i] = self.sr830_man.get_parameters_value(SR830Man.GET_PARAMETER_X, SR830Man.GET_PARAMETER_Y)
             # NI DAQ
-            vol_l[i] = self.nidaq_man.read_ai_channels()[self.comboBox_MapM_NIDAQCh.currentText()]
+            vol_l[i] = self.nidaq_man.read_task_channels('ai')[self.comboBox_MapM_NIDAQCh.currentText()]
 
         x, y, vol = np.average(x_l), np.average(y_l), np.average(vol_l)
         self.lineEdit_MapM_LockInX.setText(float2str(x))
@@ -817,7 +817,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
     def pcali_getvol(self):
         global setup_main_logger
         nidaq_ch = self.comboBox_PCCaliNIDAQCh.currentText()
-        ai_values = self.nidaq_man.read_ai_channels()
+        ai_values = self.nidaq_man.read_task_channels('ai')
         if nidaq_ch in ai_values.keys():
             vol = ai_values[nidaq_ch]
             self.lineEdit_PCaliVol.setText(f"{vol:.6f}")
@@ -900,11 +900,10 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.pushButton_PCaliRun.setEnabled(True)
         self.pushButton_PCaliRun.setText("Run")
 
-    def pdv_refresh(self, b_auto = False, interval = 1000):
-        global setup_main_logger
+    def pdv_refresh(self, b_auto: bool = False, interval: int = 1000):
         pdv_ai_ch = self.comboBox_PhotoDiode_NIDAQ_Channel.currentText()
         if pdv_ai_ch != "":
-            res_dict = self.nidaq_man.read_ai_channels()
+            res_dict = self.nidaq_man.read_task_channels('ai')
             ts = time.time() * 1000
             if pdv_ai_ch not in res_dict.keys():
                 setup_main_logger.error(f"PDV CH {pdv_ai_ch} not in the NIDAQ enabled AI channels",
@@ -921,7 +920,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         if b_auto:
             if self.pushButton_PDV_AutoRefresh.isChecked():
-                QTimer.singleShot(interval, lambda: self.pdv_refresh(True, interval) )
+                QTimer.singleShot(interval, lambda: self.pdv_refresh(True, interval))
 
     def _pdv_autorefresh_task(self):
         try:
@@ -1094,7 +1093,6 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.laser_align_z_dists_tablewin.show()
         self.laser_align_zdepth_export()
 
-    @pyqtSlot(str, list)
     def nidaq_task_channels_changed(self, ch_type: str, chs: list):
         if ch_type == 'ai':
             nidaq_ai_chs = chs
