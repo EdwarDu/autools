@@ -5,7 +5,7 @@ import traceback
 import re
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QMessageBox
-from PyQt5.QtCore import QTimer, QDir
+from PyQt5.QtCore import QTimer, QDir, pyqtSignal, pyqtSlot
 import os
 import time
 import platform
@@ -155,8 +155,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.pushButton_NIDAQ_Config.clicked.connect(lambda: self.nidaq_man.show_config_window())
         self.nidaq_man.opened.connect(lambda: self.label_NIDAQ_Conn_Status.setStyleSheet("background: green"))
         self.nidaq_man.closed.connect(lambda: self.label_NIDAQ_Conn_Status.setStyleSheet("background: red"))
-        self.nidaq_man.ao_channels_changed.connect(self.nidaq_ao_channels_changed)
-        self.nidaq_man.ai_channels_changed.connect(self.nidaq_ai_channels_changed)
+        self.nidaq_man.task_channels_changed.connect(self.nidaq_task_channels_changed)
         self.nidaq_man.ai_values_changed.connect(self.nidaq_ai_values_changed)
 
         self.piezo_man: PiezoMan = PiezoMan()
@@ -1095,27 +1094,22 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.laser_align_z_dists_tablewin.show()
         self.laser_align_zdepth_export()
 
-    def nidaq_ao_channels_changed(self):
-        # TODO
-        global setup_main_logger
-        setup_main_logger.debug(f"{self.nidaq_man.get_ao_task_channels()}", extra={"component": "Main"})
+    @pyqtSlot(str, list)
+    def nidaq_task_channels_changed(self, ch_type: str, chs: list):
+        if ch_type == 'ai':
+            nidaq_ai_chs = chs
+            setup_main_logger.debug(f"{nidaq_ai_chs}", extra={"component": "Main"})
+            self.comboBox_PhotoDiode_NIDAQ_Channel.clear()
+            self.comboBox_PhotoDiode_NIDAQ_Channel.addItems(nidaq_ai_chs)
 
-    def nidaq_ai_channels_changed(self):
-        # TODO
-        global setup_main_logger
-        nidaq_ai_chs = self.nidaq_man.get_ai_task_channels()
-        setup_main_logger.debug(f"{nidaq_ai_chs}", extra={"component": "Main"})
-        self.comboBox_PhotoDiode_NIDAQ_Channel.clear()
-        self.comboBox_PhotoDiode_NIDAQ_Channel.addItems(nidaq_ai_chs)
+            self.comboBox_PCCaliNIDAQCh.clear()
+            self.comboBox_PCCaliNIDAQCh.addItems(nidaq_ai_chs)
 
-        self.comboBox_PCCaliNIDAQCh.clear()
-        self.comboBox_PCCaliNIDAQCh.addItems(nidaq_ai_chs)
+            self.comboBox_MapM_NIDAQCh.clear()
+            self.comboBox_MapM_NIDAQCh.addItems(nidaq_ai_chs)
 
-        self.comboBox_MapM_NIDAQCh.clear()
-        self.comboBox_MapM_NIDAQCh.addItems(nidaq_ai_chs)
-
-        self.comboBox_FocusCali_NidaqCh.clear()
-        self.comboBox_FocusCali_NidaqCh.addItems(nidaq_ai_chs)
+            self.comboBox_FocusCali_NidaqCh.clear()
+            self.comboBox_FocusCali_NidaqCh.addItems(nidaq_ai_chs)
 
     def nidaq_ai_values_changed(self, values):
         # TODO
