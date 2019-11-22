@@ -411,51 +411,90 @@ class SetupMainWindow(Ui_SetupMainWindow):
         else:
             return None
 
-    def mapm_measure_auto(self, b_only_check_pzt : bool = False):
+    def mapm_measure_auto(self, b_only_check_pzt: bool = False):
         # TODO: Run Automeasure task
-        # Pzt to X0, Y0
-        x0 = self.doubleSpinBox_MapM_X0.value()
-        y0 = self.doubleSpinBox_MapM_Y0.value()
-        x1 = self.doubleSpinBox_MapM_X1.value()
-        y1 = self.doubleSpinBox_MapM_Y1.value()
-        x_samples = self.spinBox_MapM_XSamples.value()
-        y_samples = self.spinBox_MapM_YSamples.value()
-
-        x_values = np.linspace(x0, x1, x_samples)
-        y_values = np.linspace(y0, y1, y_samples)
-
-        ni_ch = self.comboBox_MapM_NIDAQCh.currentText()
-        measure_delay_ms = self.spinBox_MapM_MeasureDelay.value()
-        n_avg = self.spinBox_MapM_nAvgSamples.value()
-
-        if b_only_check_pzt:
-            setup_main_logger.info(f"Checking PZT move from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
-                                   f"#Samples X={x_samples}, Y={y_samples} ",
-                                   extra={"component": "Main/MAPM"})
+        if not b_only_check_pzt and \
+                self.mapm_last_incomplete_scan is not None and \
+                len(self.mapm_last_incomplete_scan) != 0:
+            ans = QMessageBox.question(self.window, f"Previous scan incomplete", "Continue?",
+                                       QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            start_new = ans == QMessageBox.No
         else:
-            setup_main_logger.info(f"Map scan from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
+            start_new = True
+
+        if start_new:
+            x0 = self.doubleSpinBox_MapM_X0.value()
+            y0 = self.doubleSpinBox_MapM_Y0.value()
+            x1 = self.doubleSpinBox_MapM_X1.value()
+            y1 = self.doubleSpinBox_MapM_Y1.value()
+            x_samples = self.spinBox_MapM_XSamples.value()
+            y_samples = self.spinBox_MapM_YSamples.value()
+
+            x_values = np.linspace(x0, x1, x_samples)
+            y_values = np.linspace(y0, y1, y_samples)
+
+            ni_ch = self.comboBox_MapM_NIDAQCh.currentText()
+            measure_delay_ms = self.spinBox_MapM_MeasureDelay.value()
+            n_avg = self.spinBox_MapM_nAvgSamples.value()
+
+            if b_only_check_pzt:
+                setup_main_logger.info(f"Checking PZT move from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
+                                       f"#Samples X={x_samples}, Y={y_samples} ",
+                                       extra={"component": "Main/MAPM"})
+            else:
+                setup_main_logger.info(f"Map scan from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
+                                       f"#Samples X={x_samples}, Y={y_samples} "
+                                       f"With NIDAQ ch {ni_ch}, #Avg={n_avg}"
+                                       f"Measure delay {measure_delay_ms} ms", extra={"component": "Main/MAPM"})
+
+            try:
+                if not _MAPM_TEST:
+                    self.piezo_man.goto_xyz_combined(x=x0, y=y0, z=None)
+            except TimeoutError as te:
+                setup_main_logger.error(te, extra={"component": "Main/MAPM"})
+                pos = self.piezo_man.get_real_position("A", "B", "C")
+                pos_x, pos_y, pos_z = pos["A"], pos["B"], pos["C"]
+                QMessageBox.information(self.window, "Failed to move PZT to (0, 0)",
+                                        f"Current location: X,Y,Z {pos_x:.6f}, {pos_y:.6f} {pos_z:.6f}",
+                                        QMessageBox.Ok)
+                return
+
+            if not b_only_check_pzt:
+                # we only overwrite this if it is "check pzt"
+                self.mapm_last_incomplete_scan = {
+                    "x0": x0, "y0": y0, "x1": x1, "y1": y1, "x_samples": x_samples, "y_samples": y_samples,
+                    "ni_ch": ni_ch, "measure_delay_ms": measure_delay_ms,
+                    "n_avg": n_avg, "scanned_data": {}
+                }
+        else:
+            x0 = self.mapm_last_incomplete_scan["x0"]
+            y0 = self.mapm_last_incomplete_scan["y0"]
+            x1 = self.mapm_last_incomplete_scan["x1"]
+            y1 = self.mapm_last_incomplete_scan["y1"]
+            x_samples = self.mapm_last_incomplete_scan["x_samples"]
+            y_samples = self.mapm_last_incomplete_scan["y_samples"]
+
+            self.doubleSpinBox_MapM_X0.setValue(x0)
+            self.doubleSpinBox_MapM_Y0.setValue(y0)
+            self.doubleSpinBox_MapM_X1.setValue(x1)
+            self.doubleSpinBox_MapM_Y1.setValue(y1)
+
+            x_values = np.linspace(x0, x1, x_samples)
+            y_values = np.linspace(y0, y1, y_samples)
+
+            ni_ch = self.mapm_last_incomplete_scan["ni_ch"]
+            measure_delay_ms = self.mapm_last_incomplete_scan["measure_delay_ms"]
+            n_avg = self.mapm_last_incomplete_scan["n_avg"]
+
+            self.comboBox_MapM_NIDAQCh.setCurrentText(ni_ch)
+            self.spinBox_MapM_MeasureDelay.setValue(measure_delay_ms)
+            self.spinBox_MapM_nAvgSamples.setValue(n_avg)
+            QtWidgets.qApp.processEvents()
+
+            setup_main_logger.info(f"Resume map scan from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
                                    f"#Samples X={x_samples}, Y={y_samples} "
                                    f"With NIDAQ ch {ni_ch}, #Avg={n_avg}"
                                    f"Measure delay {measure_delay_ms} ms", extra={"component": "Main/MAPM"})
-
-        try:
-            if not _MAPM_TEST:
-                self.piezo_man.goto_xyz_combined(x=x0, y=y0, z=None)
-        except TimeoutError as te:
-            setup_main_logger.error(te, extra={"component": "Main/MAPM"})
-            pos = self.piezo_man.get_real_position("A", "B", "C")
-            pos_x, pos_y, pos_z = pos["A"], pos["B"], pos["C"]
-            QMessageBox.information(self.window, "Failed to move PZT to (0, 0)",
-                                    f"Current location: X,Y,Z {pos_x:.6f}, {pos_y:.6f} {pos_z:.6f}",
-                                    QMessageBox.Ok)
-            return
-
-        # TODO: Add the feature to be able to resume previous incomplete scan
-        self.mapm_last_incomplete_scan = {
-            "x0": x0, "y0": y0, "x1": x1, "y1": y1, "x_samples": x_samples, "y_samples": y_samples,
-            "x_values": x_values, "y_values": y_values, "ni_ch": ni_ch, "measure_delay_ms": measure_delay_ms,
-            "n_avg": n_avg, "scanned_data": {}
-        }
 
         # if not b_only_check_pzt:
         # Set up plots
@@ -494,11 +533,16 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
                     if not b_only_check_pzt:
                         QtWidgets.qApp.processEvents()
-                        time.sleep(measure_delay_ms/1000)
-                        lockin_x, lockin_y, vol = self.mapm_measure(n_avg=n_avg)
+                        if (x, y) not in self.mapm_last_incomplete_scan["scanned_data"].keys():
+                            time.sleep(measure_delay_ms/1000)
+                            lockin_x, lockin_y, vol = self.mapm_measure(n_avg=n_avg)
+                        else:
+                            lockin_x, lockin_y, vol = self.mapm_last_incomplete_scan["scanned_data"][(x, y)]
+
                         self.widget_MeasurementPlot1.set_xy_value(x, y, lockin_x)
                         self.widget_MeasurementPlot2.set_xy_value(x, y, lockin_y)
                         self.widget_MeasurementPlot3.set_xy_value(x, y, vol)
+                        self.mapm_last_incomplete_scan["scanned_data"][(x, y)] = (lockin_x, lockin_y, vol)
                     else:
                         self.widget_MeasurementPlot1.set_xy_value(x, y, pos_x - x)
                         self.widget_MeasurementPlot2.set_xy_value(x, y, pos_y - y)
@@ -519,6 +563,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             if not _MAPM_TEST:
                 self.k3390man.turn_output(False)
 
+            self.mapm_last_incomplete_scan = None  # scan complete remove incomplete save
         self.save_pzt_location_map(location_table, auto_open=True)
 
     def mapm_x_changed(self):
