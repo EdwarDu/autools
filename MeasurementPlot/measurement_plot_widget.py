@@ -118,8 +118,8 @@ class MeasurementPlotWidget(pg.GraphicsLayoutWidget):
         self.map_h_line.setBounds([0, self.image_height-0.01])
 
     def set_xy_list(self, xlist, ylist):
-        self.xlist = xlist[:]
-        self.ylist = ylist[:]
+        self.xlist = np.sort(xlist)
+        self.ylist = np.sort(ylist)
         self.image_width = len(self.xlist)
         self.image_height = len(self.ylist)
         self.image_data = np.zeros((self.image_height, self.image_width))

@@ -35,6 +35,7 @@ class NIDAQDevMan(QObject):
     closed = pyqtSignal()
     task_channels_changed = pyqtSignal(str, list, name='taskChannelsChanged')
     ai_values_changed = pyqtSignal(dict, name="aiValuesChanged")
+    ao_values_changed = pyqtSignal(dict, name='aoValuesChanged')
     di_values_changed = pyqtSignal(dict, name='diValuesChanged')
 
     def __init__(self, dev_name: str = "Dev1"):
@@ -170,6 +171,7 @@ class NIDAQDevMan(QObject):
         values = [default_values[key] for key in self.ch_dict[ch_type]['chs']]
         nidaq_logger.debug(f"Writing {ch_type} {ch_value_dict}", extra={"component": "NIDAQ"})
         self.ch_dict[ch_type]['task'].write(values, auto_start=True)
+        self.ao_values_changed.emit(default_values)
 
     @staticmethod
     def get_nidaq_devices():
