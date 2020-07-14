@@ -2,9 +2,10 @@
 
 # Form implementation generated from reading ui file 'save_settings.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.1
+# Created by: PyQt5 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
+
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -33,5 +34,3 @@ class Ui_SaveSettingsDialog(object):
         SaveSettingsDialog.setWindowTitle(_translate("SaveSettingsDialog", "Save settings..."))
         self.pushButton_Refresh.setText(_translate("SaveSettingsDialog", "Refresh"))
         self.pushButton_Save2File.setText(_translate("SaveSettingsDialog", "Save ..."))
-
-

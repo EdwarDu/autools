@@ -4,10 +4,11 @@ import sys
 import traceback
 import re
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
-from PyQt5.QtCore import QTimer, QDir
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QMessageBox
+from PyQt5.QtCore import QTimer, QDir, pyqtSignal, pyqtSlot
 import os
 import time
+import platform
 import numpy as np
 
 import threading
@@ -33,10 +34,13 @@ setup_main_logger.addHandler(setup_main_logger_ch)
 
 _AUTOZ_TEST = False
 _MAPM_TEST = False
+_HAS_ANDOR = True
 
 from ..SRS.SR830Man import SR830Man, float2str
 from ..Cameras.CVCameraMan import CVCameraMan
-from ..Cameras.AndorCameraMan import AndorCameraMan
+
+if _HAS_ANDOR:
+    from ..Cameras.AndorCameraMan import AndorCameraMan
 
 
 try:
@@ -133,7 +137,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.pushButton_SR830_Config.clicked.connect(lambda: self.sr830_man.show_config_window())
         self.sr830_man.opened.connect(lambda: self.label_SR830_Conn_Status.setStyleSheet("background: green"))
         self.sr830_man.closed.connect(lambda: self.label_SR830_Conn_Status.setStyleSheet("background: red"))
-        self.sr830_man.axisValueChanged.connect(self.sr830_axis_value_changed)
+        self.sr830_man.axis_value_changed.connect(self.sr830_axis_value_changed)
 
         self.f_aotfman: FianiumAOTFMan = FianiumAOTFMan()
         self.y_aotfman: YSLAOTFMan = YSLAOTFMan()
@@ -151,8 +155,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.pushButton_NIDAQ_Config.clicked.connect(lambda: self.nidaq_man.show_config_window())
         self.nidaq_man.opened.connect(lambda: self.label_NIDAQ_Conn_Status.setStyleSheet("background: green"))
         self.nidaq_man.closed.connect(lambda: self.label_NIDAQ_Conn_Status.setStyleSheet("background: red"))
-        self.nidaq_man.ao_channels_changed.connect(self.nidaq_ao_channels_changed)
-        self.nidaq_man.ai_channels_changed.connect(self.nidaq_ai_channels_changed)
+        self.nidaq_man.task_channels_changed.connect(self.nidaq_task_channels_changed)
         self.nidaq_man.ai_values_changed.connect(self.nidaq_ai_values_changed)
 
         self.piezo_man: PiezoMan = PiezoMan()
@@ -175,7 +178,8 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.k3390man.output_state_changed.connect(self.k3390_output_state_changed)
 
         # AndorCam
-        self.andor_man = AndorCameraMan(0)
+        if _HAS_ANDOR:
+            self.andor_man = AndorCameraMan(0)
 
         # PDV plot
         self.laser_align_z_dists_tablewin = LaserAlignmentZDistsWindow()
@@ -200,6 +204,22 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.doubleSpinBox_PCaliVolTarget.valueChanged.connect(
             lambda value: self.doubleSpinBox_PCaliMaxVol.setMinimum(value + 0.1))
 
+        # FocusCali
+        self.pushButton_FocusCali_PztGotoX.clicked.connect(
+            lambda: self.piezo_man.set_target_pos(['A', self.doubleSpinBox_FocusCali_PztX.value()]))
+        self.pushButton_FocusCali_PztGotoZ.clicked.connect(
+            lambda: self.piezo_man.set_target_pos(['C', self.doubleSpinBox_FocusCali_PztZ.value()]))
+        self.pushButton_FocusCali_PztGotoY0.clicked.connect(
+            lambda: self.piezo_man.set_target_pos(['B', self.doubleSpinBox_FocusCali_PztY0.value()]))
+        self.comboBox_FocusCali_ZLines.currentTextChanged.connect(
+            lambda: self.widget_FocusCaliPlot.highlight_ch_line(self.comboBox_FocusCali_ZLines.currentData()))
+        self.pushButton_FocusCali_ClearPlot.clicked.connect(self.focuscali_clear_plot)
+        self.pushButton_FocusCali_RemoveZLine.clicked.connect(self.focuscali_removezline)
+        self.doubleSpinBox_FocusCali_PztY0.valueChanged.connect(self.focuscali_y_changed)
+        self.doubleSpinBox_FocusCali_PztY1.valueChanged.connect(self.focuscali_y_changed)
+        self.spinBox_FocusCali_PztYSamples.valueChanged.connect(self.focuscali_y_changed)
+        self.pushButton_FocusCali_Measure.clicked.connect(self.focuscali_measure)
+
         # Lock-In Measurement (LIM)
         self.pushButton_LIM_SetWL0.clicked.connect(lambda: self.lim_setwl())
         self.lineEdit_LIM_WLCurr.textChanged.connect(lambda: self.lim_wl_changed())
@@ -223,21 +243,26 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.spinBox_MapM_YSamples.valueChanged.connect(self.mapm_y_changed)
         self.mapm_x_changed()
         self.mapm_y_changed()
+        self.pushButton_MapM_CheckPzt.clicked.connect(lambda: self.mapm_measure_auto(b_only_check_pzt=True))
 
         self.pushButton_MapM_GoX0.clicked.connect(
             lambda: self.piezo_man.set_target_pos(["A", self.doubleSpinBox_MapM_X0.value()]))
         self.pushButton_MapM_GoY0.clicked.connect(
             lambda: self.piezo_man.set_target_pos(["B", self.doubleSpinBox_MapM_Y0.value()]))
 
-        self.pushButton_MapM_Measure.clicked.connect(self.mapm_measure)
-        self.pushButton_MapM_Auto.clicked.connect(self.mapm_measure_auto)
+        self.pushButton_MapM_Measure.clicked.connect(
+            lambda: self.mapm_measure(n_avg=self.spinBox_MapM_nAvgSamples.value()))
+        self.pushButton_MapM_Auto.clicked.connect(lambda: self.mapm_measure_auto(b_only_check_pzt=False))
         self.pushButton_MapM_Export.clicked.connect(self.mapm_export)
         self.pushButton_MapM_Load.clicked.connect(self.mapm_load_npraw)
 
         self.save_settings_diag = SaveSettingsWindow(self.aotf_man, self.k3390man, self.sr830_man)
         self.pushButton_SaveSettings.clicked.connect(lambda: self.save_settings_diag.show())
 
+        self.mapm_last_incomplete_scan = None
+
         self.all_cams = []
+
         self.window.show()
 
     def aotf_selected(self):
@@ -273,6 +298,52 @@ class SetupMainWindow(Ui_SetupMainWindow):
         max_power = FianiumAOTFMan.MAX_POWER if self.radioButton_AOTF_Fianium.isChecked() else YSLAOTFMan.MAX_POWER
         self.label_AOTF_PowerPerc.setText(f"{power / max_power * 100:.2f}")
 
+    def focuscali_clear_plot(self):
+        self.widget_FocusCaliPlot.clear_ch_lines()
+        self.comboBox_FocusCali_ZLines.clear()
+
+    def focuscali_removezline(self):
+        if self.comboBox_FocusCali_ZLines.currentIndex() != -1:
+            z = self.comboBox_FocusCali_ZLines.currentData()
+            self.comboBox_FocusCali_ZLines.removeItem(self.comboBox_FocusCali_ZLines.currentIndex())
+            self.widget_FocusCaliPlot.remove_ch_line(z)
+
+    def focuscali_y_changed(self):
+        y0 = self.doubleSpinBox_FocusCali_PztY0.value()
+        self.doubleSpinBox_FocusCali_PztY1.setMinimum(y0)
+        y1 = self.doubleSpinBox_FocusCali_PztY1.value()
+        n_y = self.spinBox_FocusCali_PztYSamples.value()
+        y_step = (y1-y0) / (n_y-1)
+        self.lineEdit_FocusCali_PztYStep.setText(f"{y_step:.6f}")
+
+    def focuscali_measure(self):
+        x = self.doubleSpinBox_FocusCali_PztX.value()
+        z = self.doubleSpinBox_FocusCali_PztZ.value()
+        y0 = self.doubleSpinBox_FocusCali_PztY0.value()
+        y1 = self.doubleSpinBox_FocusCali_PztY1.value()
+        n_y = self.spinBox_FocusCali_PztYSamples.value()
+        ni_ch = self.comboBox_FocusCali_NidaqCh.currentText()
+        measure_delay_ms = self.spinBox_FocusCali_MDelay.value() / 1000
+
+        setup_main_logger.info(f"Focus Cali. scan from {x:.6f},{y0:.6f} to {x:.6f},{y1:.6f} z={z:.6f}"
+                               f"#Samples Y={n_y} "
+                               f"With NIDAQ ch {ni_ch} "
+                               f"Measure delay {measure_delay_ms} ms", extra={"component": "Main/FocusCali"})
+
+        self.piezo_man.goto_xyz_combined(x=x, y=y0, z=z)
+        self.widget_FocusCaliPlot.add_ch_line(z)
+        self.comboBox_FocusCali_ZLines.addItem(f"{z:.6f}", z)
+
+        y_values = np.linspace(y0, y1, n_y)
+
+        for y in y_values:
+            self.piezo_man.goto_xyz_combined(y=y)
+            QtWidgets.qApp.processEvents()
+            time.sleep(measure_delay_ms)
+            vol = self.nidaq_man.read_task_channels('ai')[self.comboBox_FocusCali_NidaqCh.currentText()]
+            self.widget_FocusCaliPlot.add_data(y, vol)
+            QtWidgets.qApp.processEvents()
+
     def mapm_export(self):
         folder = os.path.normpath(QFileDialog.getExistingDirectory(
             self.window, 'Select folder to put the exported images'))
@@ -307,102 +378,192 @@ class SetupMainWindow(Ui_SetupMainWindow):
             setup_main_logger.error(f"No file {vol_filename} to load",
                                     extra={"component": "Main/MAPM"})
 
-    def mapm_measure(self):
-        # Lock In
-        x, y = self.sr830_man.get_parameters_value(SR830Man.GET_PARAMETER_X, SR830Man.GET_PARAMETER_Y)
+    def mapm_measure(self, n_avg: int = 1):
+        x_l, y_l, vol_l = [np.zeros(n_avg, dtype=np.float) for i in range(0, 3)]
+
+        for i in range(0, n_avg):
+            # Lock In
+            x_l[i], y_l[i] = self.sr830_man.get_parameters_value(SR830Man.GET_PARAMETER_X, SR830Man.GET_PARAMETER_Y)
+            # NI DAQ
+            vol_l[i] = self.nidaq_man.read_task_channels('ai')[self.comboBox_MapM_NIDAQCh.currentText()]
+
+        x, y, vol = np.average(x_l), np.average(y_l), np.average(vol_l)
         self.lineEdit_MapM_LockInX.setText(float2str(x))
         self.lineEdit_MapM_LockInY.setText(float2str(y))
-        # NI DAQ
-        vol = self.nidaq_man.read_ai_channels()[self.comboBox_MapM_NIDAQCh.currentText()]
         self.lineEdit_MapM_NiVol.setText(float2str(vol))
         return x, y, vol
 
-    def pzt_goto_xy(self, x, y, wait_10ms=300):
-        self.piezo_man.set_target_pos(["A", x], ["B", y])
-        i = 0
-        while i < wait_10ms:
-            pos = self.piezo_man.get_real_position("A", "B")
-            pos_x, pos_y = pos["A"], pos["B"]
-            if abs(pos_x - x) <= 0.01 and abs(pos_y - y) <= 0.01:
-                return
-            else:
-                time.sleep(0.01)
-                i += 1
-        raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
+    def save_pzt_location_map(self, loc_table: list, auto_open: bool = False):
+        fname, _ = QFileDialog.getSaveFileName(self.window, "Save as CSV file ...", ".", "CSV (*.csv)")
+        if fname is not None and fname != '':
+            with open(fname, 'w') as f_csv:
+                f_csv.write(f"# Target X, Target Y, Real X, Real Y, Real Z\n")
+                for loc in loc_table:
+                    f_csv.write(",".join([f"{x:.6f}" for x in loc]) + "\n")
 
-    def pzt_goto_xy_ont(self, x: float, y: float, wait_10ms=300):
-        self.piezo_man.set_target_pos(["A", x], ["B", y])
-        time.sleep(0.01)
-        i = 0
-        while i < wait_10ms:
-            ont = self.piezo_man.get_on_target_status("A", "B")
-            if ont["A"] and ont["B"]:
-                pos = self.piezo_man.get_real_position("A", "B")
-                pos_x, pos_y = pos["A"], pos["B"]
-                setup_main_logger.info(f"Target: {x}, {y}; Real Pos:{pos_x}, {pos_y}",
-                                       extra={"component": "Main/MAPM"})
-                return
-            else:
-                time.sleep(0.01)
-                i += 1
-        raise TimeoutError(f"PZT Unable to go to {x},{y} in {wait_10ms} x 10ms")
+            if auto_open:
+                if platform.system() == "Linux":
+                    os.system(f"xdg-open {fname}")
+                elif platform.system() == "Windows":
+                    os.startfile(f"{fname}")
+            return fname
+        else:
+            return None
 
-    def mapm_measure_auto(self):
+    def mapm_measure_auto(self, b_only_check_pzt: bool = False):
         # TODO: Run Automeasure task
-        # Pzt to X0, Y0
-        x0 = self.doubleSpinBox_MapM_X0.value()
-        y0 = self.doubleSpinBox_MapM_Y0.value()
-        x1 = self.doubleSpinBox_MapM_X1.value()
-        y1 = self.doubleSpinBox_MapM_Y1.value()
-        x_samples = self.spinBox_MapM_XSamples.value()
-        y_samples = self.spinBox_MapM_YSamples.value()
+        if not b_only_check_pzt and \
+                self.mapm_last_incomplete_scan is not None and \
+                len(self.mapm_last_incomplete_scan) != 0:
+            ans = QMessageBox.question(self.window, f"Previous scan incomplete", "Continue?",
+                                       QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            start_new = ans == QMessageBox.No
+        else:
+            start_new = True
 
-        x_values = np.linspace(x0, x1, x_samples)
-        y_values = np.linspace(y0, y1, y_samples)
+        if start_new:
+            x0 = self.doubleSpinBox_MapM_X0.value()
+            y0 = self.doubleSpinBox_MapM_Y0.value()
+            x1 = self.doubleSpinBox_MapM_X1.value()
+            y1 = self.doubleSpinBox_MapM_Y1.value()
+            x_samples = self.spinBox_MapM_XSamples.value()
+            y_samples = self.spinBox_MapM_YSamples.value()
 
-        ni_ch = self.comboBox_MapM_NIDAQCh.currentText()
-        measure_delay_ms = self.spinBox_MapM_MeasureDelay.value()
+            x_values = np.linspace(x0, x1, x_samples)
+            y_values = np.linspace(y0, y1, y_samples)
 
-        setup_main_logger.info(f"Map scan from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
-                               f"#Samples X={x_samples}, Y={y_samples} "
-                               f"With NIDAQ ch {ni_ch} "
-                               f"Measure delay {measure_delay_ms} ms", extra={"component": "Main/MAPM"})
+            ni_ch = self.comboBox_MapM_NIDAQCh.currentText()
+            measure_delay_ms = self.spinBox_MapM_MeasureDelay.value()
+            n_avg = self.spinBox_MapM_nAvgSamples.value()
 
-        try:
-            if not _MAPM_TEST:
-                self.pzt_goto_xy_ont(x0, y0)
-        except TimeoutError as te:
-            setup_main_logger.error(te, extra={"component": "Main/MAPM"})
-            return
+            if b_only_check_pzt:
+                setup_main_logger.info(f"Checking PZT move from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
+                                       f"#Samples X={x_samples}, Y={y_samples} ",
+                                       extra={"component": "Main/MAPM"})
+            else:
+                setup_main_logger.info(f"Map scan from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
+                                       f"#Samples X={x_samples}, Y={y_samples} "
+                                       f"With NIDAQ ch {ni_ch}, #Avg={n_avg}"
+                                       f"Measure delay {measure_delay_ms} ms", extra={"component": "Main/MAPM"})
 
+            try:
+                if not _MAPM_TEST:
+                    self.piezo_man.goto_xyz_combined(x=x0, y=y0, z=None)
+            except TimeoutError as te:
+                setup_main_logger.error(te, extra={"component": "Main/MAPM"})
+                pos = self.piezo_man.get_real_position("A", "B", "C")
+                pos_x, pos_y, pos_z = pos["A"], pos["B"], pos["C"]
+                QMessageBox.information(self.window, "Failed to move PZT to (0, 0)",
+                                        f"Current location: X,Y,Z {pos_x:.6f}, {pos_y:.6f} {pos_z:.6f}",
+                                        QMessageBox.Ok)
+                return
+
+            if not b_only_check_pzt:
+                # we only overwrite this if it is "check pzt"
+                self.mapm_last_incomplete_scan = {
+                    "x0": x0, "y0": y0, "x1": x1, "y1": y1, "x_samples": x_samples, "y_samples": y_samples,
+                    "ni_ch": ni_ch, "measure_delay_ms": measure_delay_ms,
+                    "n_avg": n_avg, "scanned_data": {}
+                }
+        else:
+            x0 = self.mapm_last_incomplete_scan["x0"]
+            y0 = self.mapm_last_incomplete_scan["y0"]
+            x1 = self.mapm_last_incomplete_scan["x1"]
+            y1 = self.mapm_last_incomplete_scan["y1"]
+            x_samples = self.mapm_last_incomplete_scan["x_samples"]
+            y_samples = self.mapm_last_incomplete_scan["y_samples"]
+
+            self.doubleSpinBox_MapM_X0.setValue(x0)
+            self.doubleSpinBox_MapM_Y0.setValue(y0)
+            self.doubleSpinBox_MapM_X1.setValue(x1)
+            self.doubleSpinBox_MapM_Y1.setValue(y1)
+
+            x_values = np.linspace(x0, x1, x_samples)
+            y_values = np.linspace(y0, y1, y_samples)
+
+            ni_ch = self.mapm_last_incomplete_scan["ni_ch"]
+            measure_delay_ms = self.mapm_last_incomplete_scan["measure_delay_ms"]
+            n_avg = self.mapm_last_incomplete_scan["n_avg"]
+
+            self.comboBox_MapM_NIDAQCh.setCurrentText(ni_ch)
+            self.spinBox_MapM_MeasureDelay.setValue(measure_delay_ms)
+            self.spinBox_MapM_nAvgSamples.setValue(n_avg)
+            QtWidgets.qApp.processEvents()
+
+            setup_main_logger.info(f"Resume map scan from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
+                                   f"#Samples X={x_samples}, Y={y_samples} "
+                                   f"With NIDAQ ch {ni_ch}, #Avg={n_avg}"
+                                   f"Measure delay {measure_delay_ms} ms", extra={"component": "Main/MAPM"})
+
+        # if not b_only_check_pzt:
         # Set up plots
         self.widget_MeasurementPlot1.set_xy_list(x_values, y_values)
         self.widget_MeasurementPlot2.set_xy_list(x_values, y_values)
         self.widget_MeasurementPlot3.set_xy_list(x_values, y_values)
 
-        # Sig gen ON
-        if not _MAPM_TEST:
-            self.k3390man.turn_output(True)
+        if not b_only_check_pzt:
+            # Sig gen ON
+            if not _MAPM_TEST:
+                self.k3390man.turn_output(True)
 
+        location_table = []
+        row_index = 0
         for y in y_values:
-            for x in x_values:
+            x_track = x_values if row_index % 2 == 0 else np.flip(x_values)
+            for x in x_track:
                 # Go to x, y
+                setup_main_logger.info(f"Piezo going to {x:.6f}, {y:.6f}", extra={"component": "Main/MAPM"})
                 if not _MAPM_TEST:
-                    self.pzt_goto_xy_ont(x, y)
-                QtWidgets.qApp.processEvents()
-                time.sleep(measure_delay_ms/1000)
-                if not _MAPM_TEST:
-                    lockin_x, lockin_y, vol = self.mapm_measure()
-                else:
-                    lockin_x, lockin_y, vol = x, y, x+y
-                self.widget_MeasurementPlot1.set_xy_value(x, y, lockin_x)
-                self.widget_MeasurementPlot2.set_xy_value(x, y, lockin_y)
-                self.widget_MeasurementPlot3.set_xy_value(x, y, vol)
-                QtWidgets.qApp.processEvents()
+                    try:
+                        self.piezo_man.goto_xyz_combined(x=x, y=y, z=None)
+                        pos = self.piezo_man.get_real_position("A", "B", "C")
+                        pos_x, pos_y, pos_z = pos["A"], pos["B"], pos["C"]
+                    except:
+                        pos = self.piezo_man.get_real_position("A", "B", "C")
+                        pos_x, pos_y, pos_z = pos["A"], pos["B"], pos["C"]
+                        ans = QMessageBox.information(self.window, f"Failed to move PZT to {x:.6f}, {y:.6f}",
+                                                      f"Current location: X,Y,Z {pos_x:.6f}, {pos_y:.6f} {pos_z:.6f}.\n"
+                                                      f"Continue to next location?",
+                                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                        if ans == QMessageBox.No:
+                            break
 
-        # Sig gen OFF
-        if not _MAPM_TEST:
-            self.k3390man.turn_output(False)
+                    location_table.append([x, y, pos_x, pos_y, pos_z])
+
+                    if not b_only_check_pzt:
+                        QtWidgets.qApp.processEvents()
+                        if (x, y) not in self.mapm_last_incomplete_scan["scanned_data"].keys():
+                            time.sleep(measure_delay_ms/1000)
+                            lockin_x, lockin_y, vol = self.mapm_measure(n_avg=n_avg)
+                        else:
+                            lockin_x, lockin_y, vol = self.mapm_last_incomplete_scan["scanned_data"][(x, y)]
+
+                        self.widget_MeasurementPlot1.set_xy_value(x, y, lockin_x)
+                        self.widget_MeasurementPlot2.set_xy_value(x, y, lockin_y)
+                        self.widget_MeasurementPlot3.set_xy_value(x, y, vol)
+                        self.mapm_last_incomplete_scan["scanned_data"][(x, y)] = (lockin_x, lockin_y, vol)
+                    else:
+                        self.widget_MeasurementPlot1.set_xy_value(x, y, pos_x - x)
+                        self.widget_MeasurementPlot2.set_xy_value(x, y, pos_y - y)
+                    QtWidgets.qApp.processEvents()
+                else:  # _MAPM_TEST
+                    lockin_x, lockin_y, vol = x, y, x + y
+                    self.widget_MeasurementPlot1.set_xy_value(x, y, lockin_x)
+                    self.widget_MeasurementPlot2.set_xy_value(x, y, lockin_y)
+                    self.widget_MeasurementPlot3.set_xy_value(x, y, vol)
+                    QtWidgets.qApp.processEvents()
+            else:
+                row_index += 1
+                continue
+            break
+
+        if not b_only_check_pzt:
+            # Sig gen OFF
+            if not _MAPM_TEST:
+                self.k3390man.turn_output(False)
+
+            self.mapm_last_incomplete_scan = None  # scan complete remove incomplete save
+        self.save_pzt_location_map(location_table, auto_open=True)
 
     def mapm_x_changed(self):
         x0 = self.doubleSpinBox_MapM_X0.value()
@@ -656,7 +817,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
     def pcali_getvol(self):
         global setup_main_logger
         nidaq_ch = self.comboBox_PCCaliNIDAQCh.currentText()
-        ai_values = self.nidaq_man.read_ai_channels()
+        ai_values = self.nidaq_man.read_task_channels('ai')
         if nidaq_ch in ai_values.keys():
             vol = ai_values[nidaq_ch]
             self.lineEdit_PCaliVol.setText(f"{vol:.6f}")
@@ -739,11 +900,10 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.pushButton_PCaliRun.setEnabled(True)
         self.pushButton_PCaliRun.setText("Run")
 
-    def pdv_refresh(self, b_auto = False, interval = 1000):
-        global setup_main_logger
+    def pdv_refresh(self, b_auto: bool = False, interval: int = 1000):
         pdv_ai_ch = self.comboBox_PhotoDiode_NIDAQ_Channel.currentText()
         if pdv_ai_ch != "":
-            res_dict = self.nidaq_man.read_ai_channels()
+            res_dict = self.nidaq_man.read_task_channels('ai')
             ts = time.time() * 1000
             if pdv_ai_ch not in res_dict.keys():
                 setup_main_logger.error(f"PDV CH {pdv_ai_ch} not in the NIDAQ enabled AI channels",
@@ -760,7 +920,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         if b_auto:
             if self.pushButton_PDV_AutoRefresh.isChecked():
-                QTimer.singleShot(interval, lambda: self.pdv_refresh(True, interval) )
+                QTimer.singleShot(interval, lambda: self.pdv_refresh(True, interval))
 
     def _pdv_autorefresh_task(self):
         try:
@@ -933,24 +1093,21 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.laser_align_z_dists_tablewin.show()
         self.laser_align_zdepth_export()
 
-    def nidaq_ao_channels_changed(self):
-        # TODO
-        global setup_main_logger
-        setup_main_logger.debug(f"{self.nidaq_man.get_ao_task_channels()}", extra={"component": "Main"})
+    def nidaq_task_channels_changed(self, ch_type: str, chs: list):
+        if ch_type == 'ai':
+            nidaq_ai_chs = chs
+            setup_main_logger.debug(f"{nidaq_ai_chs}", extra={"component": "Main"})
+            self.comboBox_PhotoDiode_NIDAQ_Channel.clear()
+            self.comboBox_PhotoDiode_NIDAQ_Channel.addItems(nidaq_ai_chs)
 
-    def nidaq_ai_channels_changed(self):
-        # TODO
-        global setup_main_logger
-        nidaq_ai_chs = self.nidaq_man.get_ai_task_channels()
-        setup_main_logger.debug(f"{nidaq_ai_chs}", extra={"component": "Main"})
-        self.comboBox_PhotoDiode_NIDAQ_Channel.clear()
-        self.comboBox_PhotoDiode_NIDAQ_Channel.addItems(nidaq_ai_chs)
+            self.comboBox_PCCaliNIDAQCh.clear()
+            self.comboBox_PCCaliNIDAQCh.addItems(nidaq_ai_chs)
 
-        self.comboBox_PCCaliNIDAQCh.clear()
-        self.comboBox_PCCaliNIDAQCh.addItems(nidaq_ai_chs)
+            self.comboBox_MapM_NIDAQCh.clear()
+            self.comboBox_MapM_NIDAQCh.addItems(nidaq_ai_chs)
 
-        self.comboBox_MapM_NIDAQCh.clear()
-        self.comboBox_MapM_NIDAQCh.addItems(nidaq_ai_chs)
+            self.comboBox_FocusCali_NidaqCh.clear()
+            self.comboBox_FocusCali_NidaqCh.addItems(nidaq_ai_chs)
 
     def nidaq_ai_values_changed(self, values):
         # TODO
@@ -999,20 +1156,21 @@ class SetupMainWindow(Ui_SetupMainWindow):
                 self.comboBox_CamSource.addItem(f"FlyCap Cam: {cam.get_dev_id()}")
                 self.all_cams.append(cam)
 
-        try:
-            n_andor_cams = self.andor_man.get_device_count()
-            print(n_andor_cams)
-            for i in range(0, n_andor_cams):
-                print(i)
-                if i == 0:
-                    self.comboBox_CamSource.addItem(f"Andor Cam: 0", self.andor_man)
-                    self.all_cams.append(self.andor_man)
-                else:
-                    andor_cam = AndorCameraMan(i)
-                    self.comboBox_CamSource.addItem(f"Andor Cam: {andor_cam.get_dev_id()}", andor_cam)
-                    self.all_cams.append(andor_cam)
-        except Exception as e:
-            pass
+        if _HAS_ANDOR:
+            try:
+                n_andor_cams = self.andor_man.get_device_count()
+                print(n_andor_cams)
+                for i in range(0, n_andor_cams):
+                    print(i)
+                    if i == 0:
+                        self.comboBox_CamSource.addItem(f"Andor Cam: 0", self.andor_man)
+                        self.all_cams.append(self.andor_man)
+                    else:
+                        andor_cam = AndorCameraMan(i)
+                        self.comboBox_CamSource.addItem(f"Andor Cam: {andor_cam.get_dev_id()}", andor_cam)
+                        self.all_cams.append(andor_cam)
+            except Exception as e:
+                pass
 
         try:
             self.comboBox_CamSource.setCurrentIndex(0)
@@ -1129,8 +1287,12 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.label_Keithley3390_Output.setText(f"{'ON' if on_off else 'OFF'}")
         self.label_Mapm_SigGenOutput.setText(f"{'ON' if on_off else 'OFF'}")
 
+
 if __name__ == '__main__':
+    # import pdb
+    # pdb.set_trace()
     app = QApplication(sys.argv)
     main_control = SetupMainWindow()
 
-    sys.exit(app.exec_())
+    app.exec_()
+

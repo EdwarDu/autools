@@ -166,6 +166,14 @@ class PiezoGCSCom(QObject):
                 ans_replaced = ans_str.replace("\r", "\\r")
                 piezo_logger.debug(f"Got answer <{ans_replaced}>", extra={"component": "PIEZO"})
                 return ans_str
+            elif cmd == "ONT" and b_query:
+                ans_str = ""
+                for arg in args:
+                    ans_str += arg + "=1" + PiezoGCSCom.COMMAND_END
+
+                ans_replaced = ans_str.replace("\r", "\\r")
+                piezo_logger.debug(f"Got answer <{ans_replaced}>", extra={"component": "PIEZO"})
+                return ans_str
 
         with self.ser_lock:
             self.ser.write(cmd_str.encode('utf-8'))

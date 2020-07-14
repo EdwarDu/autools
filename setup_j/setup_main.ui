@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1768</width>
-    <height>1006</height>
+    <width>2006</width>
+    <height>1177</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -277,7 +277,7 @@
                <item>
                 <widget class="QRadioButton" name="radioButton_AOTF_Fianium">
                  <property name="text">
-                  <string>Fianium</string>
+                  <string>Fianiu&amp;m</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
@@ -1266,7 +1266,7 @@
         </widget>
         <widget class="QWidget" name="tab_LaserCalibration">
          <attribute name="title">
-          <string>AOTF Power Calibration</string>
+          <string>AOTF Power Cali.</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,1">
           <property name="spacing">
@@ -1640,6 +1640,323 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="tab_FocusCali">
+         <attribute name="title">
+          <string>Focus Cali.</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_12" stretch="0,0,1">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_22">
+            <item>
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="0" column="8">
+               <widget class="QPushButton" name="pushButton_FocusCali_RemoveZLine">
+                <property name="text">
+                 <string>Remove ZLine</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="5">
+               <widget class="QSpinBox" name="spinBox_FocusCali_PztYSamples">
+                <property name="keyboardTracking">
+                 <bool>false</bool>
+                </property>
+                <property name="minimum">
+                 <number>2</number>
+                </property>
+                <property name="maximum">
+                 <number>201</number>
+                </property>
+                <property name="singleStep">
+                 <number>1</number>
+                </property>
+                <property name="value">
+                 <number>11</number>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="4">
+               <widget class="QLabel" name="label_75">
+                <property name="text">
+                 <string>#YSample:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_FocusCali_PztY0">
+                <property name="keyboardTracking">
+                 <bool>false</bool>
+                </property>
+                <property name="decimals">
+                 <number>6</number>
+                </property>
+                <property name="maximum">
+                 <double>200.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.010000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="6">
+               <widget class="QLabel" name="label_74">
+                <property name="text">
+                 <string>Y Step:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="7">
+               <widget class="QLineEdit" name="lineEdit_FocusCali_PztYStep">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>140</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLabel" name="label_49">
+                <property name="text">
+                 <string>Z:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="8">
+               <widget class="QPushButton" name="pushButton_FocusCali_PztGotoY0">
+                <property name="text">
+                 <string>Go Y0</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="6">
+               <widget class="QLabel" name="label_79">
+                <property name="text">
+                 <string>Z:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_FocusCali_PztZ">
+                <property name="keyboardTracking">
+                 <bool>false</bool>
+                </property>
+                <property name="decimals">
+                 <number>6</number>
+                </property>
+                <property name="maximum">
+                 <double>200.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.010000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="7">
+               <widget class="QComboBox" name="comboBox_FocusCali_ZLines"/>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_76">
+                <property name="text">
+                 <string>X:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_77">
+                <property name="text">
+                 <string>Y0:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="3">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_FocusCali_PztY1">
+                <property name="keyboardTracking">
+                 <bool>false</bool>
+                </property>
+                <property name="decimals">
+                 <number>6</number>
+                </property>
+                <property name="maximum">
+                 <double>200.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.010000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_FocusCali_PztX">
+                <property name="keyboardTracking">
+                 <bool>false</bool>
+                </property>
+                <property name="decimals">
+                 <number>6</number>
+                </property>
+                <property name="maximum">
+                 <double>200.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.010000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QLabel" name="label_50">
+                <property name="text">
+                 <string>Y1:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="9">
+               <widget class="QPushButton" name="pushButton_FocusCali_ClearPlot">
+                <property name="text">
+                 <string>Clear Plot</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="4">
+               <widget class="QPushButton" name="pushButton_FocusCali_PztGotoX">
+                <property name="text">
+                 <string>Go X</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="5">
+               <widget class="QPushButton" name="pushButton_FocusCali_PztGotoZ">
+                <property name="text">
+                 <string>Go Z</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_10">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_19">
+            <item>
+             <widget class="QLabel" name="label_78">
+              <property name="text">
+               <string>NIDAQ Ch:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="comboBox_FocusCali_NidaqCh"/>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_FocusCali_NiVol">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>160</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_80">
+              <property name="text">
+               <string>M. Delay (ms)</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spinBox_FocusCali_MDelay">
+              <property name="maximum">
+               <number>50000</number>
+              </property>
+              <property name="value">
+               <number>100</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_11">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_FocusCali_Measure">
+              <property name="text">
+               <string>Measure</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="FocusCaliPlotWidget" name="widget_FocusCaliPlot" native="true"/>
+          </item>
+         </layout>
+        </widget>
         <widget class="QWidget" name="tab_LockInMeasurements">
          <attribute name="title">
           <string>Lock-In Measurements</string>
@@ -1975,19 +2292,41 @@
             <item>
              <layout class="QGridLayout" name="gridLayout_MapM_Run">
               <item row="1" column="12">
-               <widget class="QLineEdit" name="lineEdit_MapM_LockInY">
-                <property name="readOnly">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="4">
-               <widget class="QLabel" name="label_46">
+               <widget class="QLabel" name="label_73">
                 <property name="text">
-                 <string>X1:</string>
+                 <string>LockIn Y:</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="8">
+               <widget class="QLabel" name="label_71">
+                <property name="text">
+                 <string>Y Step:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="7">
+               <widget class="QSpinBox" name="spinBox_MapM_XSamples">
+                <property name="keyboardTracking">
+                 <bool>false</bool>
+                </property>
+                <property name="minimum">
+                 <number>2</number>
+                </property>
+                <property name="maximum">
+                 <number>201</number>
+                </property>
+                <property name="singleStep">
+                 <number>1</number>
+                </property>
+                <property name="value">
+                 <number>11</number>
                 </property>
                </widget>
               </item>
@@ -2001,48 +2340,28 @@
                 </property>
                </widget>
               </item>
+              <item row="0" column="4">
+               <widget class="QLabel" name="label_46">
+                <property name="text">
+                 <string>X1:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
               <item row="0" column="12">
-               <widget class="QLineEdit" name="lineEdit_MapM_LockInX">
-                <property name="readOnly">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="10">
-               <widget class="QPushButton" name="pushButton_MapM_GoY0">
+               <widget class="QLabel" name="label_72">
                 <property name="text">
-                 <string>Go Y0</string>
+                 <string>LockIn X:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
-              <item row="0" column="10">
-               <widget class="QPushButton" name="pushButton_MapM_GoX0">
-                <property name="text">
-                 <string>Go X0</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="9">
-               <widget class="QLineEdit" name="lineEdit_MapM_XStep">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>140</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="readOnly">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="5">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_MapM_Y1">
+              <item row="1" column="2" colspan="2">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_MapM_Y0">
                 <property name="keyboardTracking">
                  <bool>false</bool>
                 </property>
@@ -2057,53 +2376,19 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="11">
-               <widget class="QLabel" name="label_72">
-                <property name="text">
-                 <string>LockIn X:</string>
+              <item row="0" column="5">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_MapM_X1">
+                <property name="keyboardTracking">
+                 <bool>false</bool>
                 </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                <property name="decimals">
+                 <number>6</number>
                 </property>
-               </widget>
-              </item>
-              <item row="1" column="0" colspan="2">
-               <widget class="QLabel" name="label_44">
-                <property name="text">
-                 <string>Y0:</string>
+                <property name="maximum">
+                 <double>200.000000000000000</double>
                 </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="11">
-               <widget class="QLabel" name="label_73">
-                <property name="text">
-                 <string>LockIn Y:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="6">
-               <widget class="QLabel" name="label_69">
-                <property name="text">
-                 <string>#YSample:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="6">
-               <widget class="QLabel" name="label_68">
-                <property name="text">
-                 <string>#XSample:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                <property name="singleStep">
+                 <double>0.010000000000000</double>
                 </property>
                </widget>
               </item>
@@ -2126,6 +2411,119 @@
                 </property>
                </widget>
               </item>
+              <item row="0" column="11" rowspan="2">
+               <widget class="QPushButton" name="pushButton_MapM_CheckPzt">
+                <property name="text">
+                 <string>Check PZT</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="6">
+               <widget class="QLabel" name="label_68">
+                <property name="text">
+                 <string>#XSample:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="9">
+               <widget class="QLineEdit" name="lineEdit_MapM_XStep">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>140</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="4">
+               <widget class="QLabel" name="label_47">
+                <property name="text">
+                 <string>Y1:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="10">
+               <widget class="QPushButton" name="pushButton_MapM_GoY0">
+                <property name="text">
+                 <string>Go Y0</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="6">
+               <widget class="QLabel" name="label_69">
+                <property name="text">
+                 <string>#YSample:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" colspan="2">
+               <widget class="QLabel" name="label_44">
+                <property name="text">
+                 <string>Y0:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="8">
+               <widget class="QLabel" name="label_70">
+                <property name="text">
+                 <string>X Step:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="13">
+               <widget class="QLineEdit" name="lineEdit_MapM_LockInX">
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="5">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_MapM_Y1">
+                <property name="keyboardTracking">
+                 <bool>false</bool>
+                </property>
+                <property name="decimals">
+                 <number>6</number>
+                </property>
+                <property name="maximum">
+                 <double>200.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.010000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="13">
+               <widget class="QLineEdit" name="lineEdit_MapM_LockInY">
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
               <item row="0" column="2" colspan="2">
                <widget class="QDoubleSpinBox" name="doubleSpinBox_MapM_X0">
                 <property name="keyboardTracking">
@@ -2142,68 +2540,10 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="8">
-               <widget class="QLabel" name="label_70">
+              <item row="0" column="10">
+               <widget class="QPushButton" name="pushButton_MapM_GoX0">
                 <property name="text">
-                 <string>X Step:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="8">
-               <widget class="QLabel" name="label_71">
-                <property name="text">
-                 <string>Y Step:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="4">
-               <widget class="QLabel" name="label_47">
-                <property name="text">
-                 <string>Y1:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="7">
-               <widget class="QSpinBox" name="spinBox_MapM_XSamples">
-                <property name="keyboardTracking">
-                 <bool>false</bool>
-                </property>
-                <property name="minimum">
-                 <number>2</number>
-                </property>
-                <property name="maximum">
-                 <number>51</number>
-                </property>
-                <property name="singleStep">
-                 <number>1</number>
-                </property>
-                <property name="value">
-                 <number>11</number>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="5">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_MapM_X1">
-                <property name="keyboardTracking">
-                 <bool>false</bool>
-                </property>
-                <property name="decimals">
-                 <number>6</number>
-                </property>
-                <property name="maximum">
-                 <double>200.000000000000000</double>
-                </property>
-                <property name="singleStep">
-                 <double>0.010000000000000</double>
+                 <string>Go X0</string>
                 </property>
                </widget>
               </item>
@@ -2216,29 +2556,13 @@
                  <number>2</number>
                 </property>
                 <property name="maximum">
-                 <number>51</number>
+                 <number>201</number>
                 </property>
                 <property name="singleStep">
                  <number>1</number>
                 </property>
                 <property name="value">
                  <number>11</number>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2" colspan="2">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_MapM_Y0">
-                <property name="keyboardTracking">
-                 <bool>false</bool>
-                </property>
-                <property name="decimals">
-                 <number>6</number>
-                </property>
-                <property name="maximum">
-                 <double>200.000000000000000</double>
-                </property>
-                <property name="singleStep">
-                 <double>0.010000000000000</double>
                 </property>
                </widget>
               </item>
@@ -2316,6 +2640,26 @@
               </property>
               <property name="readOnly">
                <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_30">
+              <property name="text">
+               <string>Avg:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spinBox_MapM_nAvgSamples">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="value">
+               <number>1</number>
               </property>
              </widget>
             </item>
@@ -2455,6 +2799,12 @@
    <class>LaserProfilerZDepthWidget</class>
    <extends>QWidget</extends>
    <header location="global">laser_profiler_zdepth_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FocusCaliPlotWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">focuscali_plot_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -13,7 +13,7 @@ from matplotlib.gridspec import GridSpec
 import time
 import pickle
 from pprint import pprint
-from pixelink import PixeLINK
+# from pixelink import PixeLINK
 from matplotlib.ticker import FormatStrFormatter
 
 import matplotlib.style as mplstyle
@@ -799,8 +799,8 @@ def normal_frame(frame, b_autorange=False):
         min_orig = np.min(frame)
         max_orig = np.max(frame)
         
-    return (frame.astype('float') - min_orig) / (max_orig-min_orig) if max_orig != min_orig else \
-            np.zeros(frame.shape, dtype='float')
+    return (frame.astype(np.float32) - min_orig) / (max_orig-min_orig) if max_orig != min_orig else \
+            np.zeros(frame.shape, dtype=np.float32)
 
 
 def setup_orig_fig(cam_cap, b_plk=False):
