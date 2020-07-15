@@ -347,7 +347,10 @@ class NIDAQConfigWindow(Ui_NIDAQ_Config_Window):
                     line_edit.setReadOnly(True)
                     parent_widget.addWidget(line_edit, row_index, 2, 1, 1)
                     combbox_term = QtWidgets.QComboBox(self.groupBox_Control)
-                    combbox_term.addItems(["Auto", "Differential", "RSE", "NRSE"])
+                    if row_index < len(chs) / 2:
+                        combbox_term.addItems(["Auto", "Differential", "RSE", "NRSE"])
+                    else:
+                        combbox_term.addItems(["Auto", "RSE", "NRSE"])
                     combbox_term.currentTextChanged.connect(
                         lambda term, c_t=ch_type, c_name=ch: self.nidaq_man.change_ch_term(c_t, c_name, term))
                     ctrl_w = [line_edit, combbox_term]
