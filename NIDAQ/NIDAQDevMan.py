@@ -135,6 +135,10 @@ class NIDAQDevMan(QObject):
                     elif self.ch_term_dict[ch] == "NRSE":
                         self.ch_dict[ch_type]['task'].ai_channels\
                             .add_ai_voltage_chan(ch, terminal_config=TerminalConfiguration.NRSE)
+                    else:
+                        self.ch_dict[ch_type]['task'].ai_channels.add_ai_voltage_chan(ch)
+                else:
+                    self.ch_dict[ch_type]['task'].ai_channels.add_ai_voltage_chan(ch)
             elif ch_type == 'ao':
                 self.ch_dict[ch_type]['task'].ao_channels.add_ao_voltage_chan(ch)
             elif ch_type == 'di':
@@ -281,10 +285,11 @@ class NIDAQConfigWindow(Ui_NIDAQ_Config_Window):
         for ch_type in self.chs_widget_dict.keys():
             parent_widget: QtWidgets.QGridLayout = self.chs_widget_dict[ch_type]['parent']
             widget_dict = self.chs_widget_dict[ch_type]['chs_dict']
-            for ch_name, (ch_type, ch_w_label, ch_w_enable, ch_w_value) in widget_dict.items():
+            for ch_name, (ch_type, ch_w_label, ch_w_enable, ch_w) in widget_dict.items():
                 parent_widget.removeWidget(ch_w_label)
                 parent_widget.removeWidget(ch_w_enable)
-                parent_widget.removeWidget(ch_w_value)
+                for ch_w_s in ch_w:
+                    parent_widget.removeWidget(ch_w_s)
 
             widget_dict.clear()
 
@@ -322,7 +327,7 @@ class NIDAQConfigWindow(Ui_NIDAQ_Config_Window):
                     line_edit.setReadOnly(True)
                     parent_widget.addWidget(line_edit, row_index, 2, 1, 1)
                     combbox_term = QtWidgets.QComboBox(self.groupBox_Control)
-                    combbox_term.addItems(["Differential", "RSE", "NRSE"])
+                    combbox_term.addItems(["Auto", "Differential", "RSE", "NRSE"])
                     combbox_term.currentTextChanged.connect(
                         lambda term, c_t=ch_type, c_name=ch: self.nidaq_man.change_ch_term(c_t, c_name, term))
                     ctrl_w = [line_edit, combbox_term]
