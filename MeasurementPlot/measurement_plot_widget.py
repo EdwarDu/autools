@@ -31,7 +31,7 @@ class MeasurementPlotWidget(pg.GraphicsLayoutWidget):
 
         self.p_map.addItem(self.map_img)
         self.p_map.setAspectLocked(lock=True, ratio=1)
-        self.p_map.setXLink(self.p_horizontal)
+        # self.p_map.setXLink(self.p_horizontal)
         self.p_map.invertY()
         self.p_map.showGrid(x=True, y=True, alpha=0.5)
         # self.p_map.enableAutoRange(self.p_map.getViewBox().XYAxes, enable=True)
