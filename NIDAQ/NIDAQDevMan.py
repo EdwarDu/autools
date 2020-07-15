@@ -203,9 +203,9 @@ class NIDAQDevMan(QObject):
 
     def get_ai_corresponding_diff_ch(self, ch_name: str):
         total_lines = len(self.get_ai_channels())
-        ch_name_reg = r'(?p<ch_prefix>.*)(?p<ch_id>\d+)'
+        ch_name_reg = r'(?P<ch_prefix>.*)(?P<ch_id>\d+)'
         ch_name_m = re.match(ch_name_reg, ch_name)
-        ch_id = int(ch_name_reg.group('ch_id'))
+        ch_id = int(ch_name_m.group('ch_id'))
         if 0 <= ch_id < total_lines/2:
             return f"{ch_name_m.group('ch_prefix')}{ch_id+total_lines/2}"
         else:
