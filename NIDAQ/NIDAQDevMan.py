@@ -126,6 +126,7 @@ class NIDAQDevMan(QObject):
             nidaq_logger.debug(f'Adding {ch} to {ch_type} task', extra={"component": "NIDAQ"})
             if ch_type == 'ai':
                 if ch in self.ch_term_dict.keys():
+                    nidaq_logger.debug(f'{self.ch_term_dict[ch]}', extra={"component": "NIDAQ"})
                     if self.ch_term_dict[ch] == "Differential":
                         self.ch_dict[ch_type]['task'].ai_channels\
                             .add_ai_voltage_chan(ch, terminal_config=TerminalConfiguration.DIFFERENTIAL)
@@ -251,21 +252,21 @@ class NIDAQConfigWindow(Ui_NIDAQ_Config_Window):
         ch_dict = self.nidaq_man.read_task_channels('ai')
         for c, v in ch_dict.items():
             if c in self.chs_widget_dict['ai']['chs_dict'].keys():
-                line_edit = self.chs_widget_dict['ai']['chs_dict'][c][3]
+                line_edit = self.chs_widget_dict['ai']['chs_dict'][c][3][0]
                 line_edit.setText(f"{v:.4f}")
 
     def sync_di_values(self):
         ch_dict = self.nidaq_man.read_task_channels('di')
         for c, v in ch_dict.items():
             if c in self.chs_widget_dict['di']['chs_dict'].keys():
-                spin_box: QtWidgets.QSpinBox = self.chs_widget_dict['di']['chs_dict'][c][3]
+                spin_box: QtWidgets.QSpinBox = self.chs_widget_dict['di']['chs_dict'][c][3][0]
                 spin_box.setValue(1 if v else 0)
 
     def sync_ao_values(self):
         ch_value_dict = {}
         for channel_name, (ch_type, ch_w_label, ch_w_enable, ch_w) in self.chs_widget_dict['ao']['chs_dict'].items():
             if ch_w_enable.isChecked():
-                ch_w_value, = ch_w
+                ch_w_value = ch_w[0]
                 ch_value = ch_w_value.value()
                 ch_value_dict[channel_name] = ch_value
 
@@ -275,7 +276,7 @@ class NIDAQConfigWindow(Ui_NIDAQ_Config_Window):
         ch_value_dict = {}
         for channel_name, (ch_type, ch_w_label, ch_w_enable, ch_w) in self.chs_widget_dict['do']['chs_dict'].items():
             if ch_w_enable.isChecked():
-                ch_w_value, = ch_w
+                ch_w_value = ch_w[0]
                 ch_value = ch_w_value.value() == 1
                 ch_value_dict[channel_name] = ch_value
 

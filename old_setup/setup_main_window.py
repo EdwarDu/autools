@@ -222,7 +222,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
             setup_main_logger.info(f"Resume map scan from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
                                    f"#Samples X={x_samples}, Y={y_samples} "
-                                   f"NIDAQ Ch X={ni_x_ch}, Y={ni_y_ch} In={ni_in_ch} "
+                                   f"NIDAQ Ch X={ni_x_ch} Y={ni_y_ch} In={ni_in_ch} "
                                    f"Measure delay {measure_delay_ms} ms", extra={"component": "Main/MAPM"})
 
         # if not b_only_check_pzt:
