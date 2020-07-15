@@ -207,7 +207,7 @@ class NIDAQDevMan(QObject):
         ch_name_m = re.match(ch_name_reg, ch_name)
         ch_id = int(ch_name_m.group('ch_id'))
         if 0 <= ch_id < total_lines/2:
-            return f"{ch_name_m.group('ch_prefix')}{ch_id+total_lines/2}"
+            return f"{ch_name_m.group('ch_prefix')}{int(ch_id+total_lines/2)}"
         else:
             return None
 
