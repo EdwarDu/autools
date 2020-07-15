@@ -961,7 +961,7 @@
              <widget class="MeasurementPlotWidget" name="widget_MeasurementPlot2" native="true">
               <property name="minimumSize">
                <size>
-                <width>400</width>
+                <width>0</width>
                 <height>0</height>
                </size>
               </property>
@@ -971,7 +971,7 @@
              <widget class="MeasurementPlotWidget" name="widget_MeasurementPlot3" native="true">
               <property name="minimumSize">
                <size>
-                <width>400</width>
+                <width>0</width>
                 <height>0</height>
                </size>
               </property>
