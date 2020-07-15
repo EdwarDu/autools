@@ -86,6 +86,10 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         self.piezo_cur_x = 0
         self.piezo_cur_y = 0
+        self.mapm_pause_requested = False
+        self.pushButton_MapM_Pause.setEnabled(False)
+
+        self.pushButton_MapM_Pause.clicked.connect(lambda: self.mapm_request_pause())
 
         self.pushButton_MapM_GoX0.clicked.connect(
             lambda: self.piezo_goto_xyz(x=self.doubleSpinBox_MapM_X0.value(), y=self.piezo_cur_y))
@@ -145,7 +149,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
         for i in range(0, n_avg):
             # Lock In
             if _MAPM_TEST:
-                x_l[i], y_l[i], vol_l[i] = np.abs(np.random.randn(2))
+                x_l[i], y_l[i], vol_l[i] = np.abs(np.random.randn(3))
             else:
                 x_l[i], y_l[i] = self.sr830_man.get_parameters_value(SR830Man.GET_PARAMETER_X, SR830Man.GET_PARAMETER_Y)
                 vol_l[i] = self.nidaq_man.read_task_channels("ai")[self.comboBox_MapM_NIDAQChIn.currentText()]
@@ -159,11 +163,16 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.lineEdit_MapM_NiVolIn.setText(float2str(vol))
         return x, y, vol
 
+    def mapm_request_pause(self):
+        self.mapm_pause_requested = True
+
     def mapm_measure_auto(self):
         # TODO: Run Automeasure task
+        self.pushButton_MapM_Pause.setEnabled(True)
         if self.mapm_last_incomplete_scan is not None and \
                 len(self.mapm_last_incomplete_scan) != 0:
-            ans = QMessageBox.question(self.window, f"Previous scan incomplete", "Continue?",
+            ans = QMessageBox.question(self.window, f"Previous scan incomplete",
+                                       "Continue from last scan's last position?",
                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             start_new = ans == QMessageBox.No
         else:
@@ -192,9 +201,9 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
             self.piezo_goto_xyz(x=x0, y=y0)
 
-            # we only overwrite this if it is "check pzt"
             self.mapm_last_incomplete_scan = {
                 "x0": x0, "y0": y0, "x1": x1, "y1": y1, "x_samples": x_samples, "y_samples": y_samples,
+                "ni_x_ch": ni_x_ch, "ni_y_ch": ni_y_ch, "ni_in_ch": ni_in_ch,
                 "measure_delay_ms": measure_delay_ms,
                 "scanned_data": {}
             }
@@ -248,6 +257,19 @@ class SetupMainWindow(Ui_SetupMainWindow):
                     t0 = datetime.now()
                     while (datetime.now() - t0).total_seconds() < measure_delay_ms / 1000:
                         QtWidgets.qApp.processEvents()
+                        if self.mapm_pause_requested:
+                            ans = QMessageBox.question(self.window, f"Scan paused",
+                                                       f"Stopped at X={x} Y={y}, Yes to continue or ABORT current scan",
+                                                       QMessageBox.Abort | QMessageBox.Yes, QMessageBox.Yes)
+                            if ans == QMessageBox.Abort:
+                                ans = QMessageBox.question(self.window, f"Abort scan",
+                                                           f"Are you sure?",
+                                                           QMessageBox.No | QMessageBox.Yes, QMessageBox.No)
+                                if ans == QMessageBox.Yes:
+                                    self.mapm_pause_requested = False
+                                    self.pushButton_MapM_Pause.setEnabled(False)
+                                    return
+                            self.mapm_pause_requested = False
                     lockin_x, lockin_y, vol = self.mapm_measure(n_avg=self.spinBox_MapM_NSamplesAvg.value())
                 else:
                     lockin_x, lockin_y, vol = self.mapm_last_incomplete_scan["scanned_data"][(x, y)]
@@ -261,6 +283,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
                 continue
 
         self.mapm_last_incomplete_scan = None  # scan complete remove incomplete save
+        self.pushButton_MapM_Pause.setEnabled(False)
 
     def mapm_x_changed(self):
         x0 = self.doubleSpinBox_MapM_X0.value()
