@@ -199,6 +199,7 @@ class NIDAQDevMan(QObject):
         self.ao_values_changed.emit(default_values)
 
     def change_ch_term(self, ch_type: str, ch_name: str, term: str):
+        nidaq_logger.debug(f"Setting {ch_type} {ch_name} {term}", extra={"component": "NIDAQ"})
         self.ch_term_dict[ch_name] = term
 
     def get_ai_corresponding_diff_ch(self, ch_name: str):
