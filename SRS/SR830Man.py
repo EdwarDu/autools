@@ -806,6 +806,11 @@ class SR830ConfigWindow(Ui_SR830_Config_Window):
         self.comboBox_COM_Parity.currentTextChanged.connect(self.parity_changed)
         self.comboBox_CONN.currentIndexChanged.connect(self.conn_changed)
 
+        # Force to change
+        self.baudrate_changed(self.comboBox_COM_BaudRate.currentText())
+        self.parity_changed(self.comboBox_COM_Parity.currentText())
+        self.conn_changed(self.comboBox_CONN.currentData())
+
         self.radioButton_Interf_GPIB.clicked.connect(self.interface_changed)
         self.radioButton_Interf_RS232.clicked.connect(self.interface_changed)
 
