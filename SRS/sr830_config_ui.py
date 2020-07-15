@@ -2,9 +2,10 @@
 
 # Form implementation generated from reading ui file 'sr830_config.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
+
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -404,8 +405,8 @@ class Ui_SR830_Config_Window(object):
         self.verticalLayout.addItem(spacerItem)
 
         self.retranslateUi(SR830_Config_Window)
-        self.comboBox_COM_Parity.setCurrentIndex(0)
-        self.comboBox_COM_BaudRate.setCurrentIndex(0)
+        self.comboBox_COM_Parity.setCurrentIndex(1)
+        self.comboBox_COM_BaudRate.setCurrentIndex(1)
         self.comboBox_TimeConstant.setCurrentIndex(10)
         self.comboBox_FilterSlope.setCurrentIndex(0)
         self.comboBox_Sensitivity.setCurrentIndex(10)
@@ -444,7 +445,7 @@ class Ui_SR830_Config_Window(object):
         SR830_Config_Window.setWindowTitle(_translate("SR830_Config_Window", "SR830 Configuration"))
         self.groupBox_CONN.setTitle(_translate("SR830_Config_Window", "SR830 COM"))
         self.pushButton_COM_Open.setText(_translate("SR830_Config_Window", "Open"))
-        self.comboBox_COM_Parity.setCurrentText(_translate("SR830_Config_Window", "None"))
+        self.comboBox_COM_Parity.setCurrentText(_translate("SR830_Config_Window", "ODD"))
         self.comboBox_COM_Parity.setItemText(0, _translate("SR830_Config_Window", "None"))
         self.comboBox_COM_Parity.setItemText(1, _translate("SR830_Config_Window", "ODD"))
         self.comboBox_COM_Parity.setItemText(2, _translate("SR830_Config_Window", "EVEN"))
@@ -452,7 +453,7 @@ class Ui_SR830_Config_Window(object):
         self.pushButton_COM_Refresh.setText(_translate("SR830_Config_Window", "Refresh"))
         self.label.setText(_translate("SR830_Config_Window", "CONN:"))
         self.label_6.setText(_translate("SR830_Config_Window", "BaudRate:"))
-        self.comboBox_COM_BaudRate.setCurrentText(_translate("SR830_Config_Window", "9600"))
+        self.comboBox_COM_BaudRate.setCurrentText(_translate("SR830_Config_Window", "19200"))
         self.comboBox_COM_BaudRate.setItemText(0, _translate("SR830_Config_Window", "9600"))
         self.comboBox_COM_BaudRate.setItemText(1, _translate("SR830_Config_Window", "19200"))
         self.comboBox_COM_BaudRate.setItemText(2, _translate("SR830_Config_Window", "38400"))
@@ -545,5 +546,3 @@ class Ui_SR830_Config_Window(object):
         self.lineEdit_X.setToolTip(_translate("SR830_Config_Window", "SR830 Phase (float)"))
         self.lineEdit_Y.setToolTip(_translate("SR830_Config_Window", "SR830 Phase (float)"))
         self.pushButton_SetFrequency.setText(_translate("SR830_Config_Window", "Set"))
-
-
