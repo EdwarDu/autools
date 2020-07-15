@@ -3,6 +3,7 @@ pyuic5 setup_main.ui -o setup_main_ui.py
 
 declare -a replace_strings=(
     "s/from measurement_plot_widget/from ..MeasurementPlot.measurement_plot_widget/g"
+    "s/from pdv_plot_widget/from .pdv_plot_widget/g"
 )
 
 unameOut="$(uname -s)"

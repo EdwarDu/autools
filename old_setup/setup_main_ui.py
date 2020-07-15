@@ -573,4 +573,4 @@ class Ui_SetupMainWindow(object):
         self.label_22.setText(_translate("SetupMainWindow", "ms"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_PDVMeasurement), _translate("SetupMainWindow", "NI Input"))
 from ..MeasurementPlot.measurement_plot_widget import MeasurementPlotWidget
-from pdv_plot_widget import PDVPlotWidget
+from .pdv_plot_widget import PDVPlotWidget
