@@ -30,19 +30,19 @@ else:
 
 
 def float2str(value: float):
-    if 1e9 <= value < 1e12:
+    if 1e9 <= abs(value) < 1e12:
         return f"{value:.6} G"
-    elif 1e6 <= value < 1e9:
+    elif 1e6 <= abs(value) < 1e9:
         return f"{value:.6} M"
-    elif 1e3 <= value < 1e6:
+    elif 1e3 <= abs(value) < 1e6:
         return f"{value:.6} K"
-    elif 1 <= value < 1e3:
+    elif 1 <= abs(value) < 1e3:
         return f"{value:.6}"
-    elif 1e-3 <= value < 1:
+    elif 1e-3 <= abs(value) < 1:
         return f"{value*1000:.6f} m"
-    elif 1e-6 <= value < 1e-3:
+    elif 1e-6 <= abs(value) < 1e-3:
         return f"{value*1e6:.6f} u"
-    elif 1e-9 <= value < 1e-6:
+    elif 1e-9 <= abs(value) < 1e-6:
         return f"{value*1e9:.6f} n"
     else:
         return f"{value:.6G}"

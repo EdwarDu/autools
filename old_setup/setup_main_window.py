@@ -32,7 +32,7 @@ setup_main_logger_ch = logging.StreamHandler()
 setup_main_logger_ch.setFormatter(setup_main_logger_formatter)
 setup_main_logger.addHandler(setup_main_logger_ch)
 
-_MAPM_TEST = True
+_MAPM_TEST = False
 
 from ..SRS.SR830Man import SR830Man, float2str
 from ..NIDAQ.NIDAQDevMan import NIDAQDevMan
@@ -85,7 +85,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             lambda: self.piezo_goto_xyz(y=self.doubleSpinBox_MapM_Y0.value()))
 
         self.pushButton_MapM_Measure.clicked.connect(
-            lambda: self.mapm_measure(n_avg=1))
+            lambda: self.mapm_measure(n_avg=self.spinBox_MapM_NSamplesAvg.value()))
         self.pushButton_MapM_Auto.clicked.connect(lambda: self.mapm_measure_auto())
         self.pushButton_MapM_Export.clicked.connect(self.mapm_export)
         self.pushButton_MapM_Load.clicked.connect(self.mapm_load_npraw)
@@ -95,12 +95,6 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         self.mapm_last_incomplete_scan = None
         self.window.show()
-
-        if _MAPM_TEST:
-            # FIXME: Remove when using real devices
-            self.comboBox_MapM_NIDAQChX.addItems(["X_CH"])
-            self.comboBox_MapM_NIDAQChY.addItems(["Y_CH"])
-            self.comboBox_MapM_NIDAQChZ.addItems(["Z_CH"])
 
     def mapm_export(self):
         folder = os.path.normpath(QFileDialog.getExistingDirectory(
@@ -129,18 +123,24 @@ class SetupMainWindow(Ui_SetupMainWindow):
                                    extra={"component": "Main/MAPM"})
 
     def mapm_measure(self, n_avg: int = 1):
-        x_l, y_l = [np.zeros(n_avg, dtype=np.float) for i in range(0, 2)]
+        x_l, y_l, vol_l = [np.zeros(n_avg, dtype=np.float) for i in range(0, 3)]
 
         for i in range(0, n_avg):
             # Lock In
             if _MAPM_TEST:
-                x_l[i], y_l[i] = np.abs(np.random.randn(2))
+                x_l[i], y_l[i], vol_l[i] = np.abs(np.random.randn(2))
             else:
                 x_l[i], y_l[i] = self.sr830_man.get_parameters_value(SR830Man.GET_PARAMETER_X, SR830Man.GET_PARAMETER_Y)
-        x, y = np.average(x_l), np.average(y_l)
+                vol_l[i] = self.nidaq_man.read_task_channels("ai")[self.comboBox_MapM_NIDAQChIn.currentText()]
+                setup_main_logger.debug(f"Measurement: {x_l[i]} {y_l[i]} {vol_l[i]}",
+                                        extra={"component": "Main/MAPM"})
+        x, y, vol = np.average(x_l), np.average(y_l), np.average(vol_l)
+        setup_main_logger.debug(f"Measurement AVG: {x} {y} {vol}",
+                                extra={"component": "Main/MAPM"})
         self.lineEdit_MapM_LockInX.setText(float2str(x))
         self.lineEdit_MapM_LockInY.setText(float2str(y))
-        return x, y
+        self.lineEdit_MapM_NiVolIn.setText(float2str(vol))
+        return x, y, vol
 
     def save_pzt_location_map(self, loc_table: list, auto_open: bool = False):
         fname, _ = QFileDialog.getSaveFileName(self.window, "Save as CSV file ...", ".", "CSV (*.csv)")
@@ -178,6 +178,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             y_samples = self.spinBox_MapM_YSamples.value()
             ni_x_ch = self.comboBox_MapM_NIDAQChX.currentText()
             ni_y_ch = self.comboBox_MapM_NIDAQChY.currentText()
+            ni_in_ch = self.comboBox_MapM_NIDAQChIn.currentText()
 
             x_values = np.linspace(x0, x1, x_samples)
             y_values = np.linspace(y0, y1, y_samples)
@@ -186,7 +187,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
             setup_main_logger.info(f"Map scan from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
                                    f"#Samples X={x_samples}, Y={y_samples} "
-                                   f"NIDAQ Ch X={ni_x_ch}, Y={ni_y_ch} "
+                                   f"NIDAQ Ch X={ni_x_ch}, Y={ni_y_ch} In={ni_in_ch} "
                                    f"Measure delay {measure_delay_ms} ms", extra={"component": "Main/MAPM"})
 
             self.piezo_goto_xyz(x=x0, y=y0)
@@ -206,6 +207,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             y_samples = self.mapm_last_incomplete_scan["y_samples"]
             ni_x_ch = self.mapm_last_incomplete_scan['ni_x_ch']
             ni_y_ch = self.mapm_last_incomplete_scan['ni_y_ch']
+            ni_in_ch = self.mapm_last_incomplete_scan['ni_in_ch']
 
             self.doubleSpinBox_MapM_X0.setValue(x0)
             self.doubleSpinBox_MapM_Y0.setValue(y0)
@@ -219,22 +221,24 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
             self.comboBox_MapM_NIDAQChX.setCurrentText(ni_x_ch)
             self.comboBox_MapM_NIDAQChY.setCurrentText(ni_y_ch)
+            self.comboBox_MapM_NIDAQChIn.setCurrentText(ni_in_ch)
             self.spinBox_MapM_MeasureDelay.setValue(measure_delay_ms)
             QtWidgets.qApp.processEvents()
 
             setup_main_logger.info(f"Resume map scan from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
                                    f"#Samples X={x_samples}, Y={y_samples} "
-                                   f"NIDAQ Ch X={ni_x_ch}, Y={ni_y_ch} "
+                                   f"NIDAQ Ch X={ni_x_ch}, Y={ni_y_ch} In={ni_in_ch} "
                                    f"Measure delay {measure_delay_ms} ms", extra={"component": "Main/MAPM"})
 
         # if not b_only_check_pzt:
         # Set up plots
         self.widget_MeasurementPlot1.set_xy_list(x_values, y_values)
         self.widget_MeasurementPlot2.set_xy_list(x_values, y_values)
+        self.widget_MeasurementPlot3.set_xy_list(x_values, y_values)
 
         row_index = 0
         for y in y_values:
-            x_track = x_values  # if row_index % 2 == 0 else np.flip(x_values)
+            x_track = x_values if row_index % 2 == 0 else np.flip(x_values)
             for x in x_track:
                 # Go to x, y
                 setup_main_logger.info(f"Piezo going to {x:.6f}, {y:.6f}", extra={"component": "Main/MAPM"})
@@ -244,13 +248,14 @@ class SetupMainWindow(Ui_SetupMainWindow):
                     t0 = datetime.now()
                     while (datetime.now() - t0).total_seconds() < measure_delay_ms / 1000:
                         QtWidgets.qApp.processEvents()
-                    lockin_x, lockin_y = self.mapm_measure(n_avg=1)
+                    lockin_x, lockin_y, vol = self.mapm_measure(n_avg=self.spinBox_MapM_NSamplesAvg.value())
                 else:
-                    lockin_x, lockin_y = self.mapm_last_incomplete_scan["scanned_data"][(x, y)]
+                    lockin_x, lockin_y, vol = self.mapm_last_incomplete_scan["scanned_data"][(x, y)]
 
                 self.widget_MeasurementPlot1.set_xy_value(x, y, lockin_x)
                 self.widget_MeasurementPlot2.set_xy_value(x, y, lockin_y)
-                self.mapm_last_incomplete_scan["scanned_data"][(x, y)] = (lockin_x, lockin_y)
+                self.widget_MeasurementPlot3.set_xy_value(x, y, vol)
+                self.mapm_last_incomplete_scan["scanned_data"][(x, y)] = (lockin_x, lockin_y, vol)
             else:
                 row_index += 1
                 continue
@@ -283,6 +288,12 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
             self.comboBox_MapM_NIDAQChZ.clear()
             self.comboBox_MapM_NIDAQChZ.addItems(nidaq_ao_chs)
+        elif ch_type == 'ai':
+            nidaq_ai_chs = chs
+            setup_main_logger.debug(f"{nidaq_ai_chs}", extra={"component": "Main"})
+
+            self.comboBox_MapM_NIDAQChIn.clear()
+            self.comboBox_MapM_NIDAQChIn.addItems(nidaq_ai_chs)
 
     def nidaq_ai_values_changed(self, values):
         # TODO
