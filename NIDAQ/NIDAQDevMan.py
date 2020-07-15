@@ -7,6 +7,7 @@ from .nidaq_config_ui import Ui_NIDAQ_Config_Window
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import QObject, pyqtSignal
+import re
 
 
 _SPLIT_LOG = False
@@ -171,6 +172,13 @@ class NIDAQDevMan(QObject):
             res = {self.ch_dict[ch_type]['chs'][0]: self.ch_dict[ch_type]['task'].read()}
         else:
             res = {c: v for c, v in zip(self.ch_dict[ch_type]['chs'], self.ch_dict[ch_type]['task'].read())}
+            if ch_type == 'ai':
+                for c in res.keys():
+                    if c in self.ch_term_dict.keys() and self.ch_term_dict[c] == "Differential":
+                        c_d = self.get_ai_corresponding_diff_ch(c)
+                        if c_d is not None:
+                            nidaq_logger.debug(f"Differential {c} ({res[c]}) + {c_d} ({res[c_d]})", extra={"component": "NIDAQ"})
+                            res[c] = res[c] + res[c_d]
 
         self.ai_values_changed.emit(res)
         return res
@@ -192,6 +200,16 @@ class NIDAQDevMan(QObject):
 
     def change_ch_term(self, ch_type: str, ch_name: str, term: str):
         self.ch_term_dict[ch_name] = term
+
+    def get_ai_corresponding_diff_ch(self, ch_name: str):
+        total_lines = len(self.get_ai_channels())
+        ch_name_reg = r'(?p<ch_prefix>.*)(?p<ch_id>\d+)'
+        ch_name_m = re.match(ch_name_reg, ch_name)
+        ch_id = int(ch_name_reg.group('ch_id'))
+        if 0 <= ch_id < total_lines/2:
+            return f"{ch_name_m.group('ch_prefix')}{ch_id+total_lines/2}"
+        else:
+            return None
 
     @staticmethod
     def get_nidaq_devices():
