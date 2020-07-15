@@ -69,6 +69,11 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.nidaq_man.ai_values_changed.connect(self.nidaq_ai_values_changed)
         self.nidaq_man.ao_values_changed.connect(self.nidaq_ao_values_changed)
 
+        # PDV
+        self.pdv_update_ts = None
+        self.pushButton_PDV_Refresh.clicked.connect(self.pdv_refresh)
+        self.pushButton_PDV_AutoRefresh.toggled.connect(self.pdv_autorefresh)
+
         # Map Measurement
         self.doubleSpinBox_MapM_X0.valueChanged.connect(self.mapm_x_changed)
         self.doubleSpinBox_MapM_X1.valueChanged.connect(self.mapm_x_changed)
@@ -290,6 +295,9 @@ class SetupMainWindow(Ui_SetupMainWindow):
             self.comboBox_MapM_NIDAQChIn.clear()
             self.comboBox_MapM_NIDAQChIn.addItems(nidaq_ai_chs)
 
+            self.comboBox_PhotoDiode_NIDAQ_Channel.clear()
+            self.comboBox_PhotoDiode_NIDAQ_Channel.addItems(nidaq_ai_chs)
+
     def nidaq_ai_values_changed(self, values):
         # TODO
         # global setup_main_logger
@@ -350,6 +358,45 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.piezo_cur_y = y
         setup_main_logger.debug(f"Move piezo stage to x, y, z ({x}, {y}, {z})"
                                 f"by {ao_dict}", extra={"component": "Main/MAPM"})
+
+    def pdv_refresh(self, b_auto: bool = False, interval: int = 1000):
+        pdv_ai_ch = self.comboBox_PhotoDiode_NIDAQ_Channel.currentText()
+        if pdv_ai_ch != "":
+            res_dict = self.nidaq_man.read_task_channels('ai')
+            ts = time.time() * 1000
+            if pdv_ai_ch not in res_dict.keys():
+                setup_main_logger.error(f"PDV CH {pdv_ai_ch} not in the NIDAQ enabled AI channels",
+                                        extra={"component": "Main/PDV"})
+                return
+            if self.pdv_update_ts is None:
+                self.widget_PDVPlot.add_data(0, res_dict[pdv_ai_ch])
+                self.pdv_update_ts = ts
+            else:
+                self.widget_PDVPlot.add_data(ts - self.pdv_update_ts, res_dict[pdv_ai_ch])
+        else:
+            setup_main_logger.error(f"Invalid PDV NIDAQ Channel",
+                                    extra={"component": "Main/PDV"})
+
+        if b_auto:
+            if self.pushButton_PDV_AutoRefresh.isChecked():
+                QTimer.singleShot(interval, lambda: self.pdv_refresh(True, interval))
+
+    def _pdv_autorefresh_task(self):
+        try:
+            interval = int(self.comboBox_PDV_Interval.currentText())
+            if interval < 0:
+                raise ValueError(f"Invalid interval")
+        except:
+            setup_main_logger.error(f"Invalid PDV Interval {self.comboBox_PDV_Interval.currentText()}, reset to 1000ms",
+                                    extra={"component": "Main/PDV"})
+            interval = 1000
+            self.comboBox_PDV_Interval.setCurrentText("1000")
+
+        self.pdv_refresh(True, interval)
+
+    def pdv_autorefresh(self, b_checked):
+        if b_checked:
+            self._pdv_autorefresh_task()
 
 if __name__ == '__main__':
     # import pdb

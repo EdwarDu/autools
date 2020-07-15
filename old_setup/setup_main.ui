@@ -422,7 +422,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <property name="tabsClosable">
          <bool>false</bool>
@@ -991,6 +991,108 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="tab_PDVMeasurement">
+         <attribute name="title">
+          <string>NI Input</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_13">
+            <property name="spacing">
+             <number>10</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_21">
+              <property name="text">
+               <string>NI DAQ Channel:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="comboBox_PhotoDiode_NIDAQ_Channel"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_PDV_Refresh">
+              <property name="text">
+               <string>Update</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_PDV_AutoRefresh">
+              <property name="text">
+               <string>Auto Refresh</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="comboBox_PDV_Interval">
+              <property name="inputMethodHints">
+               <set>Qt::ImhDate|Qt::ImhDigitsOnly</set>
+              </property>
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+              <property name="currentIndex">
+               <number>2</number>
+              </property>
+              <item>
+               <property name="text">
+                <string>0</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>10</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>100</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>1000</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>3000</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_22">
+              <property name="text">
+               <string>ms</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="PDVPlotWidget" name="widget_PDVPlot" native="true"/>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>
@@ -1003,6 +1105,12 @@
    <class>MeasurementPlotWidget</class>
    <extends>QWidget</extends>
    <header location="global">measurement_plot_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PDVPlotWidget</class>
+   <extends>QWidget</extends>
+   <header>pdv_plot_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
