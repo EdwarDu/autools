@@ -37,7 +37,7 @@ class MeasurementPlotWidget(pg.GraphicsLayoutWidget):
         # self.p_map.enableAutoRange(self.p_map.getViewBox().XYAxes, enable=True)
 
         self.img_gradient_item = pg.GradientEditorItem()
-        self.img_gradient_item.loadPreset('thermal')
+        self.img_gradient_item.loadPreset('bipolar')
         self.img_gradient_item.setOrientation('right')
         self.img_gradient_item.setTickValue(0, 0)
         self.img_gradient_item.setTickValue(-1, 1)
