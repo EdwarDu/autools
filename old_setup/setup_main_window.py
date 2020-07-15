@@ -142,23 +142,6 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.lineEdit_MapM_NiVolIn.setText(float2str(vol))
         return x, y, vol
 
-    def save_pzt_location_map(self, loc_table: list, auto_open: bool = False):
-        fname, _ = QFileDialog.getSaveFileName(self.window, "Save as CSV file ...", ".", "CSV (*.csv)")
-        if fname is not None and fname != '':
-            with open(fname, 'w') as f_csv:
-                f_csv.write(f"# Target X, Target Y, Real X, Real Y, Real Z\n")
-                for loc in loc_table:
-                    f_csv.write(",".join([f"{x:.6f}" for x in loc]) + "\n")
-
-            if auto_open:
-                if platform.system() == "Linux":
-                    os.system(f"xdg-open {fname}")
-                elif platform.system() == "Windows":
-                    os.startfile(f"{fname}")
-            return fname
-        else:
-            return None
-
     def mapm_measure_auto(self):
         # TODO: Run Automeasure task
         if self.mapm_last_incomplete_scan is not None and \
@@ -307,25 +290,14 @@ class SetupMainWindow(Ui_SetupMainWindow):
         # setup_main_logger.debug(f"{values}", extra={"component": "Main"})
         x_ch = self.comboBox_MapM_NIDAQChX.currentText()
         y_ch = self.comboBox_MapM_NIDAQChY.currentText()
-        z_ch = self.comboBox_MapM_NIDAQChZ.currentText()
+        # z_ch = self.comboBox_MapM_NIDAQChZ.currentText()
 
         if x_ch in values.keys():
             self.label_Piezo_X.setText(f"{(values[x_ch]-5)*10:.4f}")
         if y_ch in values.keys():
             self.label_Piezo_Y.setText(f"{(values[y_ch]-5)*10:.4f}")
-        if z_ch in values.keys():
-            self.label_Piezo_Z.setText(f"{(values[z_ch]-5)*10:.4f}")
-
-    def piezo_axis_position_changed(self, pos_dict: dict):
-        # FIXME: Must be in closed loop
-        global setup_main_logger
-        setup_main_logger.debug(f"{pos_dict}", extra={"component": "Main"})
-        if 'A' in pos_dict.keys():
-            self.label_Piezo_X.setText(f"{pos_dict['A']:.6f}")
-        if 'B' in pos_dict.keys():
-            self.label_Piezo_Y.setText(f"{pos_dict['B']:.6f}")
-        if 'C' in pos_dict.keys():
-            self.label_Piezo_Z.setText(f"{pos_dict['C']:.6f}")
+        # if z_ch in values.keys():
+        #     self.label_Piezo_Z.setText(f"{(values[z_ch]-5)*10:.4f}")
 
     def sr830_axis_value_changed(self, axis: int, value: float):
         global setup_main_logger
@@ -357,10 +329,11 @@ class SetupMainWindow(Ui_SetupMainWindow):
         else:
             y_value_dict = {}
 
-        if z is not None:
-            z_value_dict = {z_ch: 0.1*y+5}
-        else:
-            z_value_dict = {}
+        # if z is not None:
+        #     z_value_dict = {z_ch: 0.1*y+5}
+        # else:
+        #     z_value_dict = {}
+        z_value_dict = {}
 
         if x is not None or y is not None or z is not None:
             ao_dict = {**x_value_dict, **y_value_dict, **z_value_dict}
