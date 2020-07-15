@@ -754,6 +754,7 @@ class SR830Man(QObject):
         else:
             return ""
 
+
 def ask_selection(choices, prompt_str: str = 'Select: ', allow_invalid=False):
     choice = None
     while choice is None:

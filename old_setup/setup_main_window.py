@@ -103,6 +103,8 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.widget_MeasurementPlot1.export_image(prefix)
         prefix = os.path.join(folder, "lockin_y")
         self.widget_MeasurementPlot2.export_image(prefix)
+        prefix = os.path.join(folder, "pd_vol")
+        self.widget_MeasurementPlot3.export_image(prefix)
         setup_main_logger.info(f"Files exported to {folder} with prefix {{lockin_x/lockin_y}}",
                                extra={"component": "Main/MAPM"})
 
@@ -121,6 +123,13 @@ class SetupMainWindow(Ui_SetupMainWindow):
         else:
             setup_main_logger.error(f"No file {y_filename} to load",
                                    extra={"component": "Main/MAPM"})
+
+        vol_filename = os.path.join(folder, "pd_vol_map_img.npraw")
+        if os.path.exists(vol_filename):
+            self.widget_MeasurementPlot3.load_raw(vol_filename)
+        else:
+            setup_main_logger.error(f"No file {vol_filename} to load",
+                                    extra={"component": "Main/MAPM"})
 
     def mapm_measure(self, n_avg: int = 1):
         x_l, y_l, vol_l = [np.zeros(n_avg, dtype=np.float) for i in range(0, 3)]
@@ -317,7 +326,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
     def piezo_goto_xyz(self, x: float or None = None, y: float or None = None, z: float or None = None):
         x_ch = self.comboBox_MapM_NIDAQChX.currentText()
         y_ch = self.comboBox_MapM_NIDAQChY.currentText()
-        z_ch = self.comboBox_MapM_NIDAQChZ.currentText()
+        # z_ch = self.comboBox_MapM_NIDAQChZ.currentText()
 
         if x is not None:
             x_value_dict = {x_ch: 0.1*x+5}

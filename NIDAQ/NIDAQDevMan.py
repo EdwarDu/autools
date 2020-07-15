@@ -49,6 +49,7 @@ class NIDAQDevMan(QObject):
             'di': {'task': None, 'chs': []},
             'do': {'task': None, 'chs': []},
         }
+        self.output_curr_values = {}
         self.config_window = None
 
     def open(self, dev_name: str = None):
@@ -132,6 +133,9 @@ class NIDAQDevMan(QObject):
             self.ch_dict[ch_type]['chs'].append(ch)
             self.task_channels_changed.emit(ch_type, self.ch_dict[ch_type]['chs'])
 
+        if ch not in self.output_curr_values.keys():
+            self.output_curr_values['ch'] = 0 if ch_type == 'ao' else False
+
     def remove_task_channel(self, ch_type: str, ch):
         if ch_type not in self.ch_dict.keys():
             nidaq_logger.error(f'Unsupported {ch_type}', extra={"component": "NIDAQ"})
@@ -142,6 +146,9 @@ class NIDAQDevMan(QObject):
             chs = self.ch_dict[ch_type]['chs'][:]
             chs.remove(ch)
             self.set_task_channels(ch_type, chs)
+
+        if ch in self.output_curr_values.keys():
+            self.output_curr_values.pop(ch)
 
     def read_task_channels(self, ch_type: str):
         if ch_type not in ('ai', 'di'):
@@ -163,15 +170,17 @@ class NIDAQDevMan(QObject):
             nidaq_logger.error(f"Can't write {ch_type}", extra={"component": "NIDAQ"})
             return {}
 
-        default_values = {c: 0 if ch_type == 'ao' else False for c in self.ch_dict[ch_type]['chs']}
+        default_values = {c: self.output_curr_values[c] for c in self.ch_dict[ch_type]['chs']}
         for key, value in ch_value_dict.items():
             if key in default_values.keys():
                 default_values[key] = value
+                self.output_curr_values[key] = value
 
         values = [default_values[key] for key in self.ch_dict[ch_type]['chs']]
         nidaq_logger.debug(f"Writing {ch_type} {ch_value_dict}", extra={"component": "NIDAQ"})
         self.ch_dict[ch_type]['task'].write(values, auto_start=True)
-        self.ao_values_changed.emit(default_values)
+        if ch_type == 'ao':
+            self.ao_values_changed.emit(self.output_curr_values)
 
     @staticmethod
     def get_nidaq_devices():
