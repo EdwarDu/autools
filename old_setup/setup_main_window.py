@@ -306,8 +306,11 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         if x_ch in values.keys():
             self.label_Piezo_X.setText(f"{(values[x_ch]-5)*10:.4f}")
+            self.lineEdit_MapM_NiVolX.setText(f"{float2str(values[x_ch])}")
         if y_ch in values.keys():
             self.label_Piezo_Y.setText(f"{(values[y_ch]-5)*10:.4f}")
+            self.lineEdit_MapM_NiVolY.setText(f"{float2str(values[y_ch])}")
+
         # if z_ch in values.keys():
         #     self.label_Piezo_Z.setText(f"{(values[z_ch]-5)*10:.4f}")
 
