@@ -8,6 +8,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import QObject, pyqtSignal
 import re
+import numpy as np
 
 
 _SPLIT_LOG = False
@@ -162,6 +163,7 @@ class NIDAQDevMan(QObject):
             self.set_task_channels(ch_type, chs)
 
     def read_task_channels(self, ch_type: str):
+        ai_read_samples = 64  # Number of analog input samples will be averaged
         if ch_type not in ('ai', 'di'):
             nidaq_logger.error(f"Can't read {ch_type}", extra={"component": "NIDAQ"})
             return {}
@@ -169,9 +171,9 @@ class NIDAQDevMan(QObject):
         if len(self.ch_dict[ch_type]['chs']) == 0:
             res = {}
         elif len(self.ch_dict[ch_type]['chs']) == 1:
-            res = {self.ch_dict[ch_type]['chs'][0]: self.ch_dict[ch_type]['task'].read()}
+            res = {self.ch_dict[ch_type]['chs'][0]: np.average(self.ch_dict[ch_type]['task'].read(ai_read_samples))}
         else:
-            res = {c: v for c, v in zip(self.ch_dict[ch_type]['chs'], self.ch_dict[ch_type]['task'].read())}
+            res = {c: v for c, v in zip(self.ch_dict[ch_type]['chs'], [np.average(x) for x in self.ch_dict[ch_type]['task'].read(ai_read_samples)])}
             if ch_type == 'ai':
                 for c in res.keys():
                     if c in self.ch_term_dict.keys() and self.ch_term_dict[c] == "Differential":
