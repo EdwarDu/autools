@@ -79,10 +79,13 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.mapm_x_changed()
         self.mapm_y_changed()
 
+        self.piezo_cur_x = 0
+        self.piezo_cur_y = 0
+
         self.pushButton_MapM_GoX0.clicked.connect(
-            lambda: self.piezo_goto_xyz(x=self.doubleSpinBox_MapM_X0.value()))
+            lambda: self.piezo_goto_xyz(x=self.doubleSpinBox_MapM_X0.value(), y=self.piezo_cur_y))
         self.pushButton_MapM_GoY0.clicked.connect(
-            lambda: self.piezo_goto_xyz(y=self.doubleSpinBox_MapM_Y0.value()))
+            lambda: self.piezo_goto_xyz(x=self.piezo_cur_x, y=self.doubleSpinBox_MapM_Y0.value()))
 
         self.pushButton_MapM_Measure.clicked.connect(
             lambda: self.mapm_measure(n_avg=self.spinBox_MapM_NSamplesAvg.value()))
@@ -323,20 +326,12 @@ class SetupMainWindow(Ui_SetupMainWindow):
         else:
             setup_main_logger.warning(f"Unknown (from main) SR830 axis:{axis}", extra={"component": "Main"})
 
-    def piezo_goto_xyz(self, x: float or None = None, y: float or None = None, z: float or None = None):
+    def piezo_goto_xyz(self, x: float, y: float, z: float or None = None):
         x_ch = self.comboBox_MapM_NIDAQChX.currentText()
         y_ch = self.comboBox_MapM_NIDAQChY.currentText()
         # z_ch = self.comboBox_MapM_NIDAQChZ.currentText()
 
-        if x is not None:
-            x_value_dict = {x_ch: 0.1*x+5}
-        else:
-            x_value_dict = {}
-
-        if y is not None:
-            y_value_dict = {y_ch: 0.1*y+5}
-        else:
-            y_value_dict = {}
+        ao_dict = {x_ch: 0.1*x+5, y_ch: 0.1*y+5}
 
         # if z is not None:
         #     z_value_dict = {z_ch: 0.1*y+5}
@@ -344,17 +339,14 @@ class SetupMainWindow(Ui_SetupMainWindow):
         #     z_value_dict = {}
         z_value_dict = {}
 
-        if x is not None or y is not None or z is not None:
-            ao_dict = {**x_value_dict, **y_value_dict, **z_value_dict}
-            if _MAPM_TEST:
-                self.nidaq_man.ao_values_changed.emit(ao_dict)
-            else:
-                self.nidaq_man.write_task_channels('ao', ao_dict)
-            setup_main_logger.debug(f"Move piezo stage to x, y, z ({x}, {y}, {z})"
-                                    f"by {ao_dict}", extra={"component": "Main/MAPM"})
+        if _MAPM_TEST:
+            self.nidaq_man.ao_values_changed.emit(ao_dict)
         else:
-            setup_main_logger.debug(f"Not moving piezo stage", extra={"component": "Main/MAPM"})
-
+            self.nidaq_man.write_task_channels('ao', ao_dict)
+        self.piezo_cur_x = x
+        self.piezo_cur_y = y
+        setup_main_logger.debug(f"Move piezo stage to x, y, z ({x}, {y}, {z})"
+                                f"by {ao_dict}", extra={"component": "Main/MAPM"})
 
 if __name__ == '__main__':
     # import pdb
