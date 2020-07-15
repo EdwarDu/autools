@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import nidaqmx
-from nidaqmx.constants import Edge, AcquisitionType, LineGrouping
+from nidaqmx.constants import Edge, AcquisitionType, LineGrouping, TerminalConfiguration
 import logging
 from .nidaq_config_ui import Ui_NIDAQ_Config_Window
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -49,6 +49,8 @@ class NIDAQDevMan(QObject):
             'di': {'task': None, 'chs': []},
             'do': {'task': None, 'chs': []},
         }
+
+        self.ch_term_dict = {}
         self.config_window = None
 
     def open(self, dev_name: str = None):
@@ -72,6 +74,7 @@ class NIDAQDevMan(QObject):
                 self.ch_dict[ch_type]['task'].close()
                 self.ch_dict[ch_type]['task'] = None
         self.closed.emit()
+        self.ch_term_dict = {}
 
     def __del__(self):
         self.close()
@@ -122,7 +125,16 @@ class NIDAQDevMan(QObject):
         if ch not in self.ch_dict[ch_type]['chs']:
             nidaq_logger.debug(f'Adding {ch} to {ch_type} task', extra={"component": "NIDAQ"})
             if ch_type == 'ai':
-                self.ch_dict[ch_type]['task'].ai_channels.add_ai_voltage_chan(ch)
+                if ch in self.ch_term_dict.keys():
+                    if self.ch_term_dict[ch] == "Differential":
+                        self.ch_dict[ch_type]['task'].ai_channels\
+                            .add_ai_voltage_chan(ch, terminal_config=TerminalConfiguration.DIFFERENTIAL)
+                    elif self.ch_term_dict[ch] == "RSE":
+                        self.ch_dict[ch_type]['task'].ai_channels\
+                            .add_ai_voltage_chan(ch, terminal_config=TerminalConfiguration.RSE)
+                    elif self.ch_term_dict[ch] == "NRSE":
+                        self.ch_dict[ch_type]['task'].ai_channels\
+                            .add_ai_voltage_chan(ch, terminal_config=TerminalConfiguration.NRSE)
             elif ch_type == 'ao':
                 self.ch_dict[ch_type]['task'].ao_channels.add_ao_voltage_chan(ch)
             elif ch_type == 'di':
@@ -172,6 +184,9 @@ class NIDAQDevMan(QObject):
         nidaq_logger.debug(f"Writing {ch_type} {ch_value_dict}", extra={"component": "NIDAQ"})
         self.ch_dict[ch_type]['task'].write(values, auto_start=True)
         self.ao_values_changed.emit(default_values)
+
+    def change_ch_term(self, ch_type: str, ch_name: str, term: str):
+        self.ch_term_dict[ch_name] = term
 
     @staticmethod
     def get_nidaq_devices():
@@ -244,8 +259,9 @@ class NIDAQConfigWindow(Ui_NIDAQ_Config_Window):
 
     def sync_ao_values(self):
         ch_value_dict = {}
-        for channel_name, (ch_type, ch_w_label, ch_w_enable, ch_w_value) in self.chs_widget_dict['ao']['chs_dict'].items():
+        for channel_name, (ch_type, ch_w_label, ch_w_enable, ch_w) in self.chs_widget_dict['ao']['chs_dict'].items():
             if ch_w_enable.isChecked():
+                ch_w_value, = ch_w
                 ch_value = ch_w_value.value()
                 ch_value_dict[channel_name] = ch_value
 
@@ -253,8 +269,9 @@ class NIDAQConfigWindow(Ui_NIDAQ_Config_Window):
 
     def sync_do_values(self):
         ch_value_dict = {}
-        for channel_name, (ch_type, ch_w_label, ch_w_enable, ch_w_value) in self.chs_widget_dict['do']['chs_dict'].items():
+        for channel_name, (ch_type, ch_w_label, ch_w_enable, ch_w) in self.chs_widget_dict['do']['chs_dict'].items():
             if ch_w_enable.isChecked():
+                ch_w_value, = ch_w
                 ch_value = ch_w_value.value() == 1
                 ch_value_dict[channel_name] = ch_value
 
@@ -304,28 +321,35 @@ class NIDAQConfigWindow(Ui_NIDAQ_Config_Window):
                     line_edit = QtWidgets.QLineEdit(self.groupBox_Control)
                     line_edit.setReadOnly(True)
                     parent_widget.addWidget(line_edit, row_index, 2, 1, 1)
-                    ctrl_w = line_edit
+                    combbox_term = QtWidgets.QComboBox(self.groupBox_Control)
+                    combbox_term.addItems(["Differential", "RSE", "NRSE"])
+                    combbox_term.currentTextChanged.connect(
+                        lambda term, c_t=ch_type, c_name=ch: self.nidaq_man.change_ch_term(c_t, c_name, term))
+                    ctrl_w = [line_edit, combbox_term]
                 elif ch_type == 'ao':
                     spin_box = QtWidgets.QDoubleSpinBox(self.groupBox_Control)
                     spin_box.setMaximum(10)
                     spin_box.setMinimum(0)
                     spin_box.setSingleStep(0.01)
-                    ctrl_w = spin_box
+                    ctrl_w = [spin_box, ]
                 elif ch_type == 'di':
                     spin_box = QtWidgets.QSpinBox(self.groupBox_Control)
                     spin_box.setMinimum(0)
                     spin_box.setMaximum(1)
                     spin_box.setSingleStep(1)
                     spin_box.setReadOnly(True)
-                    ctrl_w = spin_box
+                    ctrl_w = [spin_box, ]
                 else:  # do
                     spin_box = QtWidgets.QSpinBox(self.groupBox_Control)
                     spin_box.setMinimum(0)
                     spin_box.setMaximum(1)
                     spin_box.setSingleStep(1)
-                    ctrl_w = spin_box
+                    ctrl_w = [spin_box, ]
 
-                parent_widget.addWidget(ctrl_w, row_index, 2, 1, 1)
+                col_index = 2
+                for ctrl in ctrl_w:
+                    parent_widget.addWidget(ctrl, row_index, col_index, 1, 1)
+                    col_index = col_index + 1
                 widget_dict[ch] = (ch_type, label, chbox_enable, ctrl_w)
                 row_index += 1
 
