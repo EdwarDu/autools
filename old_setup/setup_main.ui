@@ -834,7 +834,7 @@
             <item>
              <widget class="QLabel" name="label_75">
               <property name="text">
-               <string>#.Avg</string>
+               <string>LockIn#.Avg</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -842,19 +842,16 @@
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="spinBox_MapM_NSamplesAvg">
+             <widget class="QSpinBox" name="spinBox_MapM_NSamplesAvgLockIn">
               <property name="minimum">
                <number>1</number>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_67">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
+             <widget class="QLabel" name="label_76">
               <property name="text">
-               <string>Z:</string>
+               <string>PD#.Avg</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -862,31 +859,18 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="comboBox_MapM_NIDAQChZ">
-              <property name="enabled">
-               <bool>false</bool>
+             <widget class="QSpinBox" name="spinBox_MapM_NSamplesAvgPD">
+              <property name="minimum">
+               <number>1</number>
               </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEdit_MapM_NiVolZ">
-              <property name="enabled">
-               <bool>false</bool>
+              <property name="maximum">
+               <number>50000</number>
               </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+              <property name="singleStep">
+               <number>100</number>
               </property>
-              <property name="maximumSize">
-               <size>
-                <width>160</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
+              <property name="value">
+               <number>1500</number>
               </property>
              </widget>
             </item>

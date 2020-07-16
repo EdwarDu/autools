@@ -162,8 +162,7 @@ class NIDAQDevMan(QObject):
             chs.remove(ch)
             self.set_task_channels(ch_type, chs)
 
-    def read_task_channels(self, ch_type: str):
-        ai_read_samples = 64  # Number of analog input samples will be averaged
+    def read_task_channels(self, ch_type: str, n_samples: int = 1):
         if ch_type not in ('ai', 'di'):
             nidaq_logger.error(f"Can't read {ch_type}", extra={"component": "NIDAQ"})
             return {}
@@ -171,15 +170,19 @@ class NIDAQDevMan(QObject):
         if len(self.ch_dict[ch_type]['chs']) == 0:
             res = {}
         elif len(self.ch_dict[ch_type]['chs']) == 1:
-            res = {self.ch_dict[ch_type]['chs'][0]: np.average(self.ch_dict[ch_type]['task'].read(ai_read_samples))}
+            res = {self.ch_dict[ch_type]['chs'][0]:
+                       np.array(self.ch_dict[ch_type]['task'].read(n_samples) if n_samples != 1 else [
+                           self.ch_dict[ch_type]['task'].read(n_samples), ])}
         else:
-            res = {c: v for c, v in zip(self.ch_dict[ch_type]['chs'], [np.average(x) for x in self.ch_dict[ch_type]['task'].read(ai_read_samples)])}
+            res = {c: v for c, v in zip(self.ch_dict[ch_type]['chs'],
+                                        np.array(self.ch_dict[ch_type]['task'].read(n_samples) if n_samples != 1 else [
+                                            self.ch_dict[ch_type]['task'].read(n_samples), ]))}
             if ch_type == 'ai':
                 for c in res.keys():
                     if c in self.ch_term_dict.keys() and self.ch_term_dict[c] == "Differential":
                         c_d = self.get_ai_corresponding_diff_ch(c)
                         if c_d is not None:
-                            nidaq_logger.debug(f"Differential {c} ({res[c]}) + {c_d} ({res[c_d]})", extra={"component": "NIDAQ"})
+                            # nidaq_logger.debug(f"Differential {c} ({res[c]}) + {c_d} ({res[c_d]})", extra={"component": "NIDAQ"})
                             res[c] = res[c] + res[c_d]
 
         self.ai_values_changed.emit(res)
@@ -274,14 +277,14 @@ class NIDAQConfigWindow(Ui_NIDAQ_Config_Window):
         for c, v in ch_dict.items():
             if c in self.chs_widget_dict['ai']['chs_dict'].keys():
                 line_edit = self.chs_widget_dict['ai']['chs_dict'][c][3][0]
-                line_edit.setText(f"{v:.4f}")
+                line_edit.setText(f"{np.average(v):.4f}")
 
     def sync_di_values(self):
         ch_dict = self.nidaq_man.read_task_channels('di')
         for c, v in ch_dict.items():
             if c in self.chs_widget_dict['di']['chs_dict'].keys():
                 spin_box: QtWidgets.QSpinBox = self.chs_widget_dict['di']['chs_dict'][c][3][0]
-                spin_box.setValue(1 if v else 0)
+                spin_box.setValue(1 if v[-1] else 0)
 
     def sync_ao_values(self):
         ch_value_dict = {}

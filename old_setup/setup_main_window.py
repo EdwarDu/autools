@@ -10,6 +10,7 @@ import os
 import time
 import platform
 import numpy as np
+import concurrent.futures
 
 import threading
 from threading import Thread, Event, Lock
@@ -32,7 +33,7 @@ setup_main_logger_ch = logging.StreamHandler()
 setup_main_logger_ch.setFormatter(setup_main_logger_formatter)
 setup_main_logger.addHandler(setup_main_logger_ch)
 
-_MAPM_TEST = False
+_MAPM_TEST = True
 
 from ..SRS.SR830Man import SR830Man, float2str
 from ..NIDAQ.NIDAQDevMan import NIDAQDevMan
@@ -97,7 +98,8 @@ class SetupMainWindow(Ui_SetupMainWindow):
             lambda: self.piezo_goto_xyz(x=self.piezo_cur_x, y=self.doubleSpinBox_MapM_Y0.value()))
 
         self.pushButton_MapM_Measure.clicked.connect(
-            lambda: self.mapm_measure(n_avg=self.spinBox_MapM_NSamplesAvg.value()))
+            lambda: self.mapm_measure(lockin_n_avg=self.spinBox_MapM_NSamplesAvgLockIn.value(),
+                                      pdv_n_avg=self.spinBox_MapM_NSamplesAvgPD.value()))
         self.pushButton_MapM_Auto.clicked.connect(lambda: self.mapm_measure_auto())
         self.pushButton_MapM_Export.clicked.connect(self.mapm_export)
         self.pushButton_MapM_Load.clicked.connect(self.mapm_load_npraw)
@@ -143,25 +145,50 @@ class SetupMainWindow(Ui_SetupMainWindow):
             setup_main_logger.error(f"No file {vol_filename} to load",
                                     extra={"component": "Main/MAPM"})
 
-    def mapm_measure(self, n_avg: int = 1):
-        x_l, y_l, vol_l = [np.zeros(n_avg, dtype=np.float) for i in range(0, 3)]
+    def _get_lockin_xy(self, lockin_n_avg: int = 1):
+        if _MAPM_TEST:
+            return self.piezo_cur_x, self.piezo_cur_y
 
-        for i in range(0, n_avg):
-            # Lock In
-            if _MAPM_TEST:
-                x_l[i], y_l[i], vol_l[i] = np.abs(np.random.randn(3))
-            else:
-                x_l[i], y_l[i] = self.sr830_man.get_parameters_value(SR830Man.GET_PARAMETER_X, SR830Man.GET_PARAMETER_Y)
-                vol_l[i] = self.nidaq_man.read_task_channels("ai")[self.comboBox_MapM_NIDAQChIn.currentText()]
-                setup_main_logger.debug(f"Measurement: {x_l[i]} {y_l[i]} {vol_l[i]}",
-                                        extra={"component": "Main/MAPM"})
-        x, y, vol = np.average(x_l), np.average(y_l), np.average(vol_l)
-        setup_main_logger.debug(f"Measurement AVG: {x} {y} {vol}",
-                                extra={"component": "Main/MAPM"})
-        self.lineEdit_MapM_LockInX.setText(float2str(x))
-        self.lineEdit_MapM_LockInY.setText(float2str(y))
-        self.lineEdit_MapM_NiVolIn.setText(float2str(vol))
-        return x, y, vol
+        x_l = np.zeros(lockin_n_avg)
+        y_l = np.zeros(lockin_n_avg)
+        for i in range(0, lockin_n_avg):
+            x_l[i], y_l[i] = self.sr830_man.get_parameters_value(SR830Man.GET_PARAMETER_X, SR830Man.GET_PARAMETER_Y)
+        return np.average(x_l), np.average(y_l)
+
+    def _get_pdv_vol(self, pdv_n_avg: int = 1500):
+        if _MAPM_TEST:
+            return self.piezo_cur_x + self.piezo_cur_y
+
+        return np.average(self.nidaq_man.read_task_channels("ai", pdv_n_avg)[self.comboBox_MapM_NIDAQChIn.currentText()])
+
+    def mapm_measure(self, lockin_n_avg: int = 1, pdv_n_avg: int = 1500):
+        # x_l, y_l, vol_l = [np.zeros(n_avg, dtype=np.float) for i in range(0, 3)]
+        #
+        # for i in range(0, n_avg):
+        #     # Lock In
+        #     if _MAPM_TEST:
+        #         x_l[i], y_l[i], vol_l[i] = np.abs(np.random.randn(3))
+        #     else:
+        #         x_l[i], y_l[i] = self.sr830_man.get_parameters_value(SR830Man.GET_PARAMETER_X, SR830Man.GET_PARAMETER_Y)
+        #         vol_l[i] = np.average(self.nidaq_man.read_task_channels("ai", 1500)[
+        #                                   self.comboBox_MapM_NIDAQChIn.currentText()
+        #                               ])
+        #         setup_main_logger.debug(f"Measurement: {x_l[i]} {y_l[i]} {vol_l[i]}",
+        #                                 extra={"component": "Main/MAPM"})
+        # x, y, vol = np.average(x_l), np.average(y_l), np.average(vol_l)
+        # setup_main_logger.debug(f"Measurement AVG: {x} {y} {vol}",
+        #                         extra={"component": "Main/MAPM"})
+        # self.lineEdit_MapM_LockInX.setText(float2str(x))
+        # self.lineEdit_MapM_LockInY.setText(float2str(y))
+        # self.lineEdit_MapM_NiVolIn.setText(float2str(vol))
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            lockin_future = executor.submit(self._get_lockin_xy, lockin_n_avg)
+            pdv_future = executor.submit(self._get_pdv_vol, pdv_n_avg)
+            lockin_x, lockin_y = lockin_future.result()
+            pdv_vol = pdv_future.result()
+
+        return lockin_x, lockin_y, pdv_vol
 
     def mapm_request_pause(self):
         self.mapm_pause_requested = True
@@ -171,8 +198,27 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.pushButton_MapM_Pause.setEnabled(True)
         if self.mapm_last_incomplete_scan is not None and \
                 len(self.mapm_last_incomplete_scan) != 0:
+            x0 = self.mapm_last_incomplete_scan["x0"]
+            y0 = self.mapm_last_incomplete_scan["y0"]
+            x1 = self.mapm_last_incomplete_scan["x1"]
+            y1 = self.mapm_last_incomplete_scan["y1"]
+            x_samples = self.mapm_last_incomplete_scan["x_samples"]
+            y_samples = self.mapm_last_incomplete_scan["y_samples"]
+            ni_x_ch = self.mapm_last_incomplete_scan['ni_x_ch']
+            ni_y_ch = self.mapm_last_incomplete_scan['ni_y_ch']
+            ni_in_ch = self.mapm_last_incomplete_scan['ni_in_ch']
+
+            n_lockin_samples = self.mapm_last_incomplete_scan['n_lockin_samples']
+            n_pdv_samples = self.mapm_last_incomplete_scan['n_pdv_samples']
+            measure_delay_ms = self.spinBox_MapM_MeasureDelay.value()
+
             ans = QMessageBox.question(self.window, f"Previous scan incomplete",
-                                       "Continue from last scan's last position?",
+                                       f"Map scan from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} \n"
+                                       f"#Samples X={x_samples}, Y={y_samples} \n"
+                                       f"NIDAQ Ch X={ni_x_ch}, Y={ni_y_ch} In={ni_in_ch} \n"
+                                       f"Average LockIn {n_lockin_samples} PDV(NI) {n_pdv_samples} \n"
+                                       f"Measure delay {measure_delay_ms} ms \n"
+                                       f"Continue from last scan's last position?",
                                        QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             start_new = ans == QMessageBox.No
         else:
@@ -188,23 +234,24 @@ class SetupMainWindow(Ui_SetupMainWindow):
             ni_x_ch = self.comboBox_MapM_NIDAQChX.currentText()
             ni_y_ch = self.comboBox_MapM_NIDAQChY.currentText()
             ni_in_ch = self.comboBox_MapM_NIDAQChIn.currentText()
-
             x_values = np.linspace(x0, x1, x_samples)
             y_values = np.linspace(y0, y1, y_samples)
-
+            n_lockin_samples = self.spinBox_MapM_NSamplesAvgLockIn.value()
+            n_pdv_samples = self.spinBox_MapM_NSamplesAvgPD.value()
             measure_delay_ms = self.spinBox_MapM_MeasureDelay.value()
 
             setup_main_logger.info(f"Map scan from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
                                    f"#Samples X={x_samples}, Y={y_samples} "
                                    f"NIDAQ Ch X={ni_x_ch}, Y={ni_y_ch} In={ni_in_ch} "
+                                   f"Average LockIn {n_lockin_samples} PDV(NI) {n_pdv_samples} "
                                    f"Measure delay {measure_delay_ms} ms", extra={"component": "Main/MAPM"})
 
             self.piezo_goto_xyz(x=x0, y=y0)
-
             self.mapm_last_incomplete_scan = {
                 "x0": x0, "y0": y0, "x1": x1, "y1": y1, "x_samples": x_samples, "y_samples": y_samples,
                 "ni_x_ch": ni_x_ch, "ni_y_ch": ni_y_ch, "ni_in_ch": ni_in_ch,
                 "measure_delay_ms": measure_delay_ms,
+                "n_lockin_samples": n_lockin_samples, "n_pdv_samples": n_pdv_samples,
                 "scanned_data": {}
             }
         else:
@@ -217,17 +264,19 @@ class SetupMainWindow(Ui_SetupMainWindow):
             ni_x_ch = self.mapm_last_incomplete_scan['ni_x_ch']
             ni_y_ch = self.mapm_last_incomplete_scan['ni_y_ch']
             ni_in_ch = self.mapm_last_incomplete_scan['ni_in_ch']
+            n_lockin_samples = self.mapm_last_incomplete_scan['n_lockin_samples']
+            n_pdv_samples = self.mapm_last_incomplete_scan['n_pdv_samples']
+            measure_delay_ms = self.mapm_last_incomplete_scan["measure_delay_ms"]
+
+            x_values = np.linspace(x0, x1, x_samples)
+            y_values = np.linspace(y0, y1, y_samples)
 
             self.doubleSpinBox_MapM_X0.setValue(x0)
             self.doubleSpinBox_MapM_Y0.setValue(y0)
             self.doubleSpinBox_MapM_X1.setValue(x1)
             self.doubleSpinBox_MapM_Y1.setValue(y1)
-
-            x_values = np.linspace(x0, x1, x_samples)
-            y_values = np.linspace(y0, y1, y_samples)
-
-            measure_delay_ms = self.mapm_last_incomplete_scan["measure_delay_ms"]
-
+            self.spinBox_MapM_NSamplesAvgLockIn.setValue(n_lockin_samples)
+            self.spinBox_MapM_NSamplesAvgPD.setValue(n_pdv_samples)
             self.comboBox_MapM_NIDAQChX.setCurrentText(ni_x_ch)
             self.comboBox_MapM_NIDAQChY.setCurrentText(ni_y_ch)
             self.comboBox_MapM_NIDAQChIn.setCurrentText(ni_in_ch)
@@ -237,8 +286,11 @@ class SetupMainWindow(Ui_SetupMainWindow):
             setup_main_logger.info(f"Resume map scan from {x0:.6f},{y0:.6f} to {x1:.6f},{y1:.6f} "
                                    f"#Samples X={x_samples}, Y={y_samples} "
                                    f"NIDAQ Ch X={ni_x_ch} Y={ni_y_ch} In={ni_in_ch} "
+                                   f"Average LockIn {n_lockin_samples} PDV(NI) {n_pdv_samples} "
                                    f"Measure delay {measure_delay_ms} ms", extra={"component": "Main/MAPM"})
 
+        self.spinBox_MapM_NSamplesAvgPD.setEnabled(False)
+        self.spinBox_MapM_NSamplesAvgLockIn.setEnabled(False)
         # if not b_only_check_pzt:
         # Set up plots
         self.widget_MeasurementPlot1.set_xy_list(x_values, y_values)
@@ -268,9 +320,12 @@ class SetupMainWindow(Ui_SetupMainWindow):
                                 if ans == QMessageBox.Yes:
                                     self.mapm_pause_requested = False
                                     self.pushButton_MapM_Pause.setEnabled(False)
+                                    self.spinBox_MapM_NSamplesAvgPD.setEnabled(True)
+                                    self.spinBox_MapM_NSamplesAvgLockIn.setEnabled(True)
                                     return
                             self.mapm_pause_requested = False
-                    lockin_x, lockin_y, vol = self.mapm_measure(n_avg=self.spinBox_MapM_NSamplesAvg.value())
+                    lockin_x, lockin_y, vol = self.mapm_measure(lockin_n_avg=self.spinBox_MapM_NSamplesAvgLockIn.value(),
+                                                                pdv_n_avg=self.spinBox_MapM_NSamplesAvgPD.value())
                 else:
                     lockin_x, lockin_y, vol = self.mapm_last_incomplete_scan["scanned_data"][(x, y)]
 
@@ -284,6 +339,8 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         self.mapm_last_incomplete_scan = None  # scan complete remove incomplete save
         self.pushButton_MapM_Pause.setEnabled(False)
+        self.spinBox_MapM_NSamplesAvgPD.setEnabled(True)
+        self.spinBox_MapM_NSamplesAvgLockIn.setEnabled(True)
 
     def mapm_x_changed(self):
         x0 = self.doubleSpinBox_MapM_X0.value()
@@ -385,17 +442,17 @@ class SetupMainWindow(Ui_SetupMainWindow):
     def pdv_refresh(self, b_auto: bool = False, interval: int = 1000):
         pdv_ai_ch = self.comboBox_PhotoDiode_NIDAQ_Channel.currentText()
         if pdv_ai_ch != "":
-            res_dict = self.nidaq_man.read_task_channels('ai')
+            res_dict = self.nidaq_man.read_task_channels('ai', 1500)
             ts = time.time() * 1000
             if pdv_ai_ch not in res_dict.keys():
                 setup_main_logger.error(f"PDV CH {pdv_ai_ch} not in the NIDAQ enabled AI channels",
                                         extra={"component": "Main/PDV"})
                 return
             if self.pdv_update_ts is None:
-                self.widget_PDVPlot.add_data(0, res_dict[pdv_ai_ch])
+                self.widget_PDVPlot.add_data(0, np.average(res_dict[pdv_ai_ch]))
                 self.pdv_update_ts = ts
             else:
-                self.widget_PDVPlot.add_data(ts - self.pdv_update_ts, res_dict[pdv_ai_ch])
+                self.widget_PDVPlot.add_data(ts - self.pdv_update_ts, np.average(res_dict[pdv_ai_ch]))
         else:
             setup_main_logger.error(f"Invalid PDV NIDAQ Channel",
                                     extra={"component": "Main/PDV"})
