@@ -33,7 +33,8 @@ setup_main_logger_ch = logging.StreamHandler()
 setup_main_logger_ch.setFormatter(setup_main_logger_formatter)
 setup_main_logger.addHandler(setup_main_logger_ch)
 
-_MAPM_TEST = True
+_TEST_NO_SR830 = False
+_TEST_NO_NIDAQ = False
 
 from ..SRS.SR830Man import SR830Man, float2str
 from ..NIDAQ.NIDAQDevMan import NIDAQDevMan
@@ -146,7 +147,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
                                     extra={"component": "Main/MAPM"})
 
     def _get_lockin_xy(self, lockin_n_avg: int = 1):
-        if _MAPM_TEST:
+        if _TEST_NO_SR830:
             return self.piezo_cur_x, self.piezo_cur_y
 
         x_l = np.zeros(lockin_n_avg)
@@ -156,10 +157,15 @@ class SetupMainWindow(Ui_SetupMainWindow):
         return np.average(x_l), np.average(y_l)
 
     def _get_pdv_vol(self, pdv_n_avg: int = 1500):
-        if _MAPM_TEST:
+        if _TEST_NO_NIDAQ:
             return self.piezo_cur_x + self.piezo_cur_y
-
-        return np.average(self.nidaq_man.read_task_channels("ai", pdv_n_avg)[self.comboBox_MapM_NIDAQChIn.currentText()])
+        pdv_arr = np.array([])
+        samples_left = pdv_n_avg
+        while samples_left != 0:
+            samples2read = min(samples_left, 128)
+            pdv_arr = np.append(pdv_arr, self.nidaq_man.read_task_channels("ai", samples2read)[self.comboBox_MapM_NIDAQChIn.currentText()])
+            samples_left = samples_left-samples2read
+        return np.average(pdv_arr)
 
     def mapm_measure(self, lockin_n_avg: int = 1, pdv_n_avg: int = 1500):
         # x_l, y_l, vol_l = [np.zeros(n_avg, dtype=np.float) for i in range(0, 3)]
@@ -188,6 +194,8 @@ class SetupMainWindow(Ui_SetupMainWindow):
             lockin_x, lockin_y = lockin_future.result()
             pdv_vol = pdv_future.result()
 
+        setup_main_logger.debug(f"Measurement got values SR830 X={lockin_x}, Y={lockin_y}, PDV={pdv_vol}",
+                                extra={"component": "Main/MAPM"})
         return lockin_x, lockin_y, pdv_vol
 
     def mapm_request_pause(self):
@@ -366,8 +374,8 @@ class SetupMainWindow(Ui_SetupMainWindow):
             self.comboBox_MapM_NIDAQChY.clear()
             self.comboBox_MapM_NIDAQChY.addItems(nidaq_ao_chs)
 
-            self.comboBox_MapM_NIDAQChZ.clear()
-            self.comboBox_MapM_NIDAQChZ.addItems(nidaq_ao_chs)
+            # self.comboBox_MapM_NIDAQChZ.clear()
+            # self.comboBox_MapM_NIDAQChZ.addItems(nidaq_ao_chs)
         elif ch_type == 'ai':
             nidaq_ai_chs = chs
             setup_main_logger.debug(f"{nidaq_ai_chs}", extra={"component": "Main"})
@@ -382,7 +390,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
         # TODO
         # global setup_main_logger
         # setup_main_logger.debug(f"{values}", extra={"component": "Main"})
-        pass
+        self.lineEdit_MapM_NiVolIn.setText(f"{float2str(np.average(values[self.comboBox_MapM_NIDAQChIn.currentText()]))}")
 
     def nidaq_ao_values_changed(self, values: dict):
         # TODO
@@ -430,10 +438,13 @@ class SetupMainWindow(Ui_SetupMainWindow):
         #     z_value_dict = {}
         z_value_dict = {}
 
-        if _MAPM_TEST:
+        if _TEST_NO_NIDAQ:
+            x_ch = 'ao0'
+            y_ch = 'ao1'
             self.nidaq_man.ao_values_changed.emit(ao_dict)
         else:
             self.nidaq_man.write_task_channels('ao', ao_dict)
+
         self.piezo_cur_x = x
         self.piezo_cur_y = y
         setup_main_logger.debug(f"Move piezo stage to x, y, z ({x}, {y}, {z})"
@@ -442,7 +453,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
     def pdv_refresh(self, b_auto: bool = False, interval: int = 1000):
         pdv_ai_ch = self.comboBox_PhotoDiode_NIDAQ_Channel.currentText()
         if pdv_ai_ch != "":
-            res_dict = self.nidaq_man.read_task_channels('ai', 1500)
+            res_dict = self.nidaq_man.read_task_channels('ai', 128)
             ts = time.time() * 1000
             if pdv_ai_ch not in res_dict.keys():
                 setup_main_logger.error(f"PDV CH {pdv_ai_ch} not in the NIDAQ enabled AI channels",

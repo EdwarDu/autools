@@ -171,12 +171,14 @@ class NIDAQDevMan(QObject):
             res = {}
         elif len(self.ch_dict[ch_type]['chs']) == 1:
             res = {self.ch_dict[ch_type]['chs'][0]:
-                       np.array(self.ch_dict[ch_type]['task'].read(n_samples) if n_samples != 1 else [
-                           self.ch_dict[ch_type]['task'].read(n_samples), ])}
+                       np.array(self.ch_dict[ch_type]['task'].read(n_samples) if n_samples != 1 else
+                           self.ch_dict[ch_type]['task'].read(n_samples))}
         else:
             res = {c: v for c, v in zip(self.ch_dict[ch_type]['chs'],
-                                        np.array(self.ch_dict[ch_type]['task'].read(n_samples) if n_samples != 1 else [
-                                            self.ch_dict[ch_type]['task'].read(n_samples), ]))}
+                                        [np.array(x) for x in self.ch_dict[ch_type]['task'].read(n_samples)]
+                                        if n_samples != 1 else
+                                        self.ch_dict[ch_type]['task'].read(n_samples))}
+
             if ch_type == 'ai':
                 for c in res.keys():
                     if c in self.ch_term_dict.keys() and self.ch_term_dict[c] == "Differential":
