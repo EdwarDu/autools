@@ -219,6 +219,9 @@ class NIDAQDevMan(QObject):
         else:
             return None
 
+    def get_current_settings(self):
+        return f"[FIXME]: Using NI device {self.dev_name} ..."
+
     @staticmethod
     def get_nidaq_devices():
         return [dev.name for dev in nidaqmx.system.System.local().devices]
