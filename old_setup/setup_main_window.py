@@ -386,10 +386,11 @@ class SetupMainWindow(Ui_SetupMainWindow):
             self.comboBox_PhotoDiode_NIDAQ_Channel.clear()
             self.comboBox_PhotoDiode_NIDAQ_Channel.addItems(nidaq_ai_chs)
 
-    def nidaq_ai_values_changed(self, values):
+    def nidaq_ai_values_changed(self, values: dict):
         # TODO
         # global setup_main_logger
-        # setup_main_logger.debug(f"{values}", extra={"component": "Main"})
+        for ch in values.keys():
+            setup_main_logger.debug(f"NI DAQ Get {ch} = {np.average(values[ch])}", extra={"component": "Main"})
         self.lineEdit_MapM_NiVolIn.setText(f"{float2str(np.average(values[self.comboBox_MapM_NIDAQChIn.currentText()]))}")
 
     def nidaq_ao_values_changed(self, values: dict):
