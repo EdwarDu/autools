@@ -201,7 +201,7 @@ class NIDAQDevMan(QObject):
                 default_values[key] = value
 
         values = [default_values[key] for key in self.ch_dict[ch_type]['chs']]
-        nidaq_logger.debug(f"Writing {ch_type} {ch_value_dict}", extra={"component": "NIDAQ"})
+        nidaq_logger.debug(f"Writing {ch_type} {ch_value_dict} {values}", extra={"component": "NIDAQ"})
         self.ch_dict[ch_type]['task'].write(values, auto_start=True)
         self.ao_values_changed.emit(default_values)
 

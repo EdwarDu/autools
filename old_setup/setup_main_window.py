@@ -194,7 +194,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             lockin_x, lockin_y = lockin_future.result()
             pdv_vol = pdv_future.result()
 
-        setup_main_logger.debug(f"Measurement got values SR830 X={lockin_x}, Y={lockin_y}, PDV={pdv_vol}",
+        setup_main_logger.info(f"Measurement got values SR830 X={lockin_x}, Y={lockin_y}, PDV={pdv_vol}",
                                 extra={"component": "Main/MAPM"})
         return lockin_x, lockin_y, pdv_vol
 
