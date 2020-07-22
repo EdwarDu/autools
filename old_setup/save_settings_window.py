@@ -19,15 +19,18 @@ class SaveSettingsWindow(Ui_SaveSettingsDialog):
         for man in self._men:
             settings_str = settings_str + man.get_current_settings()
 
+        settings_str = settings_str + '\n--------------USER NOTE-------------\n'
         self._s_str = settings_str
         self.textBrowser_Settings.setText(settings_str)
 
     def save2file(self):
-        fname, _ = QFileDialog.getSaveFileName(self.window, "Save settings to file", ".",
-                                               "All Files (*.*)")
+        fname, _ = QFileDialog.getSaveFileName(self.window, caption="Save settings to file",
+                                               directory="./settings.txt",
+                                               filter="All Files (*.*)",
+                                              )
         if fname is not None and fname != "":
             with open(fname, "w") as f_setting:
-                f_setting.write(self._s_str)
+                f_setting.write(self.textBrowser_Settings.toPlainText())
 
     def show(self):
         self.window.show()

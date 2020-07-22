@@ -23,7 +23,7 @@ import logging
 
 setup_main_logger = logging.getLogger("autools_setup_main")
 
-setup_main_logger.setLevel(logging.DEBUG)
+setup_main_logger.setLevel(logging.INFO)
 setup_main_logger_fh = logging.FileHandler("autools_setup_main.log")
 setup_main_logger_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')
 setup_main_logger_fh.setFormatter(setup_main_logger_formatter)
@@ -33,8 +33,8 @@ setup_main_logger_ch = logging.StreamHandler()
 setup_main_logger_ch.setFormatter(setup_main_logger_formatter)
 setup_main_logger.addHandler(setup_main_logger_ch)
 
-_TEST_NO_SR830 = False
-_TEST_NO_NIDAQ = False
+_TEST_NO_SR830 = True
+_TEST_NO_NIDAQ = True
 
 from ..SRS.SR830Man import SR830Man, float2str
 from ..NIDAQ.NIDAQDevMan import NIDAQDevMan
@@ -120,7 +120,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.widget_MeasurementPlot2.export_image(prefix)
         prefix = os.path.join(folder, "pd_vol")
         self.widget_MeasurementPlot3.export_image(prefix)
-        setup_main_logger.info(f"Files exported to {folder} with prefix {{lockin_x/lockin_y}}",
+        setup_main_logger.info(f"Files exported to {folder} with prefix {{lockin_x/lockin_y/pd_vol}}",
                                extra={"component": "Main/MAPM"})
 
     def mapm_load_npraw(self):
@@ -148,7 +148,8 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
     def _get_lockin_xy(self, lockin_n_avg: int = 1):
         if _TEST_NO_SR830:
-            return self.piezo_cur_x, self.piezo_cur_y
+            return np.random.random(2)
+            # return self.piezo_cur_x, self.piezo_cur_y
 
         x_l = np.zeros(lockin_n_avg)
         y_l = np.zeros(lockin_n_avg)
@@ -158,11 +159,13 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
     def _get_pdv_vol(self, pdv_n_avg: int = 1500):
         if _TEST_NO_NIDAQ:
-            return self.piezo_cur_x + self.piezo_cur_y
+            # return self.piezo_cur_x + self.piezo_cur_y
+            return np.random.random(1)[0]
+
         pdv_arr = np.array([])
         samples_left = pdv_n_avg
         while samples_left != 0:
-            samples2read = min(samples_left, 128)
+            samples2read = min(samples_left, 1024)
             pdv_arr = np.append(pdv_arr, self.nidaq_man.read_task_channels("ai", samples2read)[self.comboBox_MapM_NIDAQChIn.currentText()])
             samples_left = samples_left-samples2read
         return np.average(pdv_arr)
@@ -194,8 +197,6 @@ class SetupMainWindow(Ui_SetupMainWindow):
             lockin_x, lockin_y = lockin_future.result()
             pdv_vol = pdv_future.result()
 
-        setup_main_logger.info(f"Measurement got values SR830 X={lockin_x}, Y={lockin_y}, PDV={pdv_vol}",
-                                extra={"component": "Main/MAPM"})
         return lockin_x, lockin_y, pdv_vol
 
     def mapm_request_pause(self):
@@ -307,7 +308,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         row_index = 0
         for y in y_values:
-            x_track = x_values if row_index % 2 == 0 else np.flip(x_values)
+            x_track = x_values  # if row_index % 2 == 0 else np.flip(x_values)
             for x in x_track:
                 # Go to x, y
                 setup_main_logger.info(f"Piezo going to {x:.6f}, {y:.6f}", extra={"component": "Main/MAPM"})
@@ -332,15 +333,18 @@ class SetupMainWindow(Ui_SetupMainWindow):
                                     self.spinBox_MapM_NSamplesAvgLockIn.setEnabled(True)
                                     return
                             self.mapm_pause_requested = False
-                    lockin_x, lockin_y, vol = self.mapm_measure(lockin_n_avg=self.spinBox_MapM_NSamplesAvgLockIn.value(),
+                    setup_main_logger.debug(f"Starting measurement", extra={"component": "Main/MAPM"})
+                    lockin_x, lockin_y, pdv_vol = self.mapm_measure(lockin_n_avg=self.spinBox_MapM_NSamplesAvgLockIn.value(),
                                                                 pdv_n_avg=self.spinBox_MapM_NSamplesAvgPD.value())
+                    setup_main_logger.info(f"Measurement got values SR830 X={lockin_x}, Y={lockin_y}, PDV={pdv_vol}",
+                                           extra={"component": "Main/MAPM"})
                 else:
-                    lockin_x, lockin_y, vol = self.mapm_last_incomplete_scan["scanned_data"][(x, y)]
+                    lockin_x, lockin_y, pd_vol = self.mapm_last_incomplete_scan["scanned_data"][(x, y)]
 
                 self.widget_MeasurementPlot1.set_xy_value(x, y, lockin_x)
                 self.widget_MeasurementPlot2.set_xy_value(x, y, lockin_y)
-                self.widget_MeasurementPlot3.set_xy_value(x, y, vol)
-                self.mapm_last_incomplete_scan["scanned_data"][(x, y)] = (lockin_x, lockin_y, vol)
+                self.widget_MeasurementPlot3.set_xy_value(x, y, pdv_vol)
+                self.mapm_last_incomplete_scan["scanned_data"][(x, y)] = (lockin_x, lockin_y, pdv_vol)
             else:
                 row_index += 1
                 continue
@@ -389,8 +393,8 @@ class SetupMainWindow(Ui_SetupMainWindow):
     def nidaq_ai_values_changed(self, values: dict):
         # TODO
         # global setup_main_logger
-        for ch in values.keys():
-            setup_main_logger.debug(f"NI DAQ Get {ch} = {np.average(values[ch])}", extra={"component": "Main"})
+        # for ch in values.keys():
+        #    setup_main_logger.debug(f"NI DAQ Get {ch} = {np.average(values[ch])}", extra={"component": "Main"})
         self.lineEdit_MapM_NiVolIn.setText(f"{float2str(np.average(values[self.comboBox_MapM_NIDAQChIn.currentText()]))}")
 
     def nidaq_ao_values_changed(self, values: dict):
@@ -489,6 +493,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
     def pdv_autorefresh(self, b_checked):
         if b_checked:
             self._pdv_autorefresh_task()
+
 
 if __name__ == '__main__':
     # import pdb

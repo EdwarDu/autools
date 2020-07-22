@@ -24,6 +24,7 @@ class Ui_SaveSettingsDialog(object):
         self.pushButton_Save2File.setObjectName("pushButton_Save2File")
         self.gridLayout.addWidget(self.pushButton_Save2File, 1, 1, 1, 1)
         self.textBrowser_Settings = QtWidgets.QTextBrowser(SaveSettingsDialog)
+        self.textBrowser_Settings.setReadOnly(False)
         self.textBrowser_Settings.setObjectName("textBrowser_Settings")
         self.gridLayout.addWidget(self.textBrowser_Settings, 0, 0, 1, 2)
 

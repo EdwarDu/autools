@@ -15,7 +15,7 @@ _SPLIT_LOG = False
 
 if _SPLIT_LOG:
     nidaq_logger = logging.getLogger("nidaq")
-    nidaq_logger.setLevel(logging.DEBUG)
+    nidaq_logger.setLevel(logging.INFO)
     nidaq_fh = logging.FileHandler("nidaq.log")
     nidaq_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')
     nidaq_fh.setFormatter(nidaq_formatter)
@@ -116,8 +116,16 @@ class NIDAQDevMan(QObject):
             else:  # if ch_type == 'do':
                 self.ch_dict[ch_type]['task'].do_channels.add_do_chan(ch, line_grouping=LineGrouping.CHAN_PER_LINE)
             self.ch_dict[ch_type]['chs'].append(ch)
-
+        if ch_type == 'ai':
+            self._update_ai_ch_timing()
         self.task_channels_changed.emit(ch_type, self.ch_dict[ch_type]['chs'])
+
+    def _update_ai_ch_timing(self):
+        self.ch_dict['ai']['task'].input_buf_size = 10240
+        self.ch_dict['ai']['task'].timing.cfg_samp_clk_timing(5000,
+                                                              sample_mode=nidaqmx.constants.AcquisitionType.FINITE,
+                                                              samps_per_chan=1024)
+        self.ch_dict['ai']['task'].in_stream.read_all_avail_samp = True
 
     def add_task_channel(self, ch_type: str, ch):
         if ch_type not in self.ch_dict.keys():
@@ -143,12 +151,14 @@ class NIDAQDevMan(QObject):
                 else:
                     self.ch_dict[ch_type]['task'].ai_channels.add_ai_voltage_chan(ch)
             elif ch_type == 'ao':
-                self.ch_dict[ch_type]['task'].ao_channels.add_ao_voltage_chan(ch)
+                self.ch_dict[ch_type]['task'].ao_channels.add_ao_voltage_chan(ch, min_val=0, max_val=10)
             elif ch_type == 'di':
                 self.ch_dict[ch_type]['task'].di_channels.add_di_chan(ch, line_grouping=LineGrouping.CHAN_PER_LINE)
             else:  # if ch_type == 'do':
                 self.ch_dict[ch_type]['task'].do_channels.add_do_chan(ch, line_grouping=LineGrouping.CHAN_PER_LINE)
             self.ch_dict[ch_type]['chs'].append(ch)
+            if ch_type == 'ai':
+                self._update_ai_ch_timing()
             self.task_channels_changed.emit(ch_type, self.ch_dict[ch_type]['chs'])
 
     def remove_task_channel(self, ch_type: str, ch):
