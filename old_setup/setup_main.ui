@@ -917,6 +917,13 @@
              </widget>
             </item>
             <item>
+             <widget class="QCheckBox" name="checkBox_ShowPreLine">
+              <property name="text">
+               <string>Show Last Line</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="pushButton_MapM_Auto">
               <property name="text">
                <string>Auto Measure</string>

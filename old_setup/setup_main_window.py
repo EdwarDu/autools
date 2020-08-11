@@ -33,8 +33,8 @@ setup_main_logger_ch = logging.StreamHandler()
 setup_main_logger_ch.setFormatter(setup_main_logger_formatter)
 setup_main_logger.addHandler(setup_main_logger_ch)
 
-_TEST_NO_SR830 = True
-_TEST_NO_NIDAQ = True
+_TEST_NO_SR830 = False
+_TEST_NO_NIDAQ = False
 
 from ..SRS.SR830Man import SR830Man, float2str
 from ..NIDAQ.NIDAQDevMan import NIDAQDevMan
@@ -108,8 +108,15 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.save_settings_diag = SaveSettingsWindow(self.sr830_man, self.nidaq_man)
         self.pushButton_SaveSettings.clicked.connect(lambda: self.save_settings_diag.show())
 
+        self.checkBox_ShowPreLine.toggled.connect(self.mapm_show_last_line_changed)
+
         self.mapm_last_incomplete_scan = None
         self.window.show()
+
+    def mapm_show_last_line_changed(self):
+        self.widget_MeasurementPlot1.show_h_pre_line(self.checkBox_ShowPreLine.isChecked())
+        self.widget_MeasurementPlot2.show_h_pre_line(self.checkBox_ShowPreLine.isChecked())
+        self.widget_MeasurementPlot3.show_h_pre_line(self.checkBox_ShowPreLine.isChecked())
 
     def mapm_export(self):
         folder = os.path.normpath(QFileDialog.getExistingDirectory(
@@ -347,6 +354,9 @@ class SetupMainWindow(Ui_SetupMainWindow):
                 self.mapm_last_incomplete_scan["scanned_data"][(x, y)] = (lockin_x, lockin_y, pdv_vol)
             else:
                 row_index += 1
+                self.widget_MeasurementPlot1.move_sec_h_line(y_values[row_index-1])
+                self.widget_MeasurementPlot2.move_sec_h_line(y_values[row_index-1])
+                self.widget_MeasurementPlot3.move_sec_h_line(y_values[row_index-1])
                 continue
 
         self.mapm_last_incomplete_scan = None  # scan complete remove incomplete save

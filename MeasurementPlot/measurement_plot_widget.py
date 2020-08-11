@@ -61,11 +61,30 @@ class MeasurementPlotWidget(pg.GraphicsLayoutWidget):
         self.p_map.addItem(self.map_h_line)
         self.map_h_line.setPos(0)
 
+        self.map_h_line_sec = pg.InfiniteLine(angle=0, movable=True,
+                                              label="{value:.2f}",
+                                              labelOpts={"position": 0.2, "color": (0, 255, 0)},
+                                              bounds=[0, self.image_height - 0.01],
+                                              pen=pg.mkPen('y', width=1, style=QtCore.Qt.DashLine))
+        self.p_map.addItem(self.map_h_line_sec)
+        self.map_h_line_sec.setPos(0)
+
         self.p_h_xdata = np.array(range(0, self.image_width))
         self.p_h_ydata = self.image_data[int(self.map_h_line.getPos()[1]), :]
+
+        self.p_h_xdata_sec = np.array(range(0, self.image_width))
+        self.p_h_ydata_sec = self.image_data[int(self.map_h_line.getPos()[1]), :]
+
         self.h_profile_line = self.p_horizontal.plot(self.p_h_xdata,
                                                      self.p_h_ydata,
+                                                     pen=pg.mkPen('g'),
                                                      symbol='x')
+
+        self.h_profile_line_sec = self.p_horizontal.plot(self.p_h_xdata_sec,
+                                                         self.p_h_ydata_sec,
+                                                         pen=pg.mkPen('y'),
+                                                         symbol='o')
+
         self.p_horizontal.enableAutoRange('y', enable=True)
         self.p_horizontal.disableAutoRange(axis='x')
         self.p_horizontal.setAutoVisible(x=True, y=True)
@@ -73,11 +92,18 @@ class MeasurementPlotWidget(pg.GraphicsLayoutWidget):
         self.p_horizontal.showGrid(x=True, y=True, alpha=0.5)
 
         self.map_h_line.sigPositionChanged.connect(lambda l: self.map_crosshair_h_moved(l))
+        self.map_h_line_sec.sigPositionChanged.connect(lambda l: self.map_crosshair_h_sec_moved(l))
+
         self.h_profile_curve_point = pg.CurvePoint(self.h_profile_line, pos=0)
         self.h_profile_data_note = pg.TextItem("", anchor=(1, 0), color=(255, 0, 255))
         self.p_horizontal.addItem(self.h_profile_data_note, ignoreBounds=True)
 
+        #self.h_profile_pre_curve_point = pg.CurvePoint(self.h_profile_pre_line, pos=0)
+        #self.h_profile_pre_data_note = pg.TextItem("", anchor=(1, 0), color=(255, 0, 255))
+        #self.p_horizontal.addItem(self.h_profile_pre_data_note, ignoreBounds=True)
+
         self.__auto_move_h_line = True
+        self.show_h_pre_line(False)
 
         self.p_h_mouse_sig_porxy = pg.SignalProxy(self.p_horizontal.scene().sigMouseMoved,
                                                   rateLimit=60, slot=self.p_h_mouse_moved)
@@ -86,11 +112,32 @@ class MeasurementPlotWidget(pg.GraphicsLayoutWidget):
         l.label.setText(f"{self.ylist[int(l.value())]:.6f}")
         self.update_h_profile(0)
 
+    def map_crosshair_h_sec_moved(self, l: pg.InfiniteLine):
+        l.label.setText(f"{self.ylist[int(l.value())]:.6f}")
+        self.update_h_sec_profile(0)
+
+    def show_h_pre_line(self, b_visible: bool):
+        if b_visible:
+            self.h_profile_line_sec.show()
+            self.map_h_line_sec.show()
+        else:
+            self.h_profile_line_sec.hide()
+            self.map_h_line_sec.hide()
+
     def update_h_profile(self, c: int):
         h_index = int(self.map_h_line.getPos()[1])
         self.p_h_ydata = self.image_data[h_index, :]
         self.h_profile_line.setData(y=self.p_h_ydata)
         self.move_h_note(c)
+
+    def update_h_sec_profile(self, c: int):
+        h_index = int(self.map_h_line_sec.getPos()[1])
+        self.p_h_ydata_sec = self.image_data[h_index, :]
+        self.h_profile_line_sec.setData(y=self.p_h_ydata_sec)
+
+    def move_sec_h_line(self, y: float):
+        h_index = np.where(self.ylist==y)[0][0]
+        self.map_h_line_sec.setPos(h_index)
 
     def move_h_note(self, which: int):
         self.h_profile_curve_point = pg.CurvePoint(self.h_profile_line, pos=which/(len(self.p_h_xdata) - 1))
@@ -116,6 +163,7 @@ class MeasurementPlotWidget(pg.GraphicsLayoutWidget):
         self.image_height = height
         self.map_img.setImage(self.image_data)
         self.map_h_line.setBounds([0, self.image_height-0.01])
+        self.map_h_line_sec.setBounds([0, self.image_height-0.01])
 
     def set_xy_list(self, xlist, ylist):
         self.xlist = np.sort(xlist)
@@ -125,10 +173,15 @@ class MeasurementPlotWidget(pg.GraphicsLayoutWidget):
         self.image_data = np.zeros((self.image_height, self.image_width))
         self.map_img.setImage(self.image_data)
         self.map_h_line.setBounds([0, self.image_height-0.01])
+        self.map_h_line_sec.setBounds([0, self.image_height-0.01])
         self.p_h_xdata = np.array(range(0, self.image_width))
+        self.p_h_xdata_sec = np.array(range(0, self.image_width))
         self.p_h_ydata = np.zeros(self.p_h_xdata.shape)
+        self.p_h_ydata_sec = np.zeros(self.p_h_xdata.shape)
         self.h_profile_line.setData(x=self.p_h_xdata, y=self.p_h_ydata)
+        self.h_profile_line_sec.setData(x=self.p_h_xdata_sec, y=self.p_h_ydata_sec)
         self.map_crosshair_h_moved(self.map_h_line)
+        self.map_crosshair_h_sec_moved(self.map_h_line_sec)
 
     def set_point_value(self, r: int, c: int, value: float):
         if r >= self.image_height or c >= self.image_width:
