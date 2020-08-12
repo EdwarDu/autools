@@ -315,7 +315,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         row_index = 0
         for y in y_values:
-            x_track = x_values  # if row_index % 2 == 0 else np.flip(x_values)
+            x_track = x_values if row_index % 2 == 0 else np.flip(x_values)
             for x in x_track:
                 # Go to x, y
                 setup_main_logger.info(f"Piezo going to {x:.6f}, {y:.6f}", extra={"component": "Main/MAPM"})
