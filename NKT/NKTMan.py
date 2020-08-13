@@ -2,32 +2,84 @@
 
 import serial
 import serial.tools.list_ports
+import numpy as np
+from PyQt5.QtCore import pyqtSignal
+import logging
+
+_SPLIT_LOG = False
+
+if _SPLIT_LOG:
+    nkt_logger = logging.getLogger("nkt")
+    nkt_logger.setLevel(logging.DEBUG)
+    nkt_fh = logging.FileHandler("nkt.log")
+    nkt_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')
+    nkt_fh.setFormatter(nkt_formatter)
+    nkt_logger.addHandler(nkt_fh)
+
+    nkt_ch = logging.StreamHandler()
+    nkt_ch.setFormatter(nkt_formatter)
+    nkt_logger.addHandler(nkt_ch)
+else:
+    nkt_logger = logging.getLogger("autools_setup_main")
 
 
 class NKTMan:
     """
-    NKT (Man) Class for managing comminucation with NKT Devices
+    NKT (Man) Class for managing communication with NKT Devices
     """
+
+    opened = pyqtSignal()
+    closed = pyqtSignal()
 
     TELEGRAM_START = 0x0D
     TELEGRAM_END = 0x0A
 
     def __init__(self,
                  serial_name,
-                 baudrate=9600,
+                 baudrate=115200,
                  parity=serial.PARITY_NONE,
                  stopbits=serial.STOPBITS_ONE,
-                 host_addr=0x52):
+                 host_addr=0xA1):
         self.host_addr=host_addr
-        self.ser = serial.Serial(port=serial_name,
-                                 baudrate=baudrate,
-                                 bytesize=serial.EIGHTBITS,
-                                 parity=parity,
-                                 stopbits=stopbits)
-        self.ser.inter_byte_timeout = 0.1 # when device failed to send next byte within 3 read will exit
+        self.com_dev = serial_name
+        self.ser_baudrate = baudrate
+        self.ser_parity = parity
+        self.ser_stopbits = stopbits
 
-        if not self.ser.is_open():
-            raise IOError(f"Failed to open {serial_name}")
+        if self.com_dev is None:
+            self.ser = None
+        else:
+            self.ser = serial.Serial(port=self.com_dev,
+                                     baudrate=self.ser_baudrate,
+                                     bytesize=serial.EIGHTBITS,
+                                     parity=self.ser_parity,
+                                     stopbits=self.ser_stopbits)
+            self.ser.inter_byte_timeout = 0.1  # when device failed to send next byte within 3 read will exit
+
+            if not self.ser.is_open():
+                raise IOError(f"Failed to open {serial_name}")
+            else:
+                self.opened.emit()
+
+    def open(self):
+        if self.ser is not None and self.ser.is_open:
+            self.ser.close()
+
+        self.ser = serial.Serial(port=self.com_dev, baudrate=self.ser_baudrate, bytesize=serial.EIGHTBITS,
+                                 parity=self.ser_parity, stopbits=self.ser_stopbits)
+
+        self.ser.inter_byte_timeout = 0.1
+
+        if not self.ser.is_open:
+            raise IOError(f"Failed to open the device {self.com_dev}")
+        else:
+            self.opened.emit()
+
+    def close(self):
+        if self.ser is not None and self.ser.is_open:
+            self.ser.close()
+        self.closed.emit()
+        self.ser = None
 
     MESSAGE_TYPE_NACK = 0x00
     MESSAGE_TYPE_CRC_ERR = 0x01
@@ -161,7 +213,7 @@ class NKTMan:
         raw_data.insert(0, NKTMan.TELEGRAM_START)
         return NKTMan.telegram2message(raw_data)
 
-    def read_reg(self, module_addr, reg_addr):
+    def read_reg(self, module_addr, reg_addr, dtype=None):
         msg = NKTMan.construct_message(dest=module_addr, src=self.host_addr,
                                        msg_type=NKTMan.MESSAGE_TYPE_READ,
                                        reg_num=reg_addr,
@@ -181,7 +233,10 @@ class NKTMan:
         elif r_reg_n != reg_addr:
             raise IOError(f'Wrong ACK register {r_reg_n} instead of {reg_addr}')
         else:
-            return r_data
+            if dtype is None:
+                return r_data
+            else:
+                return np.frombuffer(r_data, dtype=dtype)
 
     def write_reg(self, module_addr, reg_addr, data: bytes or bytearray):
         msg = NKTMan.construct_message(dest=module_addr, src=self.host_addr,

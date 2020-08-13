@@ -93,6 +93,8 @@ class SR830Man(QObject):
             self.ser.inter_byte_timeout = 0.1  # when device failed to send next byte within 0.1 read will exit
             if not self.ser.is_open:
                 raise IOError(f"Failed to open the device {self.com_dev}")
+            else:
+                self.opened.emit()
 
             if not SR830Man._FAKE_DEV:
                 self.output_interface(False, SR830Man.OUTPUT_INTERFACE_RS232)
