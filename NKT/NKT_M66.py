@@ -21,6 +21,10 @@ class NKT_M66:
         self.nkt_man.write_reg(self.module_addr, reg_addr, data)
 
     @property
+    def serial_number(self):
+        return self.read_reg(0x65).decode('ascii')
+
+    @property
     def rf_power(self):
         return self.read_reg(0x30, '<u1')[0]
 
@@ -108,10 +112,9 @@ class NKT_M66:
         if 0 <= ch < 8:
             return self.read_reg(0xB0 + ch, '<u2')[0]
 
-    def set_amplitude(self, ch: int, amp: float):
+    def set_amplitude(self, ch: int, amp: int):
         if 0 <= ch < 8:
-            amp_i = int(amp * 1000)
-            self.write_reg(0xB0 + ch, np.array([amp_i, ], dtype='<u2').tobytes())
+            self.write_reg(0xB0 + ch, np.array([amp, ], dtype='<u2').tobytes())
 
     def get_modulation_gain(self, ch: int):
         # FIXME: non-free FSK option
@@ -120,3 +123,18 @@ class NKT_M66:
     def set_modulation_gain(self, ch: int, gain: float):
         # FIXME: non-free FSK option
         pass
+
+    @property
+    def status(self):
+        return self.read_reg(0x66, '<u2')[0]
+
+    STATUS_BIT_EMISSION = (0x01 << 0)
+    STATUS_BIT_SUPPLY_VOLTAGE_LOW = (0x1 << 5)
+    STATUS_BIT_MODULE_TEMP_OOR = (0x1 << 6)
+    STATUS_BIT_AODS_COMM_TIMEOUT = (0x1 << 13)
+    STATUS_BIT_NEEDS_CRYSTAL_INFO = (0x1 << 14)
+    STATUS_BIT_ERROR_CODE_PRESENT = (0x1 << 15)
+
+    @property
+    def error_code(self):
+        return self.read_reg(0x67, '<u1')[0]

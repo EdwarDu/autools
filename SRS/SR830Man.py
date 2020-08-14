@@ -1027,6 +1027,7 @@ class SR830ConfigWindow(Ui_SR830_Config_Window):
         else:
             return ""
 
+
 if __name__ == '__main__':
     from PyQt5.QtWidgets import QApplication
 

@@ -35,7 +35,7 @@ class NKTMan:
     TELEGRAM_END = 0x0A
 
     def __init__(self,
-                 serial_name,
+                 serial_name=None,
                  baudrate=115200,
                  parity=serial.PARITY_NONE,
                  stopbits=serial.STOPBITS_ONE,
@@ -54,7 +54,8 @@ class NKTMan:
                                      bytesize=serial.EIGHTBITS,
                                      parity=self.ser_parity,
                                      stopbits=self.ser_stopbits)
-            self.ser.inter_byte_timeout = 0.1  # when device failed to send next byte within 3 read will exit
+            self.ser.timeout = 0.1  # Timeout set to 100ms
+            self.ser.inter_byte_timeout = 0.1
 
             if not self.ser.is_open():
                 raise IOError(f"Failed to open {serial_name}")
@@ -214,6 +215,8 @@ class NKTMan:
         return NKTMan.telegram2message(raw_data)
 
     def read_reg(self, module_addr, reg_addr, dtype=None):
+        """ read register, dtype is used to decode as in numpy"""
+        # FIXME: Verify if module_addr does not exist, IOError will be raised
         msg = NKTMan.construct_message(dest=module_addr, src=self.host_addr,
                                        msg_type=NKTMan.MESSAGE_TYPE_READ,
                                        reg_num=reg_addr,
@@ -277,9 +280,9 @@ class NKTMan:
             if module_type is None:
                 continue
             elif module_type not in NKTMan.MODULE_TYPE_DICT.keys():
-                module_lst.append( (module_addr, module_type, "UNKNOWN") )
+                module_lst.append((module_addr, module_type, "UNKNOWN") )
             else:
-                module_lst.append( (module_addr, module_type, NKTMan.MODULE_TYPE_DICT[module_type]))
+                module_lst.append((module_addr, module_type, NKTMan.MODULE_TYPE_DICT[module_type]))
         return module_lst
 
 

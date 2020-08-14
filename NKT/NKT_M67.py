@@ -21,12 +21,16 @@ class NKT_M67:
         self.nkt_man.write_reg(self.module_addr, reg_addr, data)
 
     @property
+    def serial_number(self):
+        return self.read_reg(0x65).decode('ascii')
+
+    @property
     def monitor1_readout(self):
-        return self.read_reg(0x10, '<u2')[0] / 1000
+        return self.read_reg(0x10, '<u2')[0]
 
     @property
     def monitor2_readout(self):
-        return self.read_reg(0x11, '<u2')[0] / 1000
+        return self.read_reg(0x11, '<u2')[0]
 
     @property
     def monitor1_gain(self):
@@ -80,3 +84,22 @@ class NKT_M67:
     @property
     def crystal2_max_wavelength(self):
         return self.read_reg(0xA1, '<u4')[0]
+
+    @property
+    def status(self):
+        return self.read_reg(0x66, '<u2')[0]
+
+    STATUS_BIT_INTERLOCK_OFF = (0x01 << 1)
+    STATUS_BIT_INTERLOCK_LOOP_IN = (0x01 << 2)
+    STATUS_BIT_INTERLOCK_LOOP_OUT = (0x01 << 3)
+    STATUS_BIT_SUPPLY_VOLTAGE_LOW = (0x01 << 5)
+    STATUS_BIT_MODULE_TEMP_OOR = (0x01 << 6)
+    STATUS_BIT_SHUTTER_SENSOR1 = (0x01 << 8)
+    STATUS_BIT_SHUTTER_SENSOR2 = (0x01 << 9)
+    STATUS_BIT_NEW_CRYSTAL1_TEMP = (0x01 << 10)
+    STATUS_BIT_NEW_CRYSTAL2_TEMP = (0x01 << 11)
+    STATUS_BIT_ERROR_CODE_PRESENT = (0x01 << 15)
+
+    @property
+    def error_code(self):
+        return self.read_reg(0x67, '<u1')[0]

@@ -98,7 +98,8 @@ class PiezoMan(PiezoGCSCom):
             else:
                 time.sleep(0.01)
                 i += 1
-        piezo_logger.info(f"On target status not working, switch to margin checking {x_em}, {y_em}, {z_em}",
+        piezo_logger.info(f"On target status not working, switch to margin checking "
+                          f"{self.x_em}, {self.y_em}, {self.z_em}",
                           extra={"component": "Piezo"})
         i = 0
         while i < wait_10ms / 2:

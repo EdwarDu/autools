@@ -21,12 +21,16 @@ class NKT_M60:
         self.nkt_man.write_reg(self.module_addr, reg_addr, data)
 
     @property
+    def serial_number(self):
+        return self.read_reg(0x65).decode('ascii')
+
+    @property
     def system_type(self):
         return self.read_reg(0x6B, '<u1')[0]
 
     @property
     def inlet_temperature(self):
-        return self.read_reg(0x11, '<i2')[0] / 10
+        return self.read_reg(0x11, '<i2')[0]
 
     @property
     def emission(self):
@@ -80,11 +84,11 @@ class NKT_M60:
 
     @property
     def power_level(self):
-        return self.read_reg(0x37, '<u2')[0]/1000
+        return self.read_reg(0x37, '<u2')[0]
 
     @property
     def current_level(self):
-        return self.read_reg(0x38, '<u2')[0] / 1000
+        return self.read_reg(0x38, '<u2')[0]
 
     @power_level.setter
     def power_level(self, lv: float):
@@ -118,5 +122,8 @@ class NKT_M60:
     STATUS_BIT_CLOCK_BATTERY_LOW = (0x0001 << 7)
     STATUS_BIT_CRC_ERROR_START = (0x0001 << 13)
     STATUS_BIT_LOG_ERROR = (0x0001 << 14)
-    STATUS_BIT_SYS_ERROR = (0x0001 << 15)
+    STATUS_BIT_ERROR_CODE_PRESENT = (0x0001 << 15)
 
+    @property
+    def error_code(self):
+        return self.read_reg(0x67, '<u1')[0]
