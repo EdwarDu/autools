@@ -34,7 +34,7 @@ setup_main_logger.addHandler(setup_main_logger_ch)
 
 _AUTOZ_TEST = False
 _MAPM_TEST = False
-_HAS_ANDOR = True
+_HAS_ANDOR = False
 
 from ..SRS.SR830Man import SR830Man, float2str
 from ..Cameras.CVCameraMan import CVCameraMan
