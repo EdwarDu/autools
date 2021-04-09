@@ -2,6 +2,7 @@
 import os
 import platform
 import sys
+import subprocess
 
 project_root = os.path.dirname(os.path.realpath(__file__))
 # Change working directory to project root
@@ -17,7 +18,7 @@ os.chdir("..")
 if platform.system() == "Windows":
     python3_path = os.path.join(".", "env_j", "python.exe")
 else:
-    python3_path = "/usr/bin/python3"
+    python3_path = subprocess.check_output(['which', 'python3']).decode('utf8').strip()
 
 if os.path.exists(python3_path):
     ans = input(f"Found {python3_path}, use? [Y/n]")

@@ -7,3 +7,5 @@ PyQt5>=5.12
 pyserial
 PyVISA-py
 scipy
+pyqtgraph
+Cython
