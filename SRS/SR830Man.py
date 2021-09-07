@@ -2,7 +2,7 @@
 
 import serial
 import serial.tools.list_ports
-import visa
+import pyvisa
 import numpy as np
 from threading import Lock
 from PyQt5.QtWidgets import QWidget
@@ -69,7 +69,7 @@ class SR830Man(QObject):
         self.ser_parity = parity
         self.ser_stopbits = stopbits
 
-        self.visa_rm = visa.ResourceManager()
+        self.visa_rm = pyvisa.ResourceManager()
         self.visa_dev = None
         self.visa_inst = None
         self.com_mode = 'rs232'

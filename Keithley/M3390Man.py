@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import visa
+import pyvisa
 import numpy as np
 from threading import Lock
 from PyQt5.QtWidgets import QWidget
@@ -55,7 +55,7 @@ class M3390Man(QObject):
     def __init__(self, dev_addr: str = None):
         super().__init__()
         self.dev_addr = dev_addr
-        self.rm = visa.ResourceManager()
+        self.rm = pyvisa.ResourceManager()
         if self.dev_addr is not None:
             self.dev_inst = self.rm.open_resource(self.dev_addr)
         else:
