@@ -28,7 +28,7 @@ class PiezoGCSCom(QObject):
     COMM_MODE = 'rs232'
     COMMAND_END = '\n' if COMM_MODE == 'rs232' else '\r'
 
-    _FAKE_DEV = False
+    _FAKE_DEV = True
 
     opened = pyqtSignal()
     closed = pyqtSignal()
