@@ -501,7 +501,7 @@ def update_image(window, timer):
 
 
 if __name__ == "__main__":
-    app = QtWidgets.QApplication([]);
+    app = QtWidgets.QApplication([])
     win = LaserProfilerWidget()
     win.show()
     file_path=input("Enter test image path: ")
