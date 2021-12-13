@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
 import pyqtgraph.exporters
 from matplotlib import cm
@@ -501,11 +501,12 @@ def update_image(window, timer):
 
 
 if __name__ == "__main__":
-    app = QtGui.QApplication([])
+    app = QtWidgets.QApplication([]);
     win = LaserProfilerWidget()
     win.show()
-    win.update_image_data(cv2.imread('/home/elio/ws/autools/tests/test.jpg', cv2.IMREAD_GRAYSCALE))
-    update_timer = QtCore.QTimer(win)
-    update_timer.singleShot(1000, lambda w=win, t=update_timer: update_image(w, t))
+    file_path=input("Enter test image path: ")
+    win.update_image_data(cv2.imread(file_path, cv2.IMREAD_GRAYSCALE))
+    #update_timer = QtCore.QTimer(win)
+    #update_timer.singleShot(1000, lambda w=win, t=update_timer: update_image(w, t))
 
-    QtGui.QApplication.instance().exec_()
+    app.exec_()
