@@ -33,36 +33,41 @@ def get_middle_distance(frame_line_x, frame_line, forced=False, manual_mean=None
             scale_factor = a0
             if forced:
                 if manual_mean is None:
-                    mean0 = np.average(np.where(frame_line == np.max(frame_line))) + 0.5
+                    mean0_idx = np.average(np.where(frame_line == np.max(frame_line))) + 0.5
+                    mean0 = frame_line_x[int(mean0_idx)]
                 else:
                     mean0 = manual_mean
                     a0 = frame_line[mean0] - np.min(frame_line)
 
+                sigma_left_idx = 0
                 sigma_left = 0
-                for i in range(int(mean0)-4, 2, -1):
+                for i in range(int(mean0_idx)-4, 2, -1):
                     if frame_line[i - 2] > frame_line[i - 1] > frame_line[i]:  # and \
                         # frame_line[i + 2] > frame_line[i + 1] > frame_line[i]:
-                        sigma_left = i
+                        sigma_left = frame_line_x[i]
+                        sigma_left_idx = i
                         break
 
-                sigma_right = len(frame_line)
-                for i in range(int(mean0)+4, len(frame_line)-2):
+                sigma_right_idx = len(frame_line_x)-1
+                sigma_right = frame_line_x[-1]
+                for i in range(int(mean0_idx)+4, len(frame_line_x)-2):
                     if frame_line[i + 2] > frame_line[i + 1] > frame_line[i]:  # and
                         # frame_line[i - 2] > frame_line[i - 1] > frame_line[i]:
-                        sigma_right = i
+                        sigma_right = frame_line_x[i] 
+                        sigma_right_idx = i
                         break
 
-                sigma0 = math.sqrt(np.sum(frame_line[sigma_left:sigma_right] / scale_factor *
-                                          (frame_line_x[sigma_left:sigma_right] - mean0) ** 2) /
+                sigma0 = math.sqrt(np.sum(frame_line[sigma_left_idx:sigma_right_idx] / scale_factor *
+                                          (frame_line_x[sigma_left_idx:sigma_right_idx] - mean0) ** 2) /
                                    (sigma_right-sigma_left))
 
-                frame_line_x_s = frame_line_x[sigma_left:sigma_right]
-                frame_line_s = frame_line[sigma_left:sigma_right]
+                frame_line_x_s = frame_line_x[sigma_left_idx:sigma_right_idx]
+                frame_line_s = frame_line[sigma_left_idx:sigma_right_idx]
 
                 popt, pcov = curve_fit(gaussian, frame_line_x_s, frame_line_s,
                                        p0=[a0, mean0, sigma0, offset0],
-                                       bounds=([a0 - 0.00001, mean0 - 4, -np.inf, offset0 - 0.00001],
-                                               [a0 + 0.00001, mean0 + 4, +np.inf, offset0 + 0.00001]),
+                                       bounds=([a0 - 0.00001, mean0 - 0.2*np.max(frame_line_x), -np.inf, offset0 - 0.00001],
+                                               [a0 + 0.00001, mean0 + 0.2*np.max(frame_line_x), +np.inf, offset0 + 0.00001]),
                                        maxfev=2000)
             else:
                 if manual_mean is None:
@@ -75,8 +80,8 @@ def get_middle_distance(frame_line_x, frame_line, forced=False, manual_mean=None
 
                 popt, pcov = curve_fit(gaussian, frame_line_x, frame_line,
                                        p0=[a0, mean0, sigma0, offset0],
-                                       bounds=([a0 - 0.00001, mean0 - 4, -np.inf, offset0 - 0.00001],
-                                               [a0 + 0.00001, mean0 + 4, +np.inf, offset0 + 0.00001]),
+                                       bounds=([a0 - 0.00001, mean0 - 0.2*np.max(frame_line_x), -np.inf, offset0 - 0.00001],
+                                               [a0 + 0.00001, mean0 + 0.2*np.max(frame_line_x), +np.inf, offset0 + 0.00001]),
                                        maxfev=2000)
 
             a, mean, sigma, offset = popt
@@ -105,15 +110,15 @@ LINE_LABEL_COLOR=pg.mkColor(255, 0, 255)
 CH_LINE_COLOR=pg.mkColor(0, 255, 0)
 MID_LINE_COLOR=pg.mkColor(255, 0, 255)
 
-
 class LaserProfilerWidget(pg.GraphicsLayoutWidget):
     def __init__(self, parent=None, **kargs):
         pg.GraphicsLayoutWidget.__init__(self, **kargs)
+        self._pixel_size = 1.0 # 1pixel = pixel_size um
         self.setParent(parent)
         self.setWindowTitle("Laser Profiler Plot")
-        # self.point_label = pg.LabelItem("r:, c:, p:", justify='left')
-        # self.addItem(self.point_label)
-        self.nextCol()
+        self.pixel_size_lbl = pg.LabelItem(f"Current pixel size: {self._pixel_size:.3f} um", justify='left')
+        self.addItem(self.pixel_size_lbl)
+        #self.nextCol()
         self.p_horizontal = self.addPlot()
         self.nextRow()
         self.p_vertical = self.addPlot()
@@ -125,6 +130,9 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
         self.map_img.setOpts(axisOrder="row-major")
         self.map_img.setLevels([0, 1])
         self.map_img.setImage(image=self.image_data)
+        self.img_trans = QtGui.QTransform()
+        self.img_trans.scale(self._pixel_size, self._pixel_size)
+        self.map_img.setTransform(self.img_trans)
 
         self.p_map.addItem(self.map_img)
         self.p_map.setXLink(self.p_horizontal)
@@ -154,17 +162,17 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
         self.image_width = self.image_data.shape[1]
         self.image_height = self.image_data.shape[0]
         self.map_v_line = pg.InfiniteLine(angle=90, movable=True,
-                                          label="{value:.1f}",
+                                          label="{value:.3f}",
                                           labelOpts={"position": 0.05,
                                                      "color": LINE_LABEL_COLOR,
                                                      "rotateAxis": (1, 0),
                                                      "angle": -180},
-                                          bounds=[0, self.image_width-0.001],
+                                          bounds=[0, self.image_width*self._pixel_size-0.001],
                                           pen=pg.mkPen(CH_LINE_COLOR, width=1, style=QtCore.Qt.SolidLine))
         self.map_h_line = pg.InfiniteLine(angle=0, movable=True,
-                                          label="{value:.1f}",
+                                          label="{value:.3f}",
                                           labelOpts={"position": 0.05, "color": LINE_LABEL_COLOR},
-                                          bounds=[0, self.image_height-0.001],
+                                          bounds=[0, self.image_height*self._pixel_size-0.001],
                                           pen=pg.mkPen(CH_LINE_COLOR, width=1, style=QtCore.Qt.SolidLine))
         self.p_map.addItem(self.map_v_line)
         self.p_map.addItem(self.map_h_line)
@@ -188,11 +196,11 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
                                                    pen=pg.mkPen(FRAME_LINE_COLOR, width=2, style=QtCore.Qt.SolidLine))
 
         self.h_profile_peakline = pg.InfiniteLine(angle=0, pos=1, movable=False,
-                                                  label="{value:.4f}",
+                                                  label="{value:.3f}",
                                                   labelOpts={"position": 0.2, 'color': FRAME_LINE_COLOR},
                                                   pen=pg.mkPen(FRAME_LINE_COLOR, width=2, style=QtCore.Qt.DashLine))
         self.h_profile_bottomline = pg.InfiniteLine(angle=0, pos=0, movable=False,
-                                                    label="{value:.4f}",
+                                                    label="{value:.3f}",
                                                     labelOpts={"position": 0.2, 'color': FRAME_LINE_COLOR},
                                                     pen=pg.mkPen(FRAME_LINE_COLOR, width=2, style=QtCore.Qt.DashLine))
 
@@ -200,7 +208,7 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
         self.p_horizontal.addItem(self.h_profile_bottomline)
 
         self.v_profile_peakline = pg.InfiniteLine(angle=90, pos=1, movable=False,
-                                                  label="{value:.4f}",
+                                                  label="{value:.3f}",
                                                   labelOpts={"position": 0.2,
                                                              "rotateAxis": (1, 0),
                                                              "angle": -180,
@@ -208,7 +216,7 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
                                                              },
                                                   pen=pg.mkPen(FRAME_LINE_COLOR, width=2, style=QtCore.Qt.DashLine))
         self.v_profile_bottomline = pg.InfiniteLine(angle=90, pos=0, movable=False,
-                                                    label="{value:.4f}",
+                                                    label="{value:.3f}",
                                                     labelOpts={"position": 0.2,
                                                                "rotateAxis": (1, 0),
                                                                "angle": -180,
@@ -228,11 +236,11 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
                                                       pen=pg.mkPen(FIT_LINE_COLOR, width=2, style=QtCore.Qt.SolidLine))
 
         self.h_profile_peakline_fit = pg.InfiniteLine(angle=0, pos=1, movable=False,
-                                                      label="{value:.4f}",
+                                                      label="{value:.3f}",
                                                       labelOpts={"position": 0.8, "color": FIT_LINE_COLOR},
                                                       pen=pg.mkPen(FIT_LINE_COLOR, width=2, style=QtCore.Qt.DashLine))
         self.h_profile_bottomline_fit = pg.InfiniteLine(angle=0, pos=0, movable=False,
-                                                        label="{value:.4f}",
+                                                        label="{value:.3f}",
                                                         labelOpts={"position": 0.8, "color": FIT_LINE_COLOR},
                                                         pen=pg.mkPen(FIT_LINE_COLOR, width=2, style=QtCore.Qt.DashLine))
         self.h_profile_mid_line = self.p_horizontal.plot([0, 1, 2], [0, 0, 0],
@@ -247,13 +255,13 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
         self.p_horizontal.addItem(self.h_profile_bottomline_fit)
 
         self.v_profile_peakline_fit = pg.InfiniteLine(angle=90, pos=1, movable=False,
-                                                      label="{value:.4f}",
+                                                      label="{value:.3f}",
                                                       labelOpts={"position": 0.8, "color": FIT_LINE_COLOR,
                                                                  "rotateAxis": (1, 0),
                                                                  "angle": -180},
                                                       pen=pg.mkPen(FIT_LINE_COLOR, width=2, style=QtCore.Qt.DashLine))
         self.v_profile_bottomline_fit = pg.InfiniteLine(angle=90, pos=0, movable=False,
-                                                        label="{value:.4f}",
+                                                        label="{value:.3f}",
                                                         labelOpts={"position": 0.8,
                                                                    "color": FIT_LINE_COLOR,
                                                                    "rotateAxis": (1, 0),
@@ -284,6 +292,27 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
         self.cross_markers = []
         self.cross_marker_lines = []
 
+    @property
+    def pixel_size(self):
+        return self._pixel_size
+
+    @pixel_size.setter
+    def pixel_size(self, psz: float):
+        prev_psz = self._pixel_size
+        if psz > 0:
+            self._pixel_size = psz
+        self.pixel_size_lbl.setText(f"Current pixel size: {self._pixel_size:.3f} um", justify='left')
+        self.img_trans.scale(self._pixel_size/prev_psz, self._pixel_size/prev_psz)
+        self.map_img.setTransform(self.img_trans)
+        self.map_h_line.setPos(self.map_h_line.value() / prev_psz * self._pixel_size)
+        self.map_v_line.setPos(self.map_v_line.value() / prev_psz * self._pixel_size)
+        self.update_image_data(self.image_data)
+        for i in range(0, len(self.cross_markers)):
+            row, col = self.cross_markers[i]
+            self.cross_markers[i] = (row/prev_psz*self._pixel_size, col/prev_psz*self._pixel_size)
+        self.draw_cross_markers()
+
+
     def draw_cross_markers(self):
         self.remove_all_cross_markers()
 
@@ -306,20 +335,23 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
         line_style = QtCore.Qt.DashDotLine
 
         v_line = pg.InfiniteLine(angle=90, pos=col, movable=False,
-                                 label="{value:.1f}",
+                                 label="{value:.3f}",
                                  labelOpts={"position": 0.2,
                                             "color": (0, 255, 0),
                                             "rotateAxis": (1, 0),
                                             "angle": -180},
                                  pen=pg.mkPen(line_color, width=1, style=line_style))
+        v_line.setBounds([0, self.image_width*self._pixel_size-0.001])
         self.p_map.addItem(v_line)
         self.cross_marker_lines.append(v_line)
 
         h_line = pg.InfiniteLine(angle=0, pos=row, movable=False,
-                                 label="{value:.1f}",
+                                 label="{value:.3f}",
                                  labelOpts={"position": 0.2,
                                             "color": (0, 255, 0)},
                                  pen=pg.mkPen(line_color, width=1, style=line_style))
+
+        h_line.setBounds([0, self.image_height*self._pixel_size-0.001])
         self.p_map.addItem(h_line)
         self.cross_marker_lines.append(h_line)
 
@@ -337,9 +369,9 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
 
     def update_v_profile(self):
         try:
-            v_index = int(self.map_v_line.getPos()[0])
+            v_index = int(self.map_v_line.getPos()[0]/self._pixel_size)
             line_x = self.image_data[:, v_index]
-            line_y = np.linspace(0, self.image_height, num=self.image_height)
+            line_y = np.linspace(0, (self.image_height-1)*self._pixel_size, num=self.image_height)
             self.v_profile_line.setData(x=line_x, y=line_y)
             mid_top, mid_bottom, a, offset, mean, fit_value = get_middle_distance(
                 line_y, line_x,
@@ -354,8 +386,8 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
                                             [0, mid_top, mid_bottom],)
             self.v_profile_mid_line_point = pg.CurvePoint(self.v_profile_mid_line, pos=0)
             self.v_profile_mid_note.setParentItem(self.v_profile_mid_line_point)
-            self.v_profile_mid_note.setText(f"T:{mid_top:.2f}, B:{mid_bottom:.2f}\n"
-                                            f"D:{mid_bottom - mid_top:.2f}, Sigma:{(mid_bottom - mid_top) / 2.355:.2f}")
+            self.v_profile_mid_note.setText(f"T:{mid_top:.3f}, B:{mid_bottom:.3f}\n"
+                                            f"D:{mid_bottom - mid_top:.3f}, Sigma:{(mid_bottom - mid_top) / 2.355:.3f}")
             self.v_dist = mid_bottom - mid_top
         except:
             pass
@@ -368,10 +400,10 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
 
     def update_h_profile(self):
         try:
-            h_index = int(self.map_h_line.getPos()[1])
-            line_x = np.linspace(0, self.image_width, num=self.image_width)
+            h_index = int(self.map_h_line.getPos()[1]/self._pixel_size)
+            line_x = np.linspace(0, (self.image_width-1)*self._pixel_size, num=self.image_width)
             line_y = self.image_data[h_index, :]
-            self.h_profile_line.setData(y=self.image_data[h_index, :])
+            self.h_profile_line.setData(x=line_x, y=line_y)
             mid_left, mid_right, a, offset, mean, fit_value = get_middle_distance(
                 line_x, line_y,
                 forced=self.__gaussian_fit_force_peak,
@@ -384,8 +416,8 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
             self.h_profile_mid_line.setData([mid_left, mid_right, self.image_width], [a/2+offset, a/2+offset, a/2+offset])
             self.h_profile_mid_line_point = pg.CurvePoint(self.h_profile_mid_line, pos=1)
             self.h_profile_mid_note.setParentItem(self.h_profile_mid_line_point)
-            self.h_profile_mid_note.setText(f"L:{mid_left:.2f}, R:{mid_right:.2f}\n"
-                                            f"D:{mid_right-mid_left:.2f}, Sigma:{(mid_right-mid_left)/2.355:.2f}")
+            self.h_profile_mid_note.setText(f"L:{mid_left:.3f}, R:{mid_right:.3f}\n"
+                                            f"D:{mid_right-mid_left:.3f}, Sigma:{(mid_right-mid_left)/2.355:.3f}")
             self.h_dist = mid_right - mid_left
         except:
             pass
@@ -395,15 +427,15 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
         self.map_img.setImage(image=self.image_data)
         self.image_width = self.image_data.shape[1]
         self.image_height = self.image_data.shape[0]
-        self.map_h_line.setBounds([0, self.image_height-0.001])
-        self.map_v_line.setBounds([0, self.image_width-0.001])
+        self.map_h_line.setBounds([0, self.image_height*self._pixel_size-0.001])
+        self.map_v_line.setBounds([0, self.image_width*self._pixel_size-0.001])
         if self.__cross_hair_auto_hotspot:
             max_temp = np.max(self.image_data)
             max_temp_locs = np.where(self.image_data == max_temp)
             max_temp_center_y, max_temp_center_x = (np.average(max_temp_locs[0]),
                                                     np.average(max_temp_locs[1]))
-            self.map_h_line.setPos(max_temp_center_y)
-            self.map_v_line.setPos(max_temp_center_x)
+            self.map_h_line.setPos(max_temp_center_y*self._pixel_size)
+            self.map_v_line.setPos(max_temp_center_x*self._pixel_size)
             self.update_h_profile()
             self.update_v_profile()
         else:
@@ -412,13 +444,13 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
 
     def get_h_frame_line(self, h_index: int = None):
         if h_index is None:
-            h_index = int(self.map_h_line.value())
+            h_index = int(self.map_h_line.value()/self._pixel_size)
 
         return self.image_data[h_index, :], h_index
 
     def get_v_frame_line(self, v_index: int = None):
         if v_index is None:
-            v_index = int(self.map_v_line.value())
+            v_index = int(self.map_v_line.value()/self._pixel_size)
 
         return self.image_data[:, v_index], v_index
 
@@ -496,17 +528,19 @@ def update_image(window, timer):
     # t1 = time.time() * 1000
     # print(f"Update image cost {t1-t0}ms")
     # timer.singleShot(10000, lambda w=window, t=timer: update_image(w, t))
-    window.add_cross_marker()
-    timer.singleShot(5000, lambda w=window, t=timer: update_image(w, t))
+    #window.add_cross_marker()
+    window.pixel_size += 1
+    timer.singleShot(10000, lambda w=window, t=timer: update_image(w, t))
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
     win = LaserProfilerWidget()
     win.show()
-    file_path=input("Enter test image path: ")
+    #file_path=input("Enter test image path: ")
+    file_path="../tests/test.jpg"
     win.update_image_data(cv2.imread(file_path, cv2.IMREAD_GRAYSCALE))
-    #update_timer = QtCore.QTimer(win)
-    #update_timer.singleShot(1000, lambda w=win, t=update_timer: update_image(w, t))
+    update_timer = QtCore.QTimer(win)
+    update_timer.singleShot(10000, lambda w=win, t=update_timer: update_image(w, t))
 
     app.exec_()
