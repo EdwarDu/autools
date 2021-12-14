@@ -1,0 +1,1 @@
+../setup_j/build_ui.sh
