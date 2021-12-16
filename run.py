@@ -16,7 +16,7 @@ if ans.lower().startswith("y"):
 # Go up to parent folder
 os.chdir("..")
 if platform.system() == "Windows":
-    python3_path = os.path.join(".", "env_j", "python.exe")
+    python3_path = os.path.join(".", "venv", "python.exe")
 else:
     python3_path = subprocess.check_output(['which', 'python3']).decode('utf8').strip()
 
@@ -34,4 +34,4 @@ if python3_path is None:
     python3_path = ans
 
 # Launch the app
-os.system(f"{python3_path} -m autools.setup_j.setup_main_window")
+os.system(f"{python3_path} -m autools.setup_s.setup_main_window")

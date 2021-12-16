@@ -37,6 +37,7 @@ from ..Cameras.CVCameraMan import CVCameraMan
 if _HAS_ANDOR:
     from ..Cameras.AndorCameraMan import AndorCameraMan
 from .save_settings_window import SaveSettingsWindow
+from ..CNILaser.FL266Man import FL266Man
 
 
 # noinspection PyPep8Naming
@@ -85,27 +86,47 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.checkBox_LP_auto_crosshair.setChecked(self.widget_LaserProfiler.cross_hair_auto_hotspot)
         self.checkBox_LP_gaussian_force.setChecked(self.widget_LaserProfiler.gaussian_fit_force_peak)
 
-        self.checkBox_LP_auto_crosshair.stateChanged.connect(lambda checked: self.widget_LaserProfiler.set_cross_hair_auto_hotspot(checked))
-        self.checkBox_LP_gaussian_force.stateChanged.connect(lambda checked: self.widget_LaserProfiler.set_gaussian_fit_force_peak(checked))
-        self.checkBox_LP_gaussian_manual.stateChanged.connect(lambda checked: self.widget_LaserProfiler.set_gaussian_fit_manual_mean(checked))
+        self.checkBox_LP_auto_crosshair.stateChanged.connect(
+                lambda checked: self.widget_LaserProfiler.set_cross_hair_auto_hotspot(checked))
+        self.checkBox_LP_gaussian_force.stateChanged.connect(
+                lambda checked: self.widget_LaserProfiler.set_gaussian_fit_force_peak(checked))
+        self.checkBox_LP_gaussian_manual.stateChanged.connect(
+                lambda checked: self.widget_LaserProfiler.set_gaussian_fit_manual_mean(checked))
 
         self.pushButton_LP_LoadRaw.clicked.connect(self.lp_load_raw)
 
-        self.aotf_man = self.f_aotfman
+        # CNILaser Settings
+        self.aotf_man = FL266Man()
         self.pushButton_AOTF_Config.clicked.connect(self.aotf_config_clicked)
         self.aotf_man.opened.connect(self.aotf_opened)
         self.aotf_man.closed.connect(self.aotf_closed)
         self.aotf_man.power_changed.connect(self.aotf_power_changed)
+        self.aotf_man.frequency_changed.connect(self.aotf_frequency_changed)
+
+        # Misc
+        self.doubleSpinBox_PixelSize.valueChanged.connect(self.lp_pixel_size_changed)
 
         # AndorCam
         if _HAS_ANDOR:
             self.andor_man = AndorCameraMan(0)
 
-        self.save_settings_diag = SaveSettingsWindow(self.aotf_man, self.k3390man, self.sr830_man)
-        self.pushButton_SaveSettings.clicked.connect(lambda: self.save_settings_diag.show())
-
         self.all_cams = []
         self.window.show()
+
+    def aotf_config_clicked(self):
+        self.aotf_man.show_config_window()
+
+    def aotf_opened(self):
+        self.label_AOTF_Conn_Status.setStyleSheet("background: green")
+
+    def aotf_closed(self):
+        self.label_AOTF_Conn_Status.setStyleSheet("background: red")
+
+    def aotf_power_changed(self, power_perc):
+        self.label_AOTF_PowerPerc.setText(f"{power_perc}")
+
+    def aotf_frequency_changed(self, freq):
+        self.label_AOTF_Frequency.setText(f"{freq}")
 
     def refresh_cam_source(self):
         self.comboBox_CamSource.clear()
@@ -218,6 +239,9 @@ class SetupMainWindow(Ui_SetupMainWindow):
 
         if fname is not None and fname != '':
             self.widget_LaserProfiler.load_raw(fname)
+
+    def lp_pixel_size_changed(self, psz):
+        self.widget_LaserProfiler.pixel_size = psz
 
 
 if __name__ == '__main__':

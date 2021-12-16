@@ -97,8 +97,8 @@ class FL266Man(QObject):
     CMD_GET=0x00
 
     def send_cmd(self, cmd: bytes or bytearray, cmd_type: int):
-        if cmd not in (FL266Man.CMD_SET, FL266Man.CMD_GET):
-            raise ValueError(f"Unknown command type: {cmd}")
+        if cmd_type not in (FL266Man.CMD_SET, FL266Man.CMD_GET):
+            raise ValueError(f"Unknown command type: {cmd_type}")
         fl266_logger.debug(f"Sending command: {'GET' if cmd_type == FL266Man.CMD_GET else 'SET'}: {cmd}", extra={"component": "FL266"})
         with self.ser_lock:
             self.ser.write(cmd)
@@ -114,36 +114,36 @@ class FL266Man(QObject):
         if type(cmd) is bytes:
             cmd = bytearray(cmd)
         ck = sum(cmd)
-        return cmd&0xFF
+        return ck&0xFF
  
     @staticmethod
-    def compose_cmd(ch: int, cmd: int, data: bytes):
-        if cmd not in (FL266Man.CMD_SET, FL266Man.CMD_GET):
-            raise ValueError(f"Unknown command type: {cmd}")
-        cmd_pre = b'\x53\x0a'+(ch&0xFF).to_bytes(1, byteorder='big') + (cmd&0xFF).to_bytes(1, byteorder='big') + data[0:4]
-        cmd = cmd_pre + FL266Man.fill_cmd_checksum(cmd_pre) + b'\x0d'
+    def compose_cmd(ch: int, cmd_type: int, data: bytes):
+        if cmd_type not in (FL266Man.CMD_SET, FL266Man.CMD_GET):
+            raise ValueError(f"Unknown command type: {cmd_type}")
+        cmd_pre = b'\x53\x0a'+(ch&0xFF).to_bytes(1, byteorder='big') + (cmd_type&0xFF).to_bytes(1, byteorder='big') + data[0:4]
+        cmd = cmd_pre + FL266Man.fill_cmd_checksum(cmd_pre).to_bytes(1, byteorder='big') + b'\x0d'
         return cmd
 
     @staticmethod
-    def check_response(res: bytes or bytearray, ch: int, cmd: int): 
-        if cmd not in (FL266Man.CMD_SET, FL266Man.CMD_GET):
-            raise ValueError(f"Unknown command type: {cmd}")
-        if (cmd == FL266Man.CMD_GET and len(res) != 9) or \
-            (cmd == FL266Man.CMD_SET and len(res) != 10):
+    def check_response(res: bytes or bytearray, ch: int, cmd_type: int): 
+        if cmd_type not in (FL266Man.CMD_SET, FL266Man.CMD_GET):
+            raise ValueError(f"Unknown command type: {cmd_type}")
+        if (cmd_type == FL266Man.CMD_GET and len(res) != 9) or \
+            (cmd_type == FL266Man.CMD_SET and len(res) != 10):
             return False, f"wrong response length: {len(res)}"
         if type(res) is bytes:
             res = bytearray(res)
         # check header
-        if (cmd == FL266Man.CMD_SET and res[0:2] != b'\x41\x09') or \
-                (cmd == FL266Man.CMD_GET and res[0:2] != b'\x53\x0a'):
+        if (cmd_type == FL266Man.CMD_SET and res[0:2] != b'\x41\x09') or \
+                (cmd_type == FL266Man.CMD_GET and res[0:2] != b'\x53\x0a'):
             return False, f"wrong response header: {res[0:2]}"
         # check ch
         if res[2] != ch & 0xFF:
             return False, f"wrong response CH: {res[2]}"
-        if res[3] != cmd:
+        if res[3] != cmd_type:
             return False, f"wrong response CMD: {res[3]}"
 
-        if cmd == FL266Man.CMD_SET:
+        if cmd_type == FL266Man.CMD_SET:
             if res[4:7] == b'\x4f\x4b\x21':
                 pass
             elif res[4:7] == b'\x45\x52\x52':
@@ -168,7 +168,7 @@ class FL266Man(QObject):
             perc = 0
         elif perc > 100:
             perc = 100
-        cmd = FL266Man.compose_cmd(0x01,FL266Man.CMD_SET, perc)
+        cmd = FL266Man.compose_cmd(0x01, FL266Man.CMD_SET, perc)
         ack = self.send_cmd(cmd, FL266Man.CMD_SET)
         ok, msg = FL266Man.check_response(ack, 0x01, FL266Man.CMD_SET)
         if not ok:

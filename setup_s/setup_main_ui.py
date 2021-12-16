@@ -96,6 +96,7 @@ class Ui_SetupMainWindow(object):
         self.verticalLayout_3.addLayout(self.gridLayout_3)
         self.verticalLayout.addWidget(self.groupBox_AOTF)
         self.pushButton_SaveSettings = QtWidgets.QPushButton(self.scrollAreaWidgetContents)
+        self.pushButton_SaveSettings.setEnabled(False)
         self.pushButton_SaveSettings.setObjectName("pushButton_SaveSettings")
         self.verticalLayout.addWidget(self.pushButton_SaveSettings)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)

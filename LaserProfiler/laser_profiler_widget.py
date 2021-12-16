@@ -341,7 +341,7 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
                                             "rotateAxis": (1, 0),
                                             "angle": -180},
                                  pen=pg.mkPen(line_color, width=1, style=line_style))
-        v_line.setBounds([0, self.image_width*self._pixel_size-0.001])
+        #v_line.setBounds([0, self.image_width*self._pixel_size-0.001])
         self.p_map.addItem(v_line)
         self.cross_marker_lines.append(v_line)
 
@@ -351,7 +351,7 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
                                             "color": (0, 255, 0)},
                                  pen=pg.mkPen(line_color, width=1, style=line_style))
 
-        h_line.setBounds([0, self.image_height*self._pixel_size-0.001])
+        #h_line.setBounds([0, self.image_height*self._pixel_size-0.001])
         self.p_map.addItem(h_line)
         self.cross_marker_lines.append(h_line)
 
