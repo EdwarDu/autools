@@ -516,7 +516,11 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
         np.savetxt(prefix+'_img.npraw', self.image_data)
 
     def load_raw(self, npraw_file: str):
-        image_data = np.loadtxt(npraw_file)
+        if npraw_file.endswith(".npraw"):
+            image_data = np.loadtxt(npraw_file)
+        else:
+            # FIXME: add to try .. catch
+            image_data = cv2.imread(npraw_file, cv2.IMREAD_GRAYSCALE)
         self.update_image_data(image_data)
 
 

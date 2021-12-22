@@ -32,7 +32,7 @@ setup_main_logger_ch = logging.StreamHandler()
 setup_main_logger_ch.setFormatter(setup_main_logger_formatter)
 setup_main_logger.addHandler(setup_main_logger_ch)
 
-_HAS_ANDOR = True
+_HAS_ANDOR = False
 from ..Cameras.CVCameraMan import CVCameraMan
 if _HAS_ANDOR:
     from ..Cameras.AndorCameraMan import AndorCameraMan
@@ -235,7 +235,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
             self.cam_single_shot()
 
     def lp_load_raw(self):
-        fname, _a = QFileDialog.getOpenFileName(self.window, 'Load NPRAW file', '.', 'NPRAW (*.npraw)')
+        fname, _a = QFileDialog.getOpenFileName(self.window, 'Load NPRAW/image file', '.', 'NPRAW (*.npraw);;Images (*.png *.jpg *.tif *.bmp);;All files (*.*)')
 
         if fname is not None and fname != '':
             self.widget_LaserProfiler.load_raw(fname)
