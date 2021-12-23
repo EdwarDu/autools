@@ -87,11 +87,16 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.checkBox_LP_gaussian_force.setChecked(self.widget_LaserProfiler.gaussian_fit_force_peak)
 
         self.checkBox_LP_auto_crosshair.stateChanged.connect(
-                lambda checked: self.widget_LaserProfiler.set_cross_hair_auto_hotspot(checked))
+            lambda checked: self.widget_LaserProfiler.set_cross_hair_auto_hotspot(checked))
         self.checkBox_LP_gaussian_force.stateChanged.connect(
-                lambda checked: self.widget_LaserProfiler.set_gaussian_fit_force_peak(checked))
+            lambda checked: self.widget_LaserProfiler.set_gaussian_fit_force_peak(checked))
         self.checkBox_LP_gaussian_manual.stateChanged.connect(
-                lambda checked: self.widget_LaserProfiler.set_gaussian_fit_manual_mean(checked))
+            lambda checked: self.widget_LaserProfiler.set_gaussian_fit_manual_mean(checked))
+        self.doubleSpinBox_LP_RotateAngle.valueChanged.connect(self.lp_image_rotation_a_changed)
+        
+        self.spinBox_calcInputNumPixels.valueChanged.connect(self.calc_helper)
+        self.spinBox_calcInputWaveLength.valueChanged.connect(self.calc_helper)
+        self.doubleSpinBox_CalcInputLens.valueChanged.connect(self.calc_helper)
 
         self.pushButton_LP_LoadRaw.clicked.connect(self.lp_load_raw)
 
@@ -103,15 +108,22 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.aotf_man.power_changed.connect(self.aotf_power_changed)
         self.aotf_man.frequency_changed.connect(self.aotf_frequency_changed)
 
-        # Misc
-        self.doubleSpinBox_PixelSize.valueChanged.connect(self.lp_pixel_size_changed)
-
         # AndorCam
         if _HAS_ANDOR:
             self.andor_man = AndorCameraMan(0)
 
         self.all_cams = []
         self.window.show()
+
+    def calc_helper(self):
+        wavel = self.spinBox_calcInputWaveLength.value()
+        lens = self.doubleSpinBox_CalcInputLens.value()* 1000.0
+        pixels = self.spinBox_calcInputNumPixels.value()
+        self.lineEdit_CalcPixelSize.setText(f"{lens/pixels:.3f}")
+        self.lineEdit_CalcResolution.setText(f"{lens/pixels/wavel:.3f}")
+  
+    def lp_image_rotation_a_changed(self, a):
+        self.widget_LaserProfiler.img_rotate_angle = a
 
     def aotf_config_clicked(self):
         self.aotf_man.show_config_window()

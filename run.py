@@ -3,6 +3,7 @@ import os
 import platform
 import sys
 import subprocess
+import shutil
 
 project_root = os.path.dirname(os.path.realpath(__file__))
 # Change working directory to project root
@@ -15,10 +16,7 @@ if ans.lower().startswith("y"):
 
 # Go up to parent folder
 os.chdir("..")
-if platform.system() == "Windows":
-    python3_path = os.path.join(".", "venv", "python.exe")
-else:
-    python3_path = subprocess.check_output(['which', 'python3']).decode('utf8').strip()
+python3_path = shutil.which('python')
 
 if os.path.exists(python3_path):
     ans = input(f"Found {python3_path}, use? [Y/n]")
