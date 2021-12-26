@@ -113,6 +113,8 @@ MID_LINE_COLOR=pg.mkColor(255, 0, 255)
 
 class LaserProfilerWidget(pg.GraphicsLayoutWidget):
     image_size_changed = pyqtSignal(int, int, name='image_size_changed')
+    hprof_dsize_changed = pyqtSignal(float, name='hprof_dsize_changed')
+    vprof_dsize_changed = pyqtSignal(float, name='vprof_dsize_changed')
 
     def __init__(self, parent=None, **kargs):
         pg.GraphicsLayoutWidget.__init__(self, **kargs)
@@ -127,6 +129,8 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
         self.nextRow()
         self.p_vertical = self.addPlot()
         self.p_map = self.addPlot()
+
+        self.__calc_pixelsize = 1.0
 
         self.p_vertical.invertY()
         self.image_data = np.random.rand(100, 100)
@@ -303,8 +307,8 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
             self.__h_profile_info = h_profile_info
         if v_profile_info is not None:
             self.__v_profile_info = v_profile_info
-        info_text = f"H Profile: {self.__h_profile_info}<br/>V Profile: {self.__v_profile_info}"
-        self.profile_lbl.setText(info_text)
+        info_text = f"H Profile:<br/>{self.__h_profile_info}<br/>V Profile:<br/>{self.__v_profile_info}"
+        self.profile_lbl.setText(info_text, color="#00FF00")
 
     def draw_cross_markers(self):
         self.remove_all_cross_markers()
@@ -378,7 +382,8 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
             self.v_profile_mid_note.setParentItem(self.v_profile_mid_line_point)
             self.v_profile_mid_note.setText(f"T:{mid_top:.3f}, B:{mid_bottom:.3f}\n"
                                             f"D:{mid_bottom - mid_top:.3f}")
-            self.update_profile_info(None, f"T:{mid_top:.3f}, B:{mid_bottom:.3f} D:{mid_bottom - mid_top:.3f}")
+            self.update_profile_info(None, f"&nbsp;&nbsp;T:{mid_top:8.3f}, B:{mid_bottom:8.3f}<br/>&nbsp;&nbsp;D:{mid_bottom - mid_top:8.3f}")
+            self.vprof_dsize_changed.emit(mid_bottom-mid_top)
             self.v_dist = mid_bottom - mid_top
         except:
             pass
@@ -409,7 +414,8 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
             self.h_profile_mid_note.setParentItem(self.h_profile_mid_line_point)
             self.h_profile_mid_note.setText(f"L:{mid_left:.3f}, R:{mid_right:.3f}\n"
                                             f"D:{mid_right-mid_left:.3f}")
-            self.update_profile_info(f"L:{mid_left:.3f}, R:{mid_right:.3f} D:{mid_right-mid_left:.3f}", None)
+            self.update_profile_info(f"&nbsp;&nbsp;L:{mid_left:8.3f}, R:{mid_right:8.3f}<br/>&nbsp;&nbsp;D:{mid_right-mid_left:8.3f}", None)
+            self.hprof_dsize_changed.emit(mid_right-mid_left)
             self.h_dist = mid_right - mid_left
         except:
             pass
@@ -422,6 +428,7 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
                                                 np.average(max_temp_locs[1]))
         return max_temp_center_x, max_temp_center_y
 
+    # NOT USED, the moving and clipping operations in this method is useless
     @staticmethod
     def rotate_image(img, around, angle, scale, cords = None):
         # create another image to move to center
@@ -483,10 +490,13 @@ class LaserProfilerWidget(pg.GraphicsLayoutWidget):
             rotate_matrix[0, 2] += bound_w/2 - rx
             rotate_matrix[1, 2] += bound_h/2 - ry
             image_data = cv2.warpAffine(src=image_data, M=rotate_matrix, dsize=(bound_w, bound_h))
-            cord=[self.map_v_line.value(), self.map_h_line.value(), 1]
-            new_cord=np.dot(rotate_matrix, cord)
-            self.map_v_line.setValue(new_cord[0])
-            self.map_h_line.setValue(new_cord[1])
+            
+            # Can'g rotate the mpa_h_line and map_v_line's cords every time, auto hotspot will set them below
+            # otherwise leave them be
+            #cord=[self.map_v_line.value(), self.map_h_line.value(), 1]
+            #new_cord=np.dot(rotate_matrix, cord)
+            #self.map_v_line.setValue(new_cord[0])
+            #self.map_h_line.setValue(new_cord[1])
 
         self.image_data = image_data
         self.map_img.setImage(image=self.image_data)

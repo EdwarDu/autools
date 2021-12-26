@@ -466,7 +466,7 @@
                <widget class="QLineEdit" name="lineEdit_CalcPixelSize">
                 <property name="maximumSize">
                  <size>
-                  <width>120</width>
+                  <width>100</width>
                   <height>16777215</height>
                  </size>
                 </property>
@@ -483,22 +483,75 @@
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="label_9">
-                <property name="text">
-                 <string>Res.:</string>
+               <widget class="Line" name="line">
+                <property name="lineWidth">
+                 <number>3</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_CalcResolution">
+               <widget class="QLabel" name="label_21">
+                <property name="text">
+                 <string>H-Res:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEdit_CalcHRes">
                 <property name="maximumSize">
                  <size>
-                  <width>120</width>
+                  <width>100</width>
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="maxLength">
-                 <number>200</number>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEdit_CalcHResBar">
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_22">
+                <property name="text">
+                 <string>V-Res:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEdit_CalcVRes">
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEdit_CalcVResBar">
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>16777215</height>
+                 </size>
                 </property>
                 <property name="readOnly">
                  <bool>true</bool>

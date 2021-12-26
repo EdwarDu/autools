@@ -99,6 +99,14 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.doubleSpinBox_CalcInputLens.valueChanged.connect(self.calc_helper)
 
         self.pushButton_LP_LoadRaw.clicked.connect(self.lp_load_raw)
+        self.widget_LaserProfiler.hprof_dsize_changed.connect(self.lp_hprof_d_changed)
+        self.widget_LaserProfiler.vprof_dsize_changed.connect(self.lp_vprof_d_changed)
+
+        self._pixel_size = 1
+        self._lp_hprof_d = -1 # set the d values to -1 as invalid, res will result to negative value
+        self._lp_vprof_d = -1 
+        self.calc_helper() # This will calc init pixel size
+        self.widget_LaserProfiler.refresh()  # this is force calculate d values
 
         # CNILaser Settings
         self.aotf_man = FL266Man()
@@ -116,12 +124,30 @@ class SetupMainWindow(Ui_SetupMainWindow):
         self.window.show()
 
     def calc_helper(self):
-        wavel = self.spinBox_calcInputWaveLength.value()
+        # wavel = self.spinBox_calcInputWaveLength.value()
         lens = self.doubleSpinBox_CalcInputLens.value()* 1000.0
         pixels = self.spinBox_calcInputNumPixels.value()
-        self.lineEdit_CalcPixelSize.setText(f"{lens/pixels:.3f}")
-        self.lineEdit_CalcResolution.setText(f"{lens/pixels/wavel:.3f}")
-  
+        self._pixel_size = lens/pixels
+        self.lineEdit_CalcPixelSize.setText(f"{self._pixel_size:.3f}")
+        self.lp_hprof_d_changed(None)  # force to recalculate the res values
+        self.lp_vprof_d_changed(None)
+
+    def lp_hprof_d_changed(self, d):
+        if d is not None:
+            self._lp_hprof_d = d
+        res = self._lp_hprof_d * self._pixel_size
+        res_bar = res / self.spinBox_calcInputWaveLength.value()
+        self.lineEdit_CalcHRes.setText(f"{res:.3f}")
+        self.lineEdit_CalcHResBar.setText(f"{res_bar:.3f}")
+
+    def lp_vprof_d_changed(self, d):
+        if d is not None:
+            self._lp_vprof_d = d
+        res = self._lp_vprof_d * self._pixel_size
+        res_bar = res / self.spinBox_calcInputWaveLength.value()
+        self.lineEdit_CalcVRes.setText(f"{res:.3f}")
+        self.lineEdit_CalcVResBar.setText(f"{res_bar:.3f}")
+    
     def lp_image_rotation_a_changed(self, a):
         self.widget_LaserProfiler.img_rotate_angle = a
 
@@ -247,7 +273,8 @@ class SetupMainWindow(Ui_SetupMainWindow):
             self.cam_single_shot()
 
     def lp_load_raw(self):
-        fname, _a = QFileDialog.getOpenFileName(self.window, 'Load NPRAW/image file', '.', 'NPRAW (*.npraw);;Images (*.png *.jpg *.tif *.bmp);;All files (*.*)')
+        fname, _a = QFileDialog.getOpenFileName(self.window, caption='Load NPRAW/image file', 
+            filter='Images (*.png *.jpg *.tif *.bmp);;NPRAW (*.npraw);;All files (*.*)')
 
         if fname is not None and fname != '':
             self.widget_LaserProfiler.load_raw(fname)
