@@ -114,7 +114,7 @@ cdef class Andor3Man:
         else:
             andor3_logger.info(f"Andor3 Library initialized", extra={"component": "Andor3"})
 
-    def __del__(self):
+    def __dealloc__(self):
         andor3.AT_FinaliseLibrary()
 
     def load_feature_map(self, feature_map: dict):
