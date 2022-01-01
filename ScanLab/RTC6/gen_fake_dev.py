@@ -7,6 +7,10 @@ import re
 rtc6_func_re = re.compile(r"RTC6_API (?P<return_type>[\w\d]+) __stdcall (?P<func_name>[\w\d]+)\((?P<arg_list>.*)\);")
 arg_re = re.compile(r"(?P<arg_type>[\w\*& \d]+)\s+(?P<arg_name>[\w\d]+)")
 
+if os.path.exists(sys.argv[2]):
+    print(f"{sys.argv[2]} exists, will not override", file=sys.stderr)
+    exit(1)
+
 with open(sys.argv[1], 'r') as f_header, open(sys.argv[2], 'w') as f_fake:
     print(f'#include "{sys.argv[1]}"', file=f_fake)
     print(f'#include <iostream>', file=f_fake)
