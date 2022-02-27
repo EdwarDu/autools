@@ -47,8 +47,25 @@ cdef class RTC6Man:
             16: "Verify memory error",
             17: "Externet error",
             18: "NAND memory error (Only RTC6 Ethernet Board)"
+        },
+        "load_correction_file": {
+            1: "File error (file corrupt or incomplete)",
+            2: "Memory error (RTC6 DLL-internal, Windows system memory)",
+            3: "File-open error (empty string submitted for Name parameter, file not found, etc)",
+            4: "DSP memory error",
+            5: "PCI download error (RTC6 board driver error), Ethernet download error",
+            8: "RTC6 board driver not found (get_last_error return code RTC6_ACCESS_DENIED)",
+            10: "Parameter error (incorrect No.)",
+            11: "Access error (check doc)",
+            12: "Warning: 3D correction table or Dim==3 selected, but the Option 3D is not enabled, will continue as 2D system",
+            13: "Busy error: no download, board is BUSY or INTERNAL-BUSY",
+            14: "PCI upload error (RTC6 board driver error, only applicable for download verification",
+            15: "Verify error (only applicable for download verification)"
         }
     }
+
+    # TODO: add get_last_error code
+    #RTC6_NO_PCIE_CARD_FOUND
 
     def __cinit__(self, cfg_path=os.path.dirname(os.path.abspath(__file__))):
         """
@@ -82,10 +99,40 @@ cdef class RTC6Man:
             rtc6_logger.error(f"Device reset Failed: unknown error code {err}", extra={"component": "rtc6"})
             raise RTC6DevError(err)
 
+        rtc6.reset_error(-1)
+        rtc6.config_list(4000, 4000)
+
+        err = rtc6.load_correction_file(os.path.join(cfg_path, "Cor_1to1.ct5").encode('utf-8'), 
+                                        1, # correction table
+                                        2) # use 2D only
+        if err == 0:
+            rtc6_logger.info(f"Load correction file OKAY", extra={"component": "rtc6"})
+        elif err in RTC6Man.ERR_CODES["load_correction_file"].keys():
+            if err != 12:
+                rtc6_logger.error(f"Load correction file Failed: {RTC6Man.ERR_CODES['load_correction_file'][err]}",
+                              extra={"component": "rtc6"})
+                if err == 11:
+                    # TODO: get_last_error -> detail
+                    # last_err = rtc6.get_last_error()
+                    pass
+                raise RTC6DevError(err)
+            else:
+                rtc6_logger.warning(f"Load correction file: {RTC6Man.ERR_CODES['load_correction_file'][err]}",
+                              extra={"component": "rtc6"})
+        else:
+            rtc6_logger.error(f"Load correction file Failed: unknown error code {err}", extra={"component": "rtc6"})
+            raise RTC6DevError(err)
+
+    
+    def goto_xy(self, x, y):
+        x = min(max(-524288, x), 524287)
+        y = min(max(-524288, y), 524287)
+        rtc6.goto_xy(x, y)
+
+
     def __dealloc__(self):
         """
         TODO: device finalise/close procedure
         """
         rtc6.free_rtc6_dll()
-
 
