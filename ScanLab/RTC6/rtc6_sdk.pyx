@@ -5,6 +5,7 @@ from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
 import numpy as np
 import logging
 import os
+from typing import Union
 
 #[FIXME]: For testing now, use split log
 _SPLIT_LOG = True
@@ -30,15 +31,18 @@ cdef class RTC6Man:
     """
     Cython class for wrapping API calls to RTC6_SDK
     [WARNING]:not all features will be implemented here
+    [WARNING]:FIXME: This may need to be a Singleton, client should handle that for now
     """
 
     ERR_CODES = {
         "load_program_file": {
-            2: "The board is not running.", # if a renewed call does not bring success, then a power cycle is necessary
+            # if a renewed call does not bring success, then a power cycle is necessary
+            2: "The board is not running.",
             3: "RTC6DAT.dat file or RTC6RBF.rbf file not found",
             5: "Not enough Windows memory",
             6: "Access error: the board is reserved for another user program",
-            7: "Version error: RTC6 DLL version, RTC version (firmware file RTC6RBF.rbf) and OUT version (DSP program file RTC6OUT.out) are incompatible with each other",
+            7: "Version error: RTC6 DLL version, RTC version (firmware file RTC6RBF.rbf) and "
+                "OUT version (DSP program file RTC6OUT.out) are incompatible with each other",
             8: "RTC6 board driver not found",
             9: "Loading of RTC6OUT.out or RTC6ETH.out failed or has incorrect format or other error",
             11: "Firmware error: loading of RTC6RBF.rbf file failed",
@@ -57,15 +61,48 @@ cdef class RTC6Man:
             8: "RTC6 board driver not found (get_last_error return code RTC6_ACCESS_DENIED)",
             10: "Parameter error (incorrect No.)",
             11: "Access error (check doc)",
-            12: "Warning: 3D correction table or Dim==3 selected, but the Option 3D is not enabled, will continue as 2D system",
+            12: "Warning: 3D correction table or Dim==3 selected, but the Option 3D is not enabled, "
+                "will continue as 2D system",
             13: "Busy error: no download, board is BUSY or INTERNAL-BUSY",
             14: "PCI upload error (RTC6 board driver error, only applicable for download verification",
             15: "Verify error (only applicable for download verification)"
+        },
+        "acc_error":{
+            0: "No RTC6 PCIe Board found",
+            1: "Access denied (e.g. resevered by another program)",
+            2: "Command not forwarded (internal board driver error/PCI error)",
+            3: "No response from board (likely no program has been loaded onto the RTC6)",
+            4: "Invalid parameter",
+            5: "List processing is (not) active",
+            6: "List command rejected, invalid input pointer",
+            7: "List command was converted to a list_nop",
+            8: "Version error: .dll, .rbf and .out file version are not compatible",
+            9: "Verify error",
+            10: "Type error: e.g. eth command sent to a PCIe board",
+            11: "Out of memory",
+            12: "Download error",
+            13: "General Ethernet error",
+            15: "Unsupported Windows version",
+            16: "Error reading PCI configuration register"
         }
     }
 
-    # TODO: add get_last_error code
-    #RTC6_NO_PCIE_CARD_FOUND
+    RTC6_NO_PCIE_CARD_FOUND = 0
+    RTC6_ACCESS_DENIED = 1
+    RTC6_SEND_ERROR = 2
+    RTC6_TIMEOUT = 3
+    RTC6_PARAM_ERROR = 4
+    RTC6_BUSY = 5
+    RTC6_REJCTED = 6
+    RTC6_IGNORED = 7
+    RTC6_VERSION_MISMATCH = 8
+    RTC6_VERIFY_ERROR = 9
+    RTC6_TYPE_REJECTED = 10
+    RTC6_OUT_OF_MEMORY = 11
+    RTC6_FLASH_ERROR = 12
+    RTC6_ETH_ERROR = 13
+    RTC6_WIN_VER_ERROR = 15
+    RTC6_CONFIG_ERROR = 16
 
     def __cinit__(self, cfg_path=os.path.dirname(os.path.abspath(__file__))):
         """
@@ -91,20 +128,68 @@ cdef class RTC6Man:
         err = rtc6.load_program_file(cfg_path.encode('utf-8'))
         if err == 0:
             rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
-        elif err in RTC6Man.ERR_CODES["load_program_files"].keys():
-            rtc6_logger.error(f"Device reset Failed: {RTC6Man.ERR_CODES['load_program_files'][err]}",
-                              extra={"component": "rtc6"})
-            raise RTC6DevError(err)
         else:
-            rtc6_logger.error(f"Device reset Failed: unknown error code {err}", extra={"component": "rtc6"})
-            raise RTC6DevError(err)
+            if err == 2:
+                err = rtc6.load_program_file(cfg_path.encode('utf-8'))
+            if err == 0:
+                rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
+            elif err in RTC6Man.ERR_CODES["load_program_file"].keys():
+                rtc6_logger.error(f"Device reset Failed: {RTC6Man.ERR_CODES['load_program_file'][err]}",
+                                  extra={"component": "rtc6"})
+                if err == 2:
+                    rtc6_logger.error(f"Power cycle required", extra={"component": "rtc6"})
+                raise RTC6DevError(err)
+            else:
+                rtc6_logger.error(f"Device reset Failed: unknown error code {err}", extra={"component": "rtc6"})
+                raise RTC6DevError(err)
 
         rtc6.reset_error(-1)
-        rtc6.config_list(4000, 4000)
+        
+    def config_list(self, mem1: int, mem2: int):
+        # 8,388,608 (2^23) storage positions
+        # mem1 -> list1, mem2 -> list2., rest to protected list list3
+        if mem1 <= -1 or mem1 > 1<<23:
+            rtc6_logger.warning(f"Mem1 is corrected to 2^23 from {mem1}, "
+                                f"which means Mem1=2^23, Mem2=0, List3=0", extra={"component": "rtc6"})
+            mem1 = -1
+            actual_mem1 = 1<<23
+            actual_mem2 = 0
+        else:
+            if mem1 == 0:
+                rtc6_logger.warning(f"Mem1 is corrected to 1 from {mem1}", extra={"component": "rtc6"})
+                actual_mem1 = 1
+            else:
+                actual_mem1 = mem1
+            if mem2 <= -1 or mem2 > (1<<23) - actual_mem1:
+                actual_mem2 = (1<<23) - actual_mem1
+                rtc6_logger.warning(f"Mem1 is corrected to {actual_mem1} from {mem2}",
+                                    extra={"component": "rtc6"})
+            else:
+                actual_mem2 = mem2
+        
+        rtc6_logger.debug(f"setting mem1={actual_mem1}, mem2={actual_mem2}, "
+                          f"list3={(1<<23)-actual_mem1-actual_mem2}", 
+                          extra={"component": "rtc6"})
+        rtc6.config_list(mem1, mem2)
 
-        err = rtc6.load_correction_file(os.path.join(cfg_path, "Cor_1to1.ct5").encode('utf-8'), 
-                                        1, # correction table
-                                        2) # use 2D only
+    def load_correction_file(self, cor_file: Union[None, str], table_no: int, dim: int):
+        # cor_file=os.path.join(cfg_path, "Cor_1to1.ct5")
+        if cor_file is not None and not os.path.exists(cor_file):
+            rtc6_logger.error(f"Correction file {cor_file} does not exist", extra={"component": "rtc6"})
+            raise IOError()
+        if not 1 <= table_no <= 8:
+            rct6_logger.error(f"Table no should be [1,8]", extra={"component": "rtc6"})
+            raise ValueError()
+        if dim not in (2, 3):
+            rtc6_logger.error(f"Dim should be 2 or 3", extra={"component": "rtc6"})
+            raise ValueError()
+
+        rtc6_logger.debug(f"Loading correction file {cor_file} to table {table_no}, dim={dim}", 
+                          extra={"component": "rtc6"})
+
+        cor_file_c = NULL if cor_file is None else cor_file.encode('utf-8')
+
+        err = rtc6.load_correction_file(cor_file_c, table_no, dim)
         if err == 0:
             rtc6_logger.info(f"Load correction file OKAY", extra={"component": "rtc6"})
         elif err in RTC6Man.ERR_CODES["load_correction_file"].keys():
@@ -112,9 +197,13 @@ cdef class RTC6Man:
                 rtc6_logger.error(f"Load correction file Failed: {RTC6Man.ERR_CODES['load_correction_file'][err]}",
                               extra={"component": "rtc6"})
                 if err == 11:
-                    # TODO: get_last_error -> detail
-                    # last_err = rtc6.get_last_error()
-                    pass
+                    last_err = rtc6.get_last_error()
+                    if RTC6Man.has_error(last_err, RTC6Man.RTC6_VERSION_MISMATCH):
+                        rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})
+                    elif RTC6Man.has_error(last_err, RTC6Man.RTC6_ACCESS_DENIED):
+                        rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_ACCESS_DENIED]}", extra={"component": "rtc6"})
+                    else:
+                        rtc6_logger.error(f"Unknown last error {hex(last_err)}")
                 raise RTC6DevError(err)
             else:
                 rtc6_logger.warning(f"Load correction file: {RTC6Man.ERR_CODES['load_correction_file'][err]}",
@@ -123,12 +212,17 @@ cdef class RTC6Man:
             rtc6_logger.error(f"Load correction file Failed: unknown error code {err}", extra={"component": "rtc6"})
             raise RTC6DevError(err)
 
+    @staticmethod
+    def has_error(error_code:int, bit_index: int):
+        return (error_code & (1<<bit_index)) != 0
     
-    def goto_xy(self, x, y):
-        x = min(max(-524288, x), 524287)
-        y = min(max(-524288, y), 524287)
-        rtc6.goto_xy(x, y)
-
+    def goto_xy(self, x: int, y: int):
+        x1 = min(max(-524288, x), 524287)
+        y1 = min(max(-524288, y), 524287)
+        if x != x1 or y != y1:
+            rtc6_logger.warning(f"x or y is out of range [-524288, 524287], clipped", extra={"component": "rtc6"})
+        rtc6_logger.debug(f"Going to ({x1},{y1})", extra={"component": "rtc6"})    
+        rtc6.goto_xy(x1, y1)
 
     def __dealloc__(self):
         """
