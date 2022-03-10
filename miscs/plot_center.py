@@ -90,7 +90,7 @@ def get_middle_distance(frame_line_x, frame_line, forced=False, manual_mean=None
 
 
 plt.rcParams.update({
-    "text.usetex": True,
+    #"text.usetex": True,
     "font.size": 12,
     "font.weight": "bold",
     "axes.labelweight": "bold",
@@ -101,11 +101,41 @@ plt.rcParams.update({
 img_data = cv2.imread(sys.argv[1], cv2.IMREAD_GRAYSCALE)
 img_height, img_width = img_data.shape[:2]
 
+print(f"Image width={img_width}, height={img_height}")
+
 pixel_size=0.03333 #um
 
 max_temp = np.max(img_data)
 max_temp_locs = np.where(img_data == max_temp)
 max_temp_center_y, max_temp_center_x = (int(np.average(max_temp_locs[0])+0.5), int(np.average(max_temp_locs[1])+0.5))
+print(f"Hotspot detected at x={max_temp_center_x}, y={max_temp_center_y}")
+
+ans = input("Clip image? [y/N]")
+if ans.lower().startswith("y"):
+    clip_hw_limit = min(max_temp_center_x, img_width-1-max_temp_center_x)
+    clip_hh_limit = min(max_temp_center_y, img_height-1-max_temp_center_y)
+    width_clipped=int(input(f"New half image width (left/right to center) in pixels <= {clip_hw_limit}: "))
+    width_clipped=max(8, min(width_clipped, clip_hw_limit))
+    print(f"Image width clipped to {width_clipped*2+1}")
+
+    height_clipped=int(input(f"New image height (top/bottom to center) in pixels <= {clip_hh_limit}: "))
+    height_clipped=max(8, min(height_clipped, img_height))
+    print(f"Image width clipped to {height_clipped*2+1}")
+
+    clip_left = max_temp_center_x - width_clipped
+    clip_right = max_temp_center_x + width_clipped
+    clip_top = max_temp_center_y - height_clipped
+    clip_bottom = max_temp_center_y + height_clipped
+
+    img_data = img_data[clip_top:clip_bottom+1, clip_left:clip_right+1]
+    img_height, img_width = img_data.shape[:2]
+    print(f"Clipped image width={img_width}, height={img_height}")
+
+    max_temp = np.max(img_data)
+    max_temp_locs = np.where(img_data == max_temp)
+    max_temp_center_y, max_temp_center_x = (int(np.average(max_temp_locs[0])+0.5), int(np.average(max_temp_locs[1])+0.5))
+    print(f"Hotspot detected at x={max_temp_center_x}, y={max_temp_center_y}")
+
 
 img_top = -max_temp_center_y * pixel_size
 img_bottom = (img_height-1 - max_temp_center_y) * pixel_size
@@ -136,8 +166,8 @@ x_prof_values_unit = (x_prof_values - np.min(x_prof_values))/(np.max(x_prof_valu
 x_mid_l, x_mid_r, x_popt = get_middle_distance(x_prof_line, x_prof_values_unit)
 print(f"X profile fitting: a, mean, sigma, offset={x_popt}, x_mid_l={x_mid_l}, x_mid_r={x_mid_r}")
 # recalculate
-x_prof_rec = gaussian((x_mid_l, x_mid_r), *x_popt)
-print(f"X profile gaussian recalculate: {x_prof_rec}")
+#x_prof_rec = gaussian((x_mid_l, x_mid_r), *x_popt)
+#print(f"X profile gaussian recalculate: {x_prof_rec}")
 
 y_prof_line = np.linspace(img_top, img_bottom, num=img_height)
 y_prof_values = img_data[:, max_temp_center_x]
@@ -146,8 +176,8 @@ y_prof_values_unit = (y_prof_values - np.min(y_prof_values))/(np.max(y_prof_valu
 y_mid_l, y_mid_r, y_popt = get_middle_distance(y_prof_line, y_prof_values_unit)
 print(f"Y profile fitting: a, mean, sigma, offset={y_popt}, y_mid_l={y_mid_l}, y_mid_r={y_mid_r}")
 # recalculate
-y_prof_rec = gaussian((y_mid_l, y_mid_r), *y_popt)
-print(f"Y profile gaussian recalculate: {y_prof_rec}")
+#y_prof_rec = gaussian((y_mid_l, y_mid_r), *y_popt)
+#print(f"Y profile gaussian recalculate: {y_prof_rec}")
 
 # plot use uniformed values
 ax_x_prof.plot(x_prof_line, x_prof_values_unit)
@@ -157,15 +187,15 @@ x_fit_line = np.linspace(img_left, img_right, num=1000)
 x_fit_values = gaussian(x_fit_line, *x_popt)
 
 # Plot also the fitted line in dash
-#ax_x_prof.plot(x_fit_line, x_fit_values, '--')
+ax_x_prof.plot(x_fit_line, x_fit_values, '--')
 
 ax_x_prof.annotate("", xy=(x_mid_l, 0.5), xycoords='data', xytext=(x_mid_r, 0.5), textcoords='data', 
                   arrowprops=dict(arrowstyle="<->", color="red", shrinkA=0.05, shrinkB=0.05),)
-ax_x_prof.text(x_mid_r*1.2, 0.5, f"$FWHM_{{x}}={x_mid_r-x_mid_l:.2f}\lambda_{{0}}$", color='red')
+ax_x_prof.text(x_mid_r*1.2, 0.5, f"$FWHM_{{x}}={x_mid_r-x_mid_l:.2f}\mu m$", color='red')
 
 ax_x_prof.set_xlim(img_left, img_right)
 ax_x_prof.set_ylim(0, 1)
-ax_x_prof.set_xlabel('$x/\lambda_{0}$')
+ax_x_prof.set_xlabel('$x/$')
 
 
 
@@ -176,14 +206,14 @@ y_fit_line = np.linspace(img_bottom, img_top, num=1000)
 y_fit_values = gaussian(y_fit_line, *y_popt)
 
 # Plot also the fitted line in dash
-#ax_y_prof.plot(y_fit_line, y_fit_values, '--')
+ax_y_prof.plot(y_fit_line, y_fit_values, '--')
 
 ax_y_prof.annotate("", xy=(y_mid_l, 0.5), xycoords='data', xytext=(y_mid_r, 0.5), textcoords='data', 
                   arrowprops=dict(arrowstyle="<->", color="red", shrinkA=0.05, shrinkB=0.05),)
-ax_y_prof.text(y_mid_r*1.2, 0.5, f"$FWHM_{{x,y}}={y_mid_r-y_mid_l:.2f}\lambda_{{0}}$", color='red')
+ax_y_prof.text(y_mid_r*1.2, 0.5, f"$FWHM_{{x,y}}={y_mid_r-y_mid_l:.2f}\mu m$", color='red')
 
 ax_y_prof.set_xlim(img_top, img_bottom)
 ax_y_prof.set_ylim(0, 1)
-ax_y_prof.set_xlabel('$x,y/\lambda_{0}$')
+ax_y_prof.set_xlabel('$x,y$')
 
 plt.show()
