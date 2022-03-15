@@ -173,12 +173,14 @@ cdef class RTC6Man:
         rtc6.config_list(mem1, mem2)
 
     def load_correction_file(self, cor_file: Union[None, str], table_no: int, dim: int):
-        # cor_file=os.path.join(cfg_path, "Cor_1to1.ct5")
+        if cor_file is None:
+            cor_file=os.path.join(cfg_path, "Cor_1to1.ct5")
+        
         if cor_file is not None and not os.path.exists(cor_file):
             rtc6_logger.error(f"Correction file {cor_file} does not exist", extra={"component": "rtc6"})
             raise IOError()
         if not 1 <= table_no <= 8:
-            rct6_logger.error(f"Table no should be [1,8]", extra={"component": "rtc6"})
+            rct6_logger.error(f"Table no. should be [1,8]", extra={"component": "rtc6"})
             raise ValueError()
         if dim not in (2, 3):
             rtc6_logger.error(f"Dim should be 2 or 3", extra={"component": "rtc6"})
