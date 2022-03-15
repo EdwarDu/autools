@@ -174,13 +174,13 @@ cdef class RTC6Man:
 
     def load_correction_file(self, cor_file: Union[None, str], table_no: int, dim: int):
         if cor_file is None:
-            cor_file=os.path.join(cfg_path, "Cor_1to1.ct5")
+            cor_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "Cor_1to1.ct5")
         
-        if cor_file is not None and not os.path.exists(cor_file):
+        if not os.path.exists(cor_file):
             rtc6_logger.error(f"Correction file {cor_file} does not exist", extra={"component": "rtc6"})
             raise IOError()
         if not 1 <= table_no <= 8:
-            rct6_logger.error(f"Table no. should be [1,8]", extra={"component": "rtc6"})
+            rtc6_logger.error(f"Table no. should be [1,8]", extra={"component": "rtc6"})
             raise ValueError()
         if dim not in (2, 3):
             rtc6_logger.error(f"Dim should be 2 or 3", extra={"component": "rtc6"})
@@ -189,7 +189,7 @@ cdef class RTC6Man:
         rtc6_logger.debug(f"Loading correction file {cor_file} to table {table_no}, dim={dim}", 
                           extra={"component": "rtc6"})
 
-        cor_file_c = NULL if cor_file is None else cor_file.encode('utf-8')
+        cor_file_c = cor_file.encode('utf-8')
 
         err = rtc6.load_correction_file(cor_file_c, table_no, dim)
         if err == 0:
