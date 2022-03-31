@@ -42,7 +42,6 @@ from ..Cameras.CVCameraMan import CVCameraMan
 if _HAS_ANDOR:
     from ..Cameras.AndorCameraMan import AndorCameraMan
 
-
 try:
     from ..Cameras.FlyCapMan import FlyCapMan
     _HAS_FLY = True
@@ -1159,9 +1158,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
         if _HAS_ANDOR:
             try:
                 n_andor_cams = self.andor_man.get_device_count()
-                print(n_andor_cams)
                 for i in range(0, n_andor_cams):
-                    print(i)
                     if i == 0:
                         self.comboBox_CamSource.addItem(f"Andor Cam: 0", self.andor_man)
                         self.all_cams.append(self.andor_man)

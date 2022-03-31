@@ -13,89 +13,167 @@ from ..AndorSDK3.andor_sdk3 import Andor3Man
 
 
 class AndorCameraMan(CameraMan):
-    NEO_FEATURES = {
-        "AccumulateCount": {"type": "i", },
-        "AcquisitionStart": {"type": "c", },
-        "AcquisitionStop": {"type": "c", },
-        "AOIBinning": {"type": "enum", },
-        "AOIHeight": {"type": "i", },
-        "AOILeft": {"type": "i", },
-        "AOIStride": {"type": "i", },
-        "AOITop": {"type": "i", },
-        "AOIWidth": {"type": "i", },
-        "AuxiliaryOutSource": {"type": "enum", },
-        "Baseline": {"type": "i", },
-        "BitDepth": {"type": "enum", },
-        "BufferOverflowEvent": {"type": "i", },
-        "BytesPerPixel": {"type": "f", },
-        "CameraAcquiring": {"type": "b", },
-        "CameraModel": {"type": "s", },
-        "CameraName": {"type": "s", },
-        "CameraPresent": {"type": "b", },
-        "ControllerID": {"type": "s", },
-        "CycleMode": {"type": "enum", },
-        "DeviceCount": {"type": "i", "system": True},
-        "DeviceVideoIndex": {"type": "i", },
-        "ElectronicShutteringMode": {"type": "enum", },
-        "EventEnable": {"type": "b", },
-        "EventsMissedEvent": {"type": "i", },
-        "EventSelector": {"type": "enum", },
-        "ExposureTime": {"type": "f", },
-        "ExposureEndEvent": {"type": "i", },
-        "ExposureStartEvent": {"type": "i", },
-        "FanSpeed": {"type": "enum", },
-        "FastAOIFrameRateEnable": {"type": "b", },
-        "FirmwareVersion": {"type": "s", },
-        "FrameCount": {"type": "i", },
-        "FrameRate": {"type": "f", },
-        "FullAOIControl": {"type": "b", },
-        "ImageSizeBytes": {"type": "i", },
-        "InterfaceType": {"type": "s", },
-        "IOInvert": {"type": "b", },
-        "IOSelector": {"type": "enum", },
-        "LineScanSpeed": {"type": "f", },
-        "LogLevel": {"type": "enum", "system": True},
-        "MaxInterfaceTransferRate": {"type": "f", },
-        "MetadataEnable": {"type": "b", },
-        "MetadataFrame": {"type": "b", },
-        "MetadataTimestamp": {"type": "b", },
-        "MicrocodeVersion": {"type": "s", },
-        "MultitrackBinned": {"type": "b", },
-        "MultitrackCount": {"type": "i", },
-        "MultitrackEnd": {"type": "i", },
-        "MultitrackSelector": {"type": "i", },
-        "MultitrackStart": {"type": "i", },
-        "Overlap": {"type": "b", },
-        "PixelEncoding": {"type": "enum", },
-        "PixelHeight": {"type": "f", },
-        "PixelReadoutRate": {"type": "enum", },
-        "PixelWidth": {"type": "f", },
-        # "PreAmpGain": {"type": "enum", },
-        # "PreAmpGainChannel": {"type": "enum", },
-        # "PreAmpGainControl": {"type": "enum", },
-        # "PreAmpGainSelector": {"type": "enum", },
-        "ReadoutTime": {"type": "f", },
-        "RollingShutterGlobalClear": {"type": "b", },
-        "RowNExposureEndEvent": {"type": "i", },
-        "RowNExposureStartEvent": {"type": "i", },
-        "SensorCooling": {"type": "b", },
-        "SensorHeight": {"type": "i", },
-        "SensorTemperature": {"type": "f", },
-        "SensorWidth": {"type": "i", },
-        "SerialNumber": {"type": "s", },
-        "SimplePreAmpGainControl": {"type": "enum", },
-        "SoftwareTrigger": {"type": "c", },
-        "SoftwareVersion": {"type": "s", "system": True},
-        "SpuriousNoiseFilter": {"type": "b", },
-        "StaticBlemishCorrection": {"type": "b", },
-        # "TargetSensor Temperature": {"type": "f", },
-        "Temperature Control": {"type": "enum", },
-        "Temperature Status": {"type": "enum", },
-        "TimestampClock": {"type": "i", },
-        "TimestampClock Frequency": {"type": "i", },
-        "TimestampClock Reset": {"type": "c", },
-        "TriggerMode": {"type": "enum", },
-        "VerticallyCentreAOI": {"type": "b", }
+    ANDOR3_FEATURES = {
+        "AccumulateCount" : {"type": "i",},
+        # "AcquiredCount" : {"type": "i",},
+        "AcquisitionStart" : {"type": "c",},
+        "AcquisitionStop" : {"type": "c",},
+        "AlternatingReadoutDirection" : {"type": "b",},
+        "AOIBinning" : {"type": "enum",},
+        "AOIHBin" : {"type": "i",},
+        "AOIHeight" : {"type": "i",},
+        "AOILayout" : {"type": "enum",},
+        "AOILeft" : {"type": "i",},
+        "AOIStride" : {"type": "i",},
+        "AOITop" : {"type": "i",},
+        "AOIVBin" : {"type": "i",},
+        "AOIWidth" : {"type": "i",},
+        "AuxiliaryOutSource" : {"type": "enum",},
+        "AuxOutSourceTwo" : {"type": "enum",},
+        #"BackoffTemperatureOffset" : {"type": "f",},
+        "Baseline" : {"type": "i",},
+        "BitDepth" : {"type": "enum",},
+        "BufferOverflowEvent" : {"type": "i",},
+        "BytesPerPixel" : {"type": "f",},
+        "CameraAcquiring" : {"type": "b",},
+        "CameraDump" : {"type": "c",},
+        #"CameraFamily" : {"type": "s",},
+        #"CameraMemory" : {"type": "i",},
+        "CameraModel" : {"type": "s",},
+        "CameraName" : {"type": "s",},
+        "CameraPresent" : {"type": "b",},
+        #"ColourFilter" : {"type": "enum",},
+        "ControllerID" : {"type": "s",}, # Neo, Zyla (CameraLink)
+        #"CoolerPower" : {"type": "f",},
+        "CycleMode" : {"type": "enum",},
+        #"DDGInsertionDelay" : {"type": "enum",},
+        #"DDGIOCEnable" : {"type": "b",},
+        #"DDGIOCNumberOfPulses" : {"type": "i",},
+        #"DDGIOCPeriod" : {"type": "i",},
+        #"DDGOutputDelay" : {"type": "i",},
+        #"DDGOutputEnable" : {"type": "b",},
+        #"DDGOutputStepEnable" : {"type": "b",},
+        #"DDGOpticalWidthEnable" : {"type": "b",},
+        #"DDGOutputPolarity" : {"type": "enum",},
+        #"DDGOutputSelector" : {"type": "enum",},
+        #"DDGOutputWidth" : {"type": "i",},
+        #"DDGStepCount" : {"type": "i",},
+        #"DDGStepDelayCoefficientA" : {"type": "f",},
+        #"DDGStepDelayCoefficientB" : {"type": "f",},
+        #"DDGStepDelayMode" : {"type": "enum",},
+        #"DDGStepEnabled" : {"type": "b",},
+        #"DDGStepUploadProgress" : {"type": "i",},
+        #"DDGStepUploadRequired" : {"type": "b",},
+        #"DDGStepWidthCoefficientA" : {"type": "f",},
+        #"DDGStepWidthCoefficientB" : {"type": "f",},
+        #"DDGStepWidthMode" : {"type": "enum",},
+        #"DDGQueue" : {"type": "c",},
+        #"DDGStepUploadModeValues" : {"type": "c",},
+        #"DDR2Type" : {"type": "s",},
+        "DeviceCount" : {"type": "i", "system": True},
+        "DeviceVideoIndex" : {"type": "i",}, # Neo, Zyla (CameraLink)
+        #"DisableShutter" : {"type": "b",},
+        #"DriverVersion" : {"type": "s",},
+        "ElectronicShutteringMode" : {"type": "enum",},
+        "EventEnable" : {"type": "b",},
+        "EventsMissedEvent" : {"type": "i",},
+        "EventSelector" : {"type": "enum",},
+        "ExposedPixelHeight" : {"type": "i",},
+        "ExposureTime" : {"type": "f",},
+        "ExposureEndEvent" : {"type": "i",},
+        "ExposureStartEvent" : {"type": "i",},
+        #"ExternalIOReadout" : {"type": "b",},
+        "ExternalTriggerDelay" : {"type": "f",},
+        "FanSpeed" : {"type": "enum",},
+        "FastAOIFrameRateEnable" : {"type": "b",},
+        "FirmwareVersion" : {"type": "s",},
+        "ForceShutterOpen" : {"type": "b",},
+        "FrameCount" : {"type": "i",},
+        #"FrameInterval" : {"type": "f",},
+        #"FrameIntervalTiming" : {"type": "b",},
+        "FrameRate" : {"type": "f",},
+        "FullAOIControl" : {"type": "b",},
+        #"GateMode" : {"type": "enum",},
+        #"HeatSinkTemperature" : {"type": "f",},
+        "ImageSizeBytes" : {"type": "i",},
+        #"InputVoltage" : {"type": "f",},
+        "InterfaceType" : {"type": "s",},
+        #"IOControl" : {"type": "f",},
+        #"IODirection" : {"type": "enum",},
+        #"IOState" : {"type": "b",},
+        "IOInvert" : {"type": "b",},
+        "IOSelector" : {"type": "enum",},
+        #"IRPreFlashEnable" : {"type": "b",},
+        #"KeepCleanEnable" : {"type": "b",},
+        #"KeepCleanPostExposure Enable" : {"type": "b",},
+        "LineScanSpeed" : {"type": "f",},
+        "LUTIndex" : {"type": "i",},
+        "LUTValue" : {"type": "i",},
+        "MaxInterfaceTransferRate" : {"type": "f",},
+        #"MCPGain" : {"type": "i",},
+        #"MCPIntelligate" : {"type": "b",},
+        #"MCPVoltage" : {"type": "i",},
+        "MetadataEnable" : {"type": "b",},
+        "MetadataFrame" : {"type": "b",},
+        "MetadataTimestamp"  : {"type": "b",},
+        #"MicrocodeVersion" : {"type": "s",},
+        "MultitrackBinned" : {"type": "b",},
+        "MultitrackCount" : {"type": "i",},
+        "MultitrackEnd" : {"type": "i",},
+        "MultitrackSelector" : {"type": "i",},
+        "MultitrackStart" : {"type": "i",},
+        "Overlap" : {"type": "b",},
+        "PixelCorrection" : {"type": "enum",},
+        "PixelEncoding" : {"type": "enum",},
+        "PixelHeight" : {"type": "f",},
+        "PixelReadoutRate" : {"type": "enum",},
+        "PixelWidth" : {"type": "f",},
+        #"PortSelector" : {"type": "i",},
+        #"PreAmpGain" : {"type": "enum",},
+        #"PreAmpGainChannel" : {"type": "enum",},
+        #"PreAmpGainControl" : {"type": "enum",},
+        #"PreAmpGainValue" : {"type": "i",},
+        #"PreAmpGainSelector" : {"type": "enum",},
+        #"PreAmpOffsetValue" : {"type": "i",},
+        #"PreTriggerEnabled" : {"type": "b",},
+        "ReadoutTime" : {"type": "f",},
+        "RollingShutterGlobalClear" : {"type": "b",},
+        "RowNExposureEndEvent" : {"type": "i",},
+        "RowNExposureStartEvent" : {"type": "i",},
+        "RowReadTime" : {"type": "f",},
+        "ScanSpeedControlEnable" : {"type": "b",},
+        "SensorCooling" : {"type": "b",},
+        "SensorHeight" : {"type": "i",},
+        #"SensorModel" : {"type": "s",},
+        "SensorReadoutMode" : {"type": "enum",},
+        #"SensorType" : {"type": "enum",},
+        "SensorTemperature" : {"type": "f",},
+        "SensorWidth" : {"type": "i",},
+        "SerialNumber" : {"type": "s",},
+        #"ShutterAmpControl" : {"type": "b",},
+        #"ShutterMode" : {"type": "enum",},
+        "ShutterOutputMode" : {"type": "enum",},
+        #"ShutterState" : {"type": "b",},
+        #"ShutterStrobePeriod" : {"type": "f",},
+        #"ShutterStrobePosition" : {"type": "f",},
+        "ShutterTransferTime" : {"type": "f",},
+        "SimplePreAmpGainControl" : {"type": "enum",},
+        "SoftwareTrigger" : {"type": "c",},
+        "SoftwareVersion" : {"type": "s",},
+        "SpuriousNoiseFilter" : {"type": "b",},
+        "StaticBlemishCorrection" : {"type": "b",},
+        "Synchronous Triggering" : {"type": "b",},
+        #"TargetSensor Temperature" : {"type": "f",},
+        "Temperature Control" : {"type": "enum",},
+        "Temperature Status" : {"type": "enum",},
+        "TimestampClock" : {"type": "i",},
+        "TimestampClock Frequency" : {"type": "i",},
+        "TimestampClock Reset" : {"type": "c",},
+        #"TransmitFrames" : {"type": "b",},
+        "TriggerMode" : {"type": "enum",},
+        #"UsbProductId" : {"type": "i",},
+        #"UsbDeviceId" : {"type": "i",},
+        "VerticallyCentreAOI" : {"type": "b",},
     }
 
     camera_prop_changed = pyqtSignal(list, name="CameraPropChanged")
@@ -109,13 +187,14 @@ class AndorCameraMan(CameraMan):
         self._frame_height = 0
         self._frame_stride = 0
         self._dev_h = None
+        self._pixel_encoding = None
 
         self.features = {}
 
         self.config_window = None
         self.config_window_ui_components = []
-        # Only NEO Camera
-        self._a3man.load_feature_map(AndorCameraMan.NEO_FEATURES)
+        # No Apogee/iStar-sCMOS only feature, check the doc
+        self._a3man.load_feature_map(AndorCameraMan.ANDOR3_FEATURES)
 
         self.camera_prop_changed.connect(self._update_ui_values)
 
@@ -125,10 +204,11 @@ class AndorCameraMan(CameraMan):
     def open(self):
         self._a3man.open_dev(self._dev_id)
         self._dev_h = self._a3man.get_dev_handle()
-        self._set_features(AndorCameraMan.NEO_FEATURES, True)
+        self._set_features(AndorCameraMan.ANDOR3_FEATURES, True)
         self._a3man.register_feature_cb("AOIWidth", lambda feature_name: self._frame_width_changed())
         self._a3man.register_feature_cb("AOIHeight", lambda feature_name: self._frame_height_changed())
         self._a3man.register_feature_cb("AOIStride", lambda feature_name: self._frame_stride_changed())
+        self._a3man.register_feature_cb('PixelEncoding', lambda feature_name: self._pixel_encoding_changed())
 
     def is_open(self):
         return self._a3man.is_open()
@@ -164,6 +244,9 @@ class AndorCameraMan(CameraMan):
     def _frame_stride_changed(self):
         self._frame_stride = self._a3man.get_i_feature("AOIStride")
 
+    def _pixel_encoding_changed(self):
+        self._pixel_encoding = self._a3man.get_e_feature_str("PixelEncoding")
+
     def grab_frame(self, n_channel_index: int):
         # n_channel_index is ignored as currently only mono cam is supported
         cur_buffer_size = self._a3man.get_buffer_size(self._buffer_id)
@@ -173,21 +256,13 @@ class AndorCameraMan(CameraMan):
 
         self._a3man.queue_buffer(self._buffer_id)
         self._a3man.send_command("AcquisitionStart")
-        t0 = time.time() * 1000
-        buffer_id, buffer_rd_size = self._a3man.wait_buffer(30000)  # wait for 1s
-        t1 = time.time() * 1000
-        print(f"Waited {t1 - t0} ms")
+        buffer_id, buffer_rd_size = self._a3man.wait_buffer(30000)  # wait for 30s
+        raw_bytes = self._a3man.get_data_from_buffer(buffer_id, buffer_rd_size)
         self._a3man.send_command("AcquisitionStop")
         self._a3man.flush()
-        t2 = time.time() * 1000
-        print(f"{t2 - t1} ms to stop and flush")
-        raw_bytes = self._a3man.get_data_from_buffer(buffer_id, buffer_rd_size)
-        t3 = time.time() * 1000
-        print(f"{t3 - t2} ms to process")
-        pixel_encoding = self._a3man.get_e_feature_str("PixelEncoding")
         np_arr = Andor3Man.convert_bytes_to_numpy_array(
             raw_bytes,
-            pixel_encoding,
+            self._pixel_encoding,
             self._frame_stride,
             self._frame_width,
             self._frame_height
@@ -218,7 +293,7 @@ class AndorCameraMan(CameraMan):
                         continue
 
                     self.features[feature]['b_writable'] = self._a3man.is_feature_writable(feature)
-                elif feature_type == 'b':
+                elif feature_type == 'b':    
                     self.features[feature]['b_readable'] = self._a3man.is_feature_readable(feature)
                     if not self.features[feature]['b_readable']:
                         continue
@@ -466,7 +541,7 @@ class AndorCameraMan(CameraMan):
                 pushbutton = QtWidgets.QPushButton(scrollarea_contents)
                 pushbutton.setText(f"CMD: {feature}")
                 self.config_window_ui_components.append(pushbutton)
-                pushbutton.clicked.connect(lambda a, f=feature: self._a3man.send_cmd(f))
+                pushbutton.clicked.connect(lambda a, f=feature: self._command_button_pushed(f))
                 self.features[feature]['ui_widget'] = pushbutton
                 features_grid_layout.addWidget(pushbutton, item_index_row, item_index_col, 1, 2)
                 item_index += 1
@@ -477,6 +552,16 @@ class AndorCameraMan(CameraMan):
         features_grid_layout.setVerticalSpacing(6)
 
         self._update_ui_values()
+
+    @QtCore.pyqtSlot()
+    def _command_button_pushed(self, feature):
+        try:
+            btn = self.sender()
+            btn.setStyleSheet("")
+            self._a3man.send_command(feature)
+            btn.setStyleSheet("background: green")
+        except Exception as e:
+            btn.setStyleSheet("background: red")
 
     def _update_ui_values(self, feature_name: str or list or tuple = None):
         features_update = []
@@ -567,6 +652,7 @@ class AndorCameraMan(CameraMan):
                     feature_index = self._a3man.get_e_feature_index(feature)
                     if ui_comp.currentIndex() != feature_index:
                         ui_comp.blockSignals(True)
+                        ui_comp.clear()
                         for i in range(0, n_options):
                             ui_comp.addItem(f"{i}: {self.features[feature]['options'][i]}", i)
                         ui_comp.setCurrentIndex(feature_index)

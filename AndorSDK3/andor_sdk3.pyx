@@ -28,7 +28,7 @@ feature_callback_table = {}
 # Warning: 32bit Python build will crash
 cdef int feature_cb(andor3.AT_H handle, const andor3.AT_WC* feature, void* context) with gil:
     global feature_callback_table
-    andor3_logger.info(f"{feature} notified", extra={"component": "Andor3"})
+    andor3_logger.debug(f"{feature} notified", extra={"component": "Andor3"})
     if handle in feature_callback_table.keys():
         if feature in feature_callback_table[handle].keys():
             for cb in feature_callback_table[handle][feature]:
@@ -515,10 +515,10 @@ cdef class Andor3Man:
 
         if len(buffer) < stride * height:
             buffer_fixed = buffer + "\0"*(stride*height - len(buffer))
-            andor3_logger.warning(f"Buffer size {len(buffer)} is less than excepted size {stride*height}, padding 0", extra={"component": "Andor3"})
+            andor3_logger.warning(f"Buffer size {len(buffer)} is less than expected size {stride*height}, padding 0", extra={"component": "Andor3"})
         elif len(buffer) > stride * height:
             buffer_fixed = buffer[:stride * height]
-            andor3_logger.warning(f"Buffer size {len(buffer)} is larger than excepted size {stride*height}, truncating", extra={"component": "Andor3"})
+            andor3_logger.warning(f"Buffer size {len(buffer)} is larger than expected size {stride*height}, truncating", extra={"component": "Andor3"})
         else:
             buffer_fixed = buffer
 

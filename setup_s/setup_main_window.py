@@ -32,7 +32,7 @@ setup_main_logger_ch = logging.StreamHandler()
 setup_main_logger_ch.setFormatter(setup_main_logger_formatter)
 setup_main_logger.addHandler(setup_main_logger_ch)
 
-_HAS_ANDOR = False
+_HAS_ANDOR = True
 from ..Cameras.CVCameraMan import CVCameraMan
 if _HAS_ANDOR:
     from ..Cameras.AndorCameraMan import AndorCameraMan
@@ -177,9 +177,7 @@ class SetupMainWindow(Ui_SetupMainWindow):
         if _HAS_ANDOR:
             try:
                 n_andor_cams = self.andor_man.get_device_count()
-                print(n_andor_cams)
                 for i in range(0, n_andor_cams):
-                    print(i)
                     if i == 0:
                         self.comboBox_CamSource.addItem(f"Andor Cam: 0", self.andor_man)
                         self.all_cams.append(self.andor_man)
