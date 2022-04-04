@@ -2,8 +2,10 @@
 
 import serial
 import serial.tools.list_ports
+import io
 import pyvisa
 import numpy as np
+from typing import Union
 from threading import Lock
 from PyQt5.QtWidgets import QWidget
 from .proscan3_config_ui import Ui_ProScan3_Config_Window
@@ -55,9 +57,11 @@ class ProScan3Man(QObject):
     closed = pyqtSignal()
     axis_value_changed = pyqtSignal(int, float, name='axisValueChanged')
 
+    AXIS_ID = { "X": 1, "Y": 2, "Z": 3, "A": 4, "F3": 4, "F1": 5, "F2": 6, "F4": 7, "F5": 8, "F6": 9 }
+
     _FAKE_DEV = False
 
-    def __init__(self, visa_addr: str = None,
+    def __init__(self,
                  serial_name=None,
                  baudrate=9600,
                  parity=serial.PARITY_NONE,
@@ -69,34 +73,11 @@ class ProScan3Man(QObject):
         self.ser_parity = parity
         self.ser_stopbits = stopbits
 
-        self.visa_rm = pyvisa.ResourceManager()
-        self.visa_dev = None
-        self.visa_inst = None
-        self.com_mode = 'rs232'
-        self.com_end = '\r'
-
-        if visa_addr is not None:
-            self.visa_dev = visa_addr
-            self.visa_inst = self.visa_rm.open_resource(self.visa_dev)
-            if not ProScan3Man._FAKE_DEV:
-                self.output_interface(False, ProScan3Man.OUTPUT_INTERFACE_GPIB)
-                self.gpib_override_remote_state(False, ProScan3Man.GPIB_OVERRIDE_REMOTE_STATE_ON)
-
         if self.com_dev is None:
             self.ser = None
+            self.sio = None
         else:
-            self.ser = serial.Serial(port=serial_name,
-                                     baudrate=baudrate,
-                                     bytesize=serial.EIGHTBITS,
-                                     parity=parity,
-                                     stopbits=stopbits)
-            self.ser.inter_byte_timeout = 0.1  # when device failed to send next byte within 0.1 read will exit
-            if not self.ser.is_open:
-                raise IOError(f"Failed to open the device {self.com_dev}")
-
-            if not ProScan3Man._FAKE_DEV:
-                self.output_interface(False, ProScan3Man.OUTPUT_INTERFACE_RS232)
-                self.gpib_override_remote_state(False, ProScan3Man.GPIB_OVERRIDE_REMOTE_STATE_ON)
+            self.open()
 
         if uart_lock is None:
             self.ser_lock = Lock()
@@ -107,640 +88,57 @@ class ProScan3Man(QObject):
         self.config_window = None
 
     def open(self):
-        if self.com_mode == 'rs232':
-            if self.ser is not None and self.ser.is_open:
-                self.ser.close()
+        self.close()
 
-            self.ser = serial.Serial(port=self.com_dev, baudrate=self.ser_baudrate, bytesize=serial.EIGHTBITS,
-                                     parity=self.ser_parity, stopbits=self.ser_stopbits)
+        self.ser = serial.Serial(port=self.com_dev, baudrate=self.ser_baudrate, bytesize=serial.EIGHTBITS,
+                                 parity=self.ser_parity, stopbits=self.ser_stopbits, timeout=10)
 
-            self.ser.inter_byte_timeout = 0.1
+        self.ser.inter_byte_timeout = 0.1
 
-            if not self.ser.is_open:
-                raise IOError(f"Failed to open the device {self.com_dev}")
-            else:
-                self.output_interface(False, ProScan3Man.OUTPUT_INTERFACE_RS232)
-                self.gpib_override_remote_state(False, ProScan3Man.GPIB_OVERRIDE_REMOTE_STATE_ON)
-                self.com_end = '\r'
-                self.opened.emit()
-        elif self.com_mode == 'gpib':
-            if self.visa_inst is not None:
-                self.visa_inst.close()
-                self.visa_inst = self.visa_rm.open_resource(self.visa_dev)
-                self.com_end = '\n'
-                self.output_interface(False, ProScan3Man.OUTPUT_INTERFACE_GPIB)
-                self.gpib_override_remote_state(False, ProScan3Man.GPIB_OVERRIDE_REMOTE_STATE_ON)
-        else:
-            raise ValueError(f"Unknown type of mode {self.com_mode}")
+        if not self.ser.is_open:
+            raise IOError(f"Failed to open the device {self.com_dev}")
+        self.sio = io.TextIOWrapper(io.BufferedRWPair(self.ser, self.ser), newline="\r", encoding="ascii")
+        self.opened.emit()
 
     def close(self):
         if self.ser is not None and self.ser.is_open:
+            if self.ser is not None:
+                self.sio.close()
             self.ser.close()
-        if self.visa_inst is not None:
-            self.visa_inst.close()
-            self.visa_inst = None
-        self.closed.emit()
+            self.closed.emit()
         self.ser = None
+        self.sio = None
 
     def is_open(self):
-        if self.com_mode == 'rs232':
-            return self.ser is not None and self.ser.is_open
-        elif self.com_mode == 'gpib':
-            return self.visa_inst is not None
+        return self.ser is not None and self.ser.is_open
 
-    def send_cmd(self, cmd: str, b_query: bool, *args):
+    WAIT_FOR_1LINE=1
+    WAIT_FOR_END=2
+    def send_cmd(self, cmd: str, wait_for: int, *args):
         global ProScan3_logger
-        cmd_str = cmd + ('? ' if b_query else ' ') + \
-                  ','.join([str(arg) for arg in args if arg is not None]) + \
-                  (self.com_end if self.com_mode == 'rs232' else '')
+        cmd_str = cmd + " " + ','.join([str(arg) for arg in args if arg is not None]) + "\r"
 
-        cmd_str_replaced = cmd_str.replace("\r", "\\r").replace("\n", "\\n")
+        cmd_str_replaced = cmd_str.replace("\r", "\\r")
         ProScan3_logger.debug(f"Sending command <{cmd_str_replaced}>", extra={"component": "ProScan3"})
 
-        if self.com_mode == 'rs232':
-            with self.ser_lock:
-                self.ser.write(cmd_str.encode('ascii'))
-                if b_query:
-                    ans = self.ser.read_until(terminator=self.com_end.encode('ascii')).decode('ascii')
-                    ans_replaced = ans.replace("\r", "\\r")
-                    ProScan3_logger.debug(f"Got answer: <{ans_replaced}>", extra={"component": "ProScan3"})
-                    return ans
-                else:
-                    return None
-        elif self.com_mode == 'gpib':
-            if b_query:
-                return self.visa_inst.query(cmd_str)
+        with self.ser_lock:
+            self.sio.write(cmd_str)
+            self.sio.flush()
+            if wait_for == ProScan3man.WAIT_FOR_1LINE:
+                res = sio.readline()
+            elif wait_for == ProScan3man.WAIT_FOR_END:
+                res = ""
+                while True:
+                    l = sio.readline()
+                    res += l
+                    if l == "END\r":
+                        break
             else:
-                self.visa_inst.write(cmd_str)
-
-    def ref_phase_shift(self, b_query: bool = True, x: float = None):
-        if ProScan3Man._FAKE_DEV:
-            return np.random.rand(1)[0]
-
-        res = self.send_cmd("PHAS", b_query, x)
-        if b_query:
-            return float(res)
-
-    REF_SOURCE_INTERNAL = 1
-    REF_SOURCE_EXTERNAL = 0
-
-    def ref_source(self, b_query: bool = True, i: int = None):
-        if ProScan3Man._FAKE_DEV:
-            return 1
-
-        res = self.send_cmd("FMOD", b_query, i)
-        if b_query:
-            return int(res)
-
-    def ref_frequency(self, b_query: bool = True, f: float = None):
-        if ProScan3Man._FAKE_DEV:
-            return 1000
-
-        res = self.send_cmd("FREQ", b_query, f)
-        if b_query:
-            return float(res)
-
-    REF_TRIGGER_SLOPE2SINE = 0
-    REF_TRIGGER_TTL_RISING = 1
-    REF_TRIGGER_TTL_FALLING = 2
-
-    def ref_trigger(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("RSLP", b_query, i)
-        if b_query:
-            return int(res)
-
-    def detection_harmonic(self, b_query: bool = True, i: int = None):
-        """1 <= i <= 19999 and i*f <= 102kHz"""
-        res = self.send_cmd("HARM", b_query, i)
-        if b_query:
-            return int(res)
-
-    def sine_output_amp(self, b_query: bool = True, x: float = None):
-        """0.004 <= x <= 5.000"""
-        res = self.send_cmd("SLVL", b_query, x)
-        if b_query:
-            return float(res)
-
-    INPUT_CFG_A = 0
-    INPUT_CFG_A_B = 1
-    INPUT_CFG_I_1M_OHM = 2
-    INPUT_CFG_I_100M_OHM = 3
-
-    def input_config(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("ISRC", b_query, i)
-        if b_query:
-            return int(res)
-
-    INPUT_SHIELD_GND_FLOAT = 0
-    INPUT_SHIELD_GND_GROUND = 1
-
-    def input_shield_gnd(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("IGND", b_query, i)
-        if b_query:
-            return int(res)
-
-    INPUT_COUPLING_AC = 0
-    INPUT_COUPLING_DC = 1
-
-    def input_coupling(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("ICPL", b_query, i)
-        if b_query:
-            return int(res)
-
-    LINE_NOTCH_FILTERS_OUT = 0
-    LINE_NOTCH_FILTERS_LINEIN = 1
-    LINE_NOTCH_FILTERS_2XLINEIN = 2
-    LINE_NOTCH_FILTERS_BOTHIN = 3
-
-    def line_notch_filters(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("ILIN", b_query, i)
-        if b_query:
-            return int(res)
-
-    SENSITIVITY_LST = ("2 nV/fA", "5 nV/fA", "10 nV/fA", "20 nV/fA",
-                       "50 nV/fA", "100 nV/fA", "200 nV/fA", "500 nV/fA",
-                       "1 uV/pA", "2 uV/pA", "5 uV/pA", "10 uV/pA", "20 uV/pA",
-                       "50 uV/pA", "100 uV/pA", "200 uV/pA", "500 uV/pA",
-                       "1 mV/nA", "2 mV/nA", "5 mV/nA", "10 mV/nA",
-                       "20 mV/nA", "50 mV/nA", "100 mV/nA", "200 mV/nA", "500 mV/nA", "1 V/uA")
-
-    @staticmethod
-    def sensitivity_str2int(sens: str):
-        if sens not in ProScan3Man.SENSITIVITY_LST:
-            return None
-        else:
-            return ProScan3Man.SENSITIVITY_LST.index(sens)
-
-    @staticmethod
-    def sensitivity_int2str(sens_i: int):
-        if 0 <= sens_i < len(ProScan3Man.SENSITIVITY_LST):
-            return ProScan3Man.SENSITIVITY_LST[sens_i]
-        else:
-            return None
-
-    def sensitivity(self, b_query: bool = True, i: int = None):
-        """ 2nV (0) <= i <= 1V (26)"""
-        if ProScan3Man._FAKE_DEV:
-            return 4
-
-        res = self.send_cmd("SENS", b_query, i)
-        if b_query:
-            return int(res)
-
-    DYN_RESERVE_MODE_HIGHRESERVE = 0
-    DYN_RESERVE_MODE_NORMAL = 1
-    DYN_RESERVE_MODE_LOWNOISE = 2
-
-    def dyn_reserve_mode(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("RMOD", b_query, i)
-        if b_query:
-            return int(res)
-
-    TIME_CONSTANT_LST = ("10 us", "30 us", "100 us", "300 us", "1 ms",
-                         "3 ms", "10 ms", "30 ms", "100 ms", "300 ms",
-                         "1 s", "3 s", "10 s", "30 s", "100 s",
-                         "300 s", "1 ks", "3 ks", "10 ks", "30 ks")
-
-    @staticmethod
-    def time_constant_str2int(tcons: str):
-        if tcons not in ProScan3Man.TIME_CONSTANT_LST:
-            return None
-        else:
-            return ProScan3Man.TIME_CONSTANT_LST.index(tcons)
-
-    @staticmethod
-    def time_constant_int2str(tcons_i: int):
-        if 0 <= tcons_i < len(ProScan3Man.TIME_CONSTANT_LST):
-            return ProScan3Man.TIME_CONSTANT_LST[tcons_i]
-        else:
-            return None
-
-    def time_constant(self, b_query: bool = True, i: int = None):
-        """
-        use ProScan3Man.time_constant_str2int, and ProScan3Man.time_constant_int2str
-        for the parameter
-        """
-        if ProScan3Man._FAKE_DEV:
-            return 5
-
-        res = self.send_cmd("OFLT", b_query, i)
-        if b_query:
-            return int(res)
-
-    LOW_PASS_FILTER_SLOPE_6DB_OCT = 0
-    LOW_PASS_FILTER_SLOPE_12DB_OCT = 1
-    LOW_PASS_FILTER_SLOPE_18DB_OCT = 2
-    LOW_PASS_FILTER_SLOPE_24DB_OCT = 3
-
-    def low_pass_filter_slope(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("OFSL", b_query, i)
-        if b_query:
-            return int(res)
-
-    SYNC_FILTER_OFF = 0
-    SYNC_FILTER_ON_BELOW_200HZ = 1
-
-    def sync_filter(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("SYNC", b_query, i)
-        if b_query:
-            return int(res)
-
-    DISPLAY_CH_CH1 = 1
-    DISPLAY_CH_CH2 = 2
-    DISPLAY_CH_DIS_XY = 0
-    DISPLAY_CH_DIS_R_THETA = 1
-    DISPLAY_CH_DIS_XNYN = 2
-    DISPLAY_CH_DIS_AUX1_3 = 3
-    DISPLAY_CH_DIS_AUX2_4 = 4
-    DISPLAY_CH_RATIO_DIS_NONE = 0
-    DISPLAY_CH_RATIO_DIS_AUX1_3 = 1
-    DISPLAY_CH_RATIO_DIS_AUX2_4 = 2
-
-    def display_ch1_2(self, ch: int, b_query: bool = True, dis: int = None, ratio_dis: int = None):
-        res = self.send_cmd("DDEF", b_query, ch, dis, ratio_dis)
-        if b_query:
-            return [int(x) for x in res.split(",") if x != '']
-
-    OUTPUT_SOURCE_CH_CH1 = 1
-    OUTPUT_SOURCE_CH_CH2 = 2
-    OUTPUT_SOURCE_DIS_X_Y = 1
-    OUTPUT_SOURCE_DIS_DISPLAY = 0
-
-    def output_source(self, ch: int, b_query: bool = True, dis: int = None):
-        res = self.send_cmd("FPOP", b_query, ch, dis)
-        if b_query:
-            return int(res)
-
-    OFFSET_EXPAND_AXIS_X = 1
-    OFFSET_EXPAND_AXIS_Y = 2
-    OFFSET_EXPAND_AXIS_R = 3
-    OFFSET_EXPAND_EXPAND1 = 0
-    OFFSET_EXPAND_EXPAND10 = 1
-    OFFSET_EXPAND_EXPAND100 = 2
-
-    def offset_expand(self, axis: int, b_query: bool = True, offset_percent: float = None, expand: int = None):
-        """ -105.00 <= offset_percent <= 105.00"""
-        res = self.send_cmd("OEXP", b_query, axis, offset_percent, expand)
-        if b_query:
-            res_part = res.split(",")
-            return [float(res_part[0]), int(res_part[1])]
-
-    AUTO_OFFSET_AXIS_X = 1
-    AUTO_OFFSET_AXIS_Y = 2
-    AUTO_OFFSET_AXIS_R = 3
-
-    def auto_offset(self, axis: int):
-        self.send_cmd("AOFF", False, axis)
-
-    def get_aux_input(self, which: int):
-        """
-        Get AUX input voltage
-        :param which: [1,4] Aux Input
-        :return Aux input voltage in Volts, 1/3mV resolution
-        """
-        res = self.send_cmd("OAUX", True, which)
-        return float(res)
-
-    def aux_output_voltage(self, which: int, b_query: bool = True, vols: float = None):
-        """
-        Set or query AUX output voltage
-        :param which: [1,4]
-        :param b_query:
-        :param vols: output voltage in Volts (nearest mV)
-        :return: if b_query then return output voltage
-        """
-        """ -10.5 <= vols <= 10.5"""
-        res = self.send_cmd("AUXV", b_query, which, vols)
-        if b_query:
-            return float(res)
-
-    OUTPUT_INTERFACE_RS232 = 0
-    OUTPUT_INTERFACE_GPIB = 1
-
-    def output_interface(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("OUTX", b_query, i)
-        if b_query:
-            return int(res)
-
-    GPIB_OVERRIDE_REMOTE_STATE_OFF = 0
-    GPIB_OVERRIDE_REMOTE_STATE_ON = 1
-
-    def gpib_override_remote_state(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("OVRM", b_query, i)
-        if b_query:
-            return int(res)
-
-    KEY_CLICK_OFF = 0
-    KEY_CLICK_ON = 1
-
-    def key_click(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("KCLK", b_query, i)
-        if b_query:
-            return int(res)
-
-    ALARMS_OFF = 0
-    ALARMS_ON = 1
-
-    def alarms(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("ALRM", b_query, i)
-        if b_query:
-            return int(res)
-
-    def save_cur_setup(self, i: int):
-        self.send_cmd("SSET", False, i)
-
-    def load_setup(self, i: int):
-        self.send_cmd("RSET", False, i)
-
-    def auto_gain(self):
-        self.send_cmd("AGAN", False)
-
-    def auto_reserve(self):
-        self.send_cmd("ARSV", False)
-
-    def auto_phase(self):
-        self.send_cmd("APHS", False)
-
-    DATA_SAMPLE_RATE_LST = ("62.5 mHz", "125 mHz", "250 mHz", "500 mHz",
-                            "1 Hz", "2 Hz", "4 Hz", "8 Hz", "16 Hz",
-                            "32 Hz", "64 Hz", "128 Hz", "256 Hz",
-                            "512 Hz", "Trigger")
-
-    @staticmethod
-    def data_sample_rate_str2int(srt: str):
-        if srt not in ProScan3Man.DATA_SAMPLE_RATE_LST:
-            return None
-        else:
-            return ProScan3Man.DATA_SAMPLE_RATE_LST.index(srt)
-
-    @staticmethod
-    def data_sample_rate_int2str(srt_i: int):
-        if 0 <= srt_i < len(ProScan3Man.DATA_SAMPLE_RATE_LST):
-            return ProScan3Man.DATA_SAMPLE_RATE_LST[srt_i]
-        else:
-            return None
-
-    def data_sample_rate(self, b_query: bool = True, i: int = None):
-        """62.5mHz (0) <= i <= 512Hz (13) / Tigger (14)"""
-        res = self.send_cmd("SRAT", b_query, i)
-        if b_query:
-            return int(res)
-
-    DATA_SCAN_MODE_SHOT = 0
-    DATA_SCAN_MODE_LOOP = 1
-
-    def data_scan_mode(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("SEND", b_query, i)
-        if b_query:
-            return int(res)
-
-    def trigger(self):
-        self.send_cmd("TRIG", False)
-
-    TRIGGER_STARTS_SCAN_NO = 0
-    TRIGGER_STARTS_SCAN_YES = 1
-
-    def trigger_starts_can(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("TSTR", b_query, i)
-        if b_query:
-            return int(res)
-
-    def start_scan(self):
-        self.send_cmd("STRT", False)
-
-    def pause_scan(self):
-        self.send_cmd("PAUS", False)
-
-    def reset_scan(self):
-        self.send_cmd("REST", False)
-
-    GET_AXIS_VALUE_X = 1
-    GET_AXIS_VALUE_Y = 2
-    GET_AXIS_VALUE_R = 3
-    GET_AXIS_VALUE_THETA = 4
-
-    def get_axis_value(self, which: int):
-        if ProScan3Man._FAKE_DEV:
-            return np.random.rand(1)[0] + which
-
-        res = float(self.send_cmd("OUTP", True, which))
-        self.axis_value_changed.emit(which, res)
-        return res
-
-    GET_DISPLAY_VALUE_1 = 1
-    GET_DISPLAY_VALUE_2 = 2
-
-    def get_display_value(self, which: int):
-        res = self.send_cmd("OUTR", True, which)
-        return float(res)
-
-    GET_PARAMETER_X = 1
-    GET_PARAMETER_Y = 2
-    GET_PARAMETER_R = 3
-    GET_PARAMETER_THETA = 4
-    GET_PARAMETER_AUX_IN1 = 5
-    GET_PARAMETER_AUX_IN2 = 6
-    GET_PARAMETER_AUX_IN3 = 7
-    GET_PARAMETER_AUX_IN4 = 8
-    GET_PARAMETER_REF_FREQ = 9
-    GET_PARAMETER_CH1_DISPLAY = 10
-    GET_PARAMETER_CH2_DISPLAY = 11
-
-    def get_parameters_value(self, i: int, j: int, k: int = None, l: int = None, m: int = None, n: int = None):
-        res = self.send_cmd("SNAP", True, i, j, k, l, m, n)
-        values = [float(x) for x in res.split(",") if x != '']
-        axes = [wh for wh in (i,j,k,l,m,n) if wh is not None]
-        for index in range(0, len(axes)):
-            self.axis_value_changed.emit(axes[index], values[index])
-        return values
-
-    def get_number_in_display_buffer(self):
-        res = self.send_cmd("SPTS", True)
-        return int(res)
-
-    def get_points_ascii(self, dis: int, start_index: int, n_points: int):
-        res = self.send_cmd("TRCA", True, dis, start_index, n_points)
-        return [float(x) for x in res.split(",") if x != '']
-
-    def get_points_ieee_float(self, dis: int, start_index: int, n_points: int):
-        cmd_str = f'TRCB? {dis},{start_index},{n_points}' + (self.com_end if self.com_mode == 'rs232' else '')
-
-        if self.com_mode == 'rs232':
-            self.ser.write(cmd_str.encode('ascii'))
-            raw_bytes = self.ser.read(n_points * 4)
-        elif self.com_mode == 'gpib':
-            raw_bytes = self.visa_inst.read_raw()
-        else:
-            raw_bytes = b''
-        
-        res = np.frombuffer(raw_bytes, dtype='<f4')
-        return res
-
-    @staticmethod
-    def non_normalized_float_from_bytes(raw_bytes: bytes):
-        values = []
-        for i in range(0, len(raw_bytes)-3, 4):
-            mantissa = np.frombuffer(raw_bytes[i:i+2], dtype='<i2')[0]
-            exp = raw_bytes[i+2]
-            byte3 = raw_bytes[i+3]   # should always be 0
-            values.append(mantissa * pow(2, exp-124))
-
-        return values
-
-    def get_points_binary_float(self, dis: int, start_index: int, n_points: int):
-        cmd_str = f'TRCL? {dis},{start_index},{n_points}' + (self.com_end if self.com_mode == 'rs232' else '')
-        if self.com_mode == 'rs232':
-            self.ser.write(cmd_str.encode('ascii'))
-            raw_bytes = self.ser.read(n_points * 4)
-        elif self.com_mode == 'gpib':
-            raw_bytes = self.visa_inst.read_raw()
-        else:
-            raw_bytes = b''
-        
-        return ProScan3Man.non_normalized_float_from_bytes(raw_bytes)
-
-    FAST_DATA_TRANSFER_MODE_ON = 1
-    FAST_DATA_TRANSFER_MODE_OFF = 0
-
-    def fast_data_transfer_mode(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("FAST", b_query, i)
-        if b_query:
-            return int(res)
-
-    def start_scan_500ms_delay(self):
-        self.send_cmd("STRD", False)
-
-    def reset_default_config(self):
-        self.send_cmd("*RST", False)
-
-    def get_device_id(self):
-        return self.send_cmd("*IDN", True).decode('ascii')
-
-    LOCAL_REMOTE_STATE_LOCAL = 0
-    LOCAL_REMOTE_STATE_REMOTE = 1
-    LOCAL_REMOTE_STATE_LOCAL_LOCKOUT = 2
-
-    def local_remote_state(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("LOCL", b_query, i)
-        if b_query:
-            return int(res)
-
-    def clear_status(self):
-        """
-        Clears all status register, status enable register is not cleared
-        :return:
-        """
-        self.send_cmd("*CLS", False)
-
-    STANDARD_EVENT_STATUS_INP = 0
-    STANDARD_EVENT_STATUS_QRY = 2
-    STANDARD_EVENT_STATUS_EXE = 4
-    STANDARD_EVENT_STATUS_CMD = 5
-    STANDARD_EVENT_STATUS_URQ = 6
-    STANDARD_EVENT_STATUS_PON = 7
-
-    def standard_event_status_enable(self, b_query: bool = True, i: int = None, j: int = None):
-        res = self.send_cmd("*ESE", b_query, i, j)
-        if b_query:
-            return int(res)
-
-    def standard_event_status(self, i: int = None):
-        res = self.send_cmd("*ESR", True, i)
-        return int(res)
-
-    def is_command_queue_overflow(self):
-        return True if self.standard_event_status(ProScan3Man.STANDARD_EVENT_STATUS_INP) == 1 else False
-
-    def is_command_output_overflow(self):
-        return True if self.standard_event_status(ProScan3Man.STANDARD_EVENT_STATUS_QRY) == 1 else False
-
-    def is_command_cannot_execute(self):
-        return True if self.standard_event_status(ProScan3Man.STANDARD_EVENT_STATUS_EXE) == 1 else False
-
-    def is_command_illegal(self):
-        return True if self.standard_event_status(ProScan3Man.STANDARD_EVENT_STATUS_CMD) == 1 else False
-
-    SERIAL_POLL_STATUS_SCN = 0
-    SERIAL_POLL_STATUS_IFC = 1
-    SERIAL_POLL_STATUS_ERR = 2
-    SERIAL_POLL_STATUS_LIA = 3
-    SERIAL_POLL_STATUS_MAV = 4
-    SERIAL_POLL_STATUS_ESB = 5
-    SERIAL_POLL_STATUS_SRQ = 6
-
-    def serial_poll_enable(self, b_query: bool = True, i: int = None, j: int = None):
-        res = self.send_cmd("*SRE", b_query, i, j)
-        if b_query:
-            return int(res)
-
-    def serial_poll_status(self, i: int = None):
-        res = self.send_cmd("*STB", True, i)
-        return int(res)
-
-    def is_no_scan_in_progress(self):
-        return True if self.serial_poll_status(ProScan3Man.SERIAL_POLL_STATUS_SCN) == 1 else False
-
-    POWER_ON_STATUS_CLEAR_SET = 1
-    POWER_ON_STATUS_CLEAR_CLEAR = 0
-
-    def power_on_status_clear(self, b_query: bool = True, i: int = None):
-        res = self.send_cmd("*PSC", b_query, i)
-        if b_query:
-            return int(res)
-
-    ERROR_STATUS_BACKUP = 1
-    ERROR_STATUS_RAM = 2
-    ERROR_STATUS_ROM = 4
-    ERROR_STATUS_GPIB = 5
-    ERROR_STATUS_DSP = 6
-    ERROR_STATUS_MATH = 7
-
-    def error_status_enable(self, b_query: bool = True, i: int = None, j: int = None):
-        res = self.send_cmd("ERRE", b_query, i, j)
-        if b_query:
-            return int(res)
-
-    def error_status(self, i: int = None):
-        res = self.send_cmd("ERRS", True, i)
-        return int(res)
-
-    LIA_STATUS_RSRV_INPT = 0
-    LIA_STATUS_FILTR = 1
-    LIA_STATUS_OUTPT = 2
-    LIA_STATUS_UNLK = 3
-    LIA_STATUS_RANGE = 4
-    LIA_STATUS_TC = 5
-    LIA_STATUS_TRIG = 6
-
-    def lia_status_enable(self, b_query: bool = True, i: int = None, j: int = None):
-        res = self.send_cmd("LIAE", b_query, i, j)
-        if b_query:
-            return int(res)
-
-    def lia_status(self, i: int = None):
-        res = self.send_cmd("LIAS", True, i)
-        return int(res)
-
-    def is_input_amp_overload(self):
-        return True if self.lia_status(ProScan3Man.LIA_STATUS_RSRV_INPT) == 1 else False
-
-    def is_time_constant_filter_overload(self):
-        return True if self.lia_status(ProScan3Man.LIA_STATUS_FILTR) == 1 else False
-
-    def is_output_overloaded(self):
-        return True if self.lia_status(ProScan3Man.LIA_STATUS_OUTPT) == 1 else False
-
-    def is_reference_unlocked(self):
-        return True if self.lia_status(ProScan3Man.LIA_STATUS_UNLK) == 1 else False
-
-    def is_freq_out_of_range(self):
-        return True if self.lia_status(ProScan3Man.LIA_STATUS_RANGE) == 1 else False
-
-    def is_time_constant_changed(self):
-        return True if self.lia_status(ProScan3Man.LIA_STATUS_TC) == 1 else False
-
-    def is_triggered(self):
-        return True if self.lia_status(ProScan3Man.LIA_STATUS_TRIG) == 1 else False
+                raise ValueError(f"Donot know what to wait {wait_for}")
+
+            ans_replaced = res.replace("\r", "\\r")
+            ProScan3_logger.debug(f"Got answer: <{ans_replaced}>", extra={"component": "ProScan3"})
+            return res.strip()
 
     def show_config_window(self):
         if self.config_window is None:
@@ -753,6 +151,174 @@ class ProScan3Man(QObject):
             return self.config_window.get_current_settings(with_header)
         else:
             return ""
+
+    def get_peripherals_info(self):
+        return self.send_cmd("?", ProScan3man.WAIT_FOR_END)
+
+    def check_limit_switch(self):
+        ans = self.send_cmd("=", ProScan3man.WAIT_FOR_1LINE)
+        ans_byte = int(ans) & 0xFF
+        res = {
+                "-A": ans_byte & 0x80 != 0,
+                "+A": ans_byte & 0x40 != 0,
+                "-Z": ans_byte & 0x20 != 0,
+                "+Z": ans_byte & 0x10 != 0,
+                "-Y": ans_byte & 0x08 != 0,
+                "+Y": ans_byte & 0x04 != 0,
+                "-X": ans_byte & 0x02 != 0,
+                "+X": ans_byte & 0x01 != 0
+              }
+        return res
+
+    def get_axis_motion_status(self, axis: str | None):
+        allowed_axis = ("X", "Y", "S", "Z", "A", "F", "F1", "F2")
+        if axis is not None and axis not in allowed_axis:
+            ProScan3_logger.error(f"Invalid axis: <{axis}>", extra={"component": "ProScan3"})
+            raise ValueError(f"{axis} is not allowed as parameter for $, only {allowed_axis}")
+        else:
+            ans = self.send_cmd("$", ProScan3man.WAIT_FOR_1LINE, axis)
+            ans_byte = int(ans) & 0x3F
+            if axis is None:
+                res = {
+                        "F2": ans_byte & 0x20 != 0,
+                        "F1": ans_byte & 0x10 != 0,
+                        "A": ans_byte & 0x08 != 0,
+                        "Z": ans_byte & 0x04 != 0,
+                        "Y": ans_byte & 0x02 != 0,
+                        "X": ans_byte & 0x01 != 0,
+                       }
+                return res
+            elif axis == "S":
+                res = {
+                        "Y": ans_byte & 0x02 != 0,
+                        "X": ans_byte & 0x01 != 0,
+                      }
+                return res
+            elif axis == "F":
+                res = {
+                        "F2": ans_byte & 0x02 != 0,
+                        "F1": ans_byte & 0x01 != 0,
+                      }
+                return res
+            else:
+                res = { axis : ans_byte & 0x01 != 0 }
+                return res
+
+    def change_baudrate(self, baudrate: int):
+        # FIXME: This is tricky to handle, need to test
+        allowed_baudrate_dict = {9600: 96, 19200: 19, 38400: 38, 115400: 115}
+        if baudrate not in allowed_baudrate_dict.keys():
+            ProScan3_logger.error(f"Invalid baudrate: <{baudrate}>", extra={"component": "ProScan3"})
+            raise ValueError(f"{baudrate} is not allowed as parameter for BAUD, only {allowed_baudrate_dict.keys()}")
+        else:
+            try:
+                ans = self.send_cmd("BAUD", ProScan3man.WAIT_FOR_1LINE, allowed_baudrate_dict[baudrate])
+            except Exception as e:
+                ProScan3_logger.warning(f"Exception when try to set baudrate to {baudrate}: <{e}>", extra={"component": "ProScan3"})
+            finally:
+                self.ser_baudrate = baudrate
+                self.close()
+                self.open()
+
+    def get_command_mode(self):
+        return self.send_cmd("COMP", ProScan3man.WAIT_FOR_1LINE)
+
+    def set_command_mode(self, b_compatibility: bool):
+        return self.send_cmd("COMP", ProScan3man.WAIT_FOR_1LINE, 1 if b_compatibility else 0)
+
+    #def get_instrument_info(self):
+    #    return self.send_cmd("DATE", ????)
+
+    def set_error_code_mode(self, b_human_readable: bool):
+        return self.send_cmd("ERROR", ProScan3man.WAIT_FOR_1LINE, 1 if b_human_readable else 0)
+
+    def stop_movement(self):
+        return self.send_cmd("I", ProScan3man.WAIT_FOR_1LINE)
+
+    def kill_movement(self):
+        return self.send_cmd("K", ProScan3man.WAIT_FOR_1LINE)
+
+    def macro_start_stop(self):
+        return self.send_cmd("MACRO", ProScan3man.WAIT_FOR_1LINE)
+
+    def get_serial_num(self):
+        return self.send_cmd("SERIAL", ProScan3man.WAIT_FOR_1LINE)
+
+    def get_limit_switch_status(self):
+        ans = self.send_cmd("LMT", ProScan3man.WAIT_FOR_1LINE)
+        ans_byte = int(ans)&0xFF
+        res = {
+                "-A": ans_byte & 0x80 != 0,
+                "+A": ans_byte & 0x40 != 0,
+                "-Z": ans_byte & 0x20 != 0,
+                "+Z": ans_byte & 0x10 != 0,
+                "-Y": ans_byte & 0x08 != 0,
+                "+Y": ans_byte & 0x04 != 0,
+                "-X": ans_byte & 0x02 != 0,
+                "+X": ans_byte & 0x01 != 0
+              }
+        return res
+
+    def soak_test(self):
+        return self.send_cmd("SOAK", ProScan3man.WAIT_FOR_1LINE)
+
+    def get_software_version(self):
+        return self.send_cmd("VERSION", ProScan3man.WAIT_FOR_1LINE)
+
+    def insert_wait(self, ms: int):
+        return self.send_cmd("WAIT", ProScan3man.WAIT_FOR_1LINE, ms)
+
+    def get_stage_step_size(self,):
+        ans = self.send_cmd("X", ProScan3man.WAIT_FOR_1LINE)
+        u, v = re.split(r"[,\s]+", ans)
+        return (u, v)
+
+    def set_stage_step_size(self, x_step: int, y_step: int):
+        return self.send_cmd("X", ProScan3man.WAIT_FOR_1LINE, x_step, y_step)
+
+    def set_stage_backlash(self, b_for_ser_joystick: bool, bl_enable: bool, bl_value: int | None = None):
+        return self.send_cmd("BLSH" if b_for_ser_joystick else "BLSJ", ProScan3man.WAIT_FOR_1LINE, 1 if bl_enable else 0, bl_value)
+
+    def get_stage_backlash(self):
+        ans = self.send_cmd("BLSH" if b_for_ser_joystick else "BLSJ", ProScan3man.WAIT_FOR_1LINE)
+        return re.split(r"[,\s]+", ans)
+ 
+    def move_back(self, steps: int | None):
+        #FIXME: if steps is None then it will move v steps defined by X command ?? doc is unclear, need to test
+        return self.send_cmd("B", ProScan3man.WAIT_FOR_1LINE, steps)
+
+    def move_forward(self, steps: int | None):
+        #FIXME: if steps is None then it will move v steps defined by X command ?? doc is unclear, need to test
+        return self.send_cmd("F", ProScan3man.WAIT_FOR_1LINE, steps)
+
+    def move_left(self, steps: int | None):
+        #FIXME: if steps is None then it will move v steps defined by X command ?? doc is unclear, need to test
+        return self.send_cmd("L", ProScan3man.WAIT_FOR_1LINE, steps)
+
+    def move_to(self, x: int, y: int, z: int | None):
+        return self.send_cmd("G", ProScan3man.WAIT_FOR_1LINE, x, y, z)
+
+    def move_by(self, x: int, y: int, z: int | None):
+        return self.send_cmd("GR", ProScan3man.WAIT_FOR_1LINE, x, y, z)
+
+    def move_x_to(self, x: int):
+        return self.send_cmd("GX", ProScan3man.WAIT_FOR_1LINE, x)
+
+    def move_y_to(self, y: int):
+        return self.send_cmd("GY", ProScan3man.WAIT_FOR_1LINE, y)
+
+    def turn_joystick(self, b_on_off):
+        #FIXME: ??? Doc unclear
+        return self.send_cmd("J" if b_on_off else "H", ProScan3man.WAIT_FOR_1LINE)
+
+    def set_joystick_direction(self, b_x_y: bool, b_inverted: bool):
+        return self.send_cmd("JXD" if b_x_y else "JYD", ProScan3man.WAIT_FOR_1LINE, -1 if b_inverted else 1)
+
+    def get_joystick_direction(self, b_x_y):
+        return self.send_cmd("JXD" if b_x_y else "JYD", ProScan3man.WAIT_FOR_1LINE)
+
+    def move_focus_to_zero(self):
+        return self.send_cmd("M", ProScan3man.WAIT_FOR_1LINE)
 
 
 def ask_selection(choices, prompt_str: str = 'Select: ', allow_invalid=False):
@@ -862,19 +428,6 @@ class ProScan3ConfigWindow(Ui_ProScan3_Config_Window):
         self.lineEdit_R.setText(float2str(r))
         self.lineEdit_Theta.setText(float2str(theta))
         self.lineEdit_Frequency.setText(f"{f:.6f}")
-
-    def interface_changed(self):
-        if self.radioButton_Interf_RS232.isChecked():
-            self.radioButton_Interf_GPIB.setChecked(False)
-            self.comboBox_COM_Parity.setEnabled(True)
-            self.comboBox_COM_BaudRate.setEnabled(True)
-            self.ProScan3man.com_mode = 'rs232'
-
-        if self.radioButton_Interf_GPIB.isChecked():
-            self.radioButton_Interf_RS232.setChecked(False)
-            self.comboBox_COM_Parity.setEnabled(False)
-            self.comboBox_COM_BaudRate.setEnabled(False)
-            self.ProScan3man.com_mode = 'gpib'
 
         self.refresh_comlist()
 
