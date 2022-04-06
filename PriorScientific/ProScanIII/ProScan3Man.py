@@ -13,6 +13,7 @@ from PyQt5.QtGui import QDoubleValidator
 import traceback
 import logging
 from PyQt5.QtCore import QObject, pyqtSignal
+from enum import Enum
 
 _SPLIT_LOG = False
 
@@ -124,9 +125,9 @@ class ProScan3Man(QObject):
         with self.ser_lock:
             self.sio.write(cmd_str)
             self.sio.flush()
-            if wait_for == ProScan3man.WAIT_FOR_1LINE:
+            if wait_for == ProScan3Man.WAIT_FOR_1LINE:
                 res = sio.readline()
-            elif wait_for == ProScan3man.WAIT_FOR_END:
+            elif wait_for == ProScan3Man.WAIT_FOR_END:
                 res = ""
                 while True:
                     l = sio.readline()
@@ -153,10 +154,10 @@ class ProScan3Man(QObject):
             return ""
 
     def get_peripherals_info(self):
-        return self.send_cmd("?", ProScan3man.WAIT_FOR_END)
+        return self.send_cmd("?", ProScan3Man.WAIT_FOR_END)
 
     def check_limit_switch(self):
-        ans = self.send_cmd("=", ProScan3man.WAIT_FOR_1LINE)
+        ans = self.send_cmd("=", ProScan3Man.WAIT_FOR_1LINE)
         ans_byte = int(ans) & 0xFF
         res = {
                 "-A": ans_byte & 0x80 != 0,
@@ -176,7 +177,7 @@ class ProScan3Man(QObject):
             ProScan3_logger.error(f"Invalid axis: <{axis}>", extra={"component": "ProScan3"})
             raise ValueError(f"{axis} is not allowed as parameter for $, only {allowed_axis}")
         else:
-            ans = self.send_cmd("$", ProScan3man.WAIT_FOR_1LINE, axis)
+            ans = self.send_cmd("$", ProScan3Man.WAIT_FOR_1LINE, axis)
             ans_byte = int(ans) & 0x3F
             if axis is None:
                 res = {
@@ -212,7 +213,7 @@ class ProScan3Man(QObject):
             raise ValueError(f"{baudrate} is not allowed as parameter for BAUD, only {allowed_baudrate_dict.keys()}")
         else:
             try:
-                ans = self.send_cmd("BAUD", ProScan3man.WAIT_FOR_1LINE, allowed_baudrate_dict[baudrate])
+                ans = self.send_cmd("BAUD", ProScan3Man.WAIT_FOR_1LINE, allowed_baudrate_dict[baudrate])
             except Exception as e:
                 ProScan3_logger.warning(f"Exception when try to set baudrate to {baudrate}: <{e}>", extra={"component": "ProScan3"})
             finally:
@@ -221,31 +222,31 @@ class ProScan3Man(QObject):
                 self.open()
 
     def get_command_mode(self):
-        return self.send_cmd("COMP", ProScan3man.WAIT_FOR_1LINE)
+        return self.send_cmd("COMP", ProScan3Man.WAIT_FOR_1LINE)
 
     def set_command_mode(self, b_compatibility: bool):
-        return self.send_cmd("COMP", ProScan3man.WAIT_FOR_1LINE, 1 if b_compatibility else 0)
+        return self.send_cmd("COMP", ProScan3Man.WAIT_FOR_1LINE, 1 if b_compatibility else 0)
 
     #def get_instrument_info(self):
     #    return self.send_cmd("DATE", ????)
 
     def set_error_code_mode(self, b_human_readable: bool):
-        return self.send_cmd("ERROR", ProScan3man.WAIT_FOR_1LINE, 1 if b_human_readable else 0)
+        return self.send_cmd("ERROR", ProScan3Man.WAIT_FOR_1LINE, 1 if b_human_readable else 0)
 
     def stop_movement(self):
-        return self.send_cmd("I", ProScan3man.WAIT_FOR_1LINE)
+        return self.send_cmd("I", ProScan3Man.WAIT_FOR_1LINE)
 
     def kill_movement(self):
-        return self.send_cmd("K", ProScan3man.WAIT_FOR_1LINE)
+        return self.send_cmd("K", ProScan3Man.WAIT_FOR_1LINE)
 
     def macro_start_stop(self):
-        return self.send_cmd("MACRO", ProScan3man.WAIT_FOR_1LINE)
+        return self.send_cmd("MACRO", ProScan3Man.WAIT_FOR_1LINE)
 
     def get_serial_num(self):
-        return self.send_cmd("SERIAL", ProScan3man.WAIT_FOR_1LINE)
+        return self.send_cmd("SERIAL", ProScan3Man.WAIT_FOR_1LINE)
 
     def get_limit_switch_status(self):
-        ans = self.send_cmd("LMT", ProScan3man.WAIT_FOR_1LINE)
+        ans = self.send_cmd("LMT", ProScan3Man.WAIT_FOR_1LINE)
         ans_byte = int(ans)&0xFF
         res = {
                 "-A": ans_byte & 0x80 != 0,
@@ -260,65 +261,285 @@ class ProScan3Man(QObject):
         return res
 
     def soak_test(self):
-        return self.send_cmd("SOAK", ProScan3man.WAIT_FOR_1LINE)
+        return self.send_cmd("SOAK", ProScan3Man.WAIT_FOR_1LINE)
 
     def get_software_version(self):
-        return self.send_cmd("VERSION", ProScan3man.WAIT_FOR_1LINE)
+        return self.send_cmd("VERSION", ProScan3Man.WAIT_FOR_1LINE)
 
     def insert_wait(self, ms: int):
-        return self.send_cmd("WAIT", ProScan3man.WAIT_FOR_1LINE, ms)
+        return self.send_cmd("WAIT", ProScan3Man.WAIT_FOR_1LINE, ms)
 
     def get_stage_step_size(self,):
-        ans = self.send_cmd("X", ProScan3man.WAIT_FOR_1LINE)
+        ans = self.send_cmd("X", ProScan3Man.WAIT_FOR_1LINE)
         u, v = re.split(r"[,\s]+", ans)
         return (u, v)
 
     def set_stage_step_size(self, x_step: int, y_step: int):
-        return self.send_cmd("X", ProScan3man.WAIT_FOR_1LINE, x_step, y_step)
+        return self.send_cmd("X", ProScan3Man.WAIT_FOR_1LINE, x_step, y_step)
 
-    def set_stage_backlash(self, b_for_ser_joystick: bool, bl_enable: bool, bl_value: int | None = None):
-        return self.send_cmd("BLSH" if b_for_ser_joystick else "BLSJ", ProScan3man.WAIT_FOR_1LINE, 1 if bl_enable else 0, bl_value)
+    def set_stage_backlash(self, b_stage_z: bool, b_for_ser_joystick: bool, bl_enable: bool, bl_value: int | None = None):
+        return self.send_cmd("BL"+("S" if b_stage_z else "Z") + ("H" if b_for_ser_joystick else "J"), 
+                ProScan3Man.WAIT_FOR_1LINE, 1 if bl_enable else 0, bl_value)
 
-    def get_stage_backlash(self):
-        ans = self.send_cmd("BLSH" if b_for_ser_joystick else "BLSJ", ProScan3man.WAIT_FOR_1LINE)
+    def get_stage_backlash(self, b_stage_z: bool):
+        ans = self.send_cmd("BL"+("S" if b_stage_z else "Z") + ("H" if b_for_ser_joystick else "J"), ProScan3Man.WAIT_FOR_1LINE)
         return re.split(r"[,\s]+", ans)
  
-    def move_back(self, steps: int | None):
-        #FIXME: if steps is None then it will move v steps defined by X command ?? doc is unclear, need to test
-        return self.send_cmd("B", ProScan3man.WAIT_FOR_1LINE, steps)
-
-    def move_forward(self, steps: int | None):
-        #FIXME: if steps is None then it will move v steps defined by X command ?? doc is unclear, need to test
-        return self.send_cmd("F", ProScan3man.WAIT_FOR_1LINE, steps)
-
-    def move_left(self, steps: int | None):
-        #FIXME: if steps is None then it will move v steps defined by X command ?? doc is unclear, need to test
-        return self.send_cmd("L", ProScan3man.WAIT_FOR_1LINE, steps)
+    def move_in_dir(self, d: str, steps: int | None):
+        if d not in ("B", "F", "L", "R", "U", "D"):
+            ProScan3_logger.error(f"Direction {d} invalid (B, F, L, R, U, D)", extra={"component": "ProScan3"})
+            raise ValueError(f"Direction {d} invalid (B, F, L, R, U, D)")
+        return self.send_cmd(d, ProScan3Man.WAIT_FOR_1LINE, steps)
 
     def move_to(self, x: int, y: int, z: int | None):
-        return self.send_cmd("G", ProScan3man.WAIT_FOR_1LINE, x, y, z)
+        return self.send_cmd("G", ProScan3Man.WAIT_FOR_1LINE, x, y, z)
 
     def move_by(self, x: int, y: int, z: int | None):
-        return self.send_cmd("GR", ProScan3man.WAIT_FOR_1LINE, x, y, z)
+        return self.send_cmd("GR", ProScan3Man.WAIT_FOR_1LINE, x, y, z)
 
-    def move_x_to(self, x: int):
-        return self.send_cmd("GX", ProScan3man.WAIT_FOR_1LINE, x)
-
-    def move_y_to(self, y: int):
-        return self.send_cmd("GY", ProScan3man.WAIT_FOR_1LINE, y)
+    def move_xyz_to(self, axis_x_y_z: str, pos: int):
+        if axis_x_y_z not in ("X", "Y", "Z"):
+            ProScan3_logger.error(f"Axis {axis_x_y_z} invalid (X, Y, Z)", extra={"component": "ProScan3"})
+            raise ValueError(f"Axis {axis_x_y_z} invalid (X, Y, Z)")
+        return self.send_cmd("G"+axis_x_y_z, ProScan3Man.WAIT_FOR_1LINE, pos)
 
     def turn_joystick(self, b_on_off):
         #FIXME: ??? Doc unclear
-        return self.send_cmd("J" if b_on_off else "H", ProScan3man.WAIT_FOR_1LINE)
+        return self.send_cmd("J" if b_on_off else "H", ProScan3Man.WAIT_FOR_1LINE)
 
-    def set_joystick_direction(self, b_x_y: bool, b_inverted: bool):
-        return self.send_cmd("JXD" if b_x_y else "JYD", ProScan3man.WAIT_FOR_1LINE, -1 if b_inverted else 1)
+    def set_direction(self, b_for_ser_joystick: bool, axis_x_y_z: str, b_inverted: bool):
+        if axis_x_y_z not in ("X", "Y", "Z"):
+            ProScan3_logger.error(f"Axis {axis_x_y_z} invalid (X, Y, Z)", extra={"component": "ProScan3"})
+            raise ValueError(f"Axis {axis_x_y_z} invalid (X, Y, Z)")
+        return self.send_cmd(("" if b_for_ser_joystick else "J")+axis_x_y_z+"D", ProScan3Man.WAIT_FOR_1LINE, -1 if b_inverted else 1)
 
-    def get_joystick_direction(self, b_x_y):
-        return self.send_cmd("JXD" if b_x_y else "JYD", ProScan3man.WAIT_FOR_1LINE)
+    def get_direction(self, b_for_ser_joystick: bool, axis_x_y_z: str):
+        if axis_x_y_z not in ("X", "Y", "Z"):
+            ProScan3_logger.error(f"Axis {axis_x_y_z} invalid (X, Y, Z)", extra={"component": "ProScan3"})
+            raise ValueError(f"Axis {axis_x_y_z} invalid (X, Y, Z)")
+        return self.send_cmd(("" if b_for_ser_joystick else "J")+axis_x_y_z+"D", ProScan3Man.WAIT_FOR_1LINE)
 
-    def move_focus_to_zero(self):
-        return self.send_cmd("M", ProScan3man.WAIT_FOR_1LINE)
+    def move_xyz_to_zero(self):
+        return self.send_cmd("M", ProScan3Man.WAIT_FOR_1LINE)
+
+    def set_speed_joystick(self, b_stage_z: bool, speed_perc: int):
+        if 1 <= speed_perc <= 100:
+            return self.send_cmd("O" if b_stage_z else "OF", ProScan3Man.WAIT_FOR_1LINE, speed_perc)
+        else:
+            ProScan3_logger.error(f"Speed percentage {speed_perc} out of range [1, 100]", extra={"component": "ProScan3"})
+            raise ValueError(f"Speed percentage {speed_perc} out of range [1, 100]")
+
+    def get_speed_joystick(self, b_stage_z: bool):
+        #FIXME: doc is not clear
+        return int(self.send_cmd("O" if b_stage_z else "OF", ProScan3Man.WAIT_FOR_1LINE))
+
+    def get_xyz_axes_pos(self):
+        ans = self.send_cmd("P", ProScan3Man.WAIT_FOR_1LINE)
+        return re.split(r"[,\s]+", ans)
+
+    def set_xyz_axes_pos(self, x: int, y: int, z: int):
+        #WARNING: no range check
+        return self.send_cmd("P", ProScan3Man.WAIT_FOR_1LINE, x, y, z)
+
+    def get_axis_pos(self, axis_x_y_z: str):
+        if axis_x_y_z not in ("X", "Y", "Z"):
+            ProScan3_logger.error(f"Axis {axis_x_y_z} invalid (X, Y, Z)", extra={"component": "ProScan3"})
+            raise ValueError(f"Axis {axis_x_y_z} invalid (X, Y, Z)")
+        return int(self.send_cmd("P"+axis_x_y_z, ProScan3Man.WAIT_FOR_1LINE))
+
+    def set_x_axis_pos(self, axis_x_y_z: str, pos: int):
+        if axis_x_y_z not in ("X", "Y", "Z"):
+            ProScan3_logger.error(f"Axis {axis_x_y_z} invalid (X, Y, Z)", extra={"component": "ProScan3"})
+            raise ValueError(f"Axis {axis_x_y_z} invalid (X, Y, Z)")
+        return self.send_cmd("P"+axis_x_y_z, ProScan3Man.WAIT_FOR_1LINE, pos)
+
+    def set_unit_step_size(self, b_stage_z: bool, n_microsteps: int):
+        return self.send_cmd("SS"+("" if b_stage_z else "Z"), ProScan3Man.WAIT_FOR_1LINE, n_microsteps)
+
+    def get_unit_step_size(self, b_stage_z: bool):
+        #WARNING: DOC: in COMPATABILITY mode, this value is based on the older 100 microsteps/fullstep of H127/128 sys
+        return int(self.send_cmd("SS"+("" if b_stage_z else "Z"), ProScan3Man.WAIT_FOR_1LINE))
+
+    def set_resolution(self, b_stage_z: bool, resolution: float):
+        #FIXME: DOC: NO RESPONSE????? WAIT FOR NOTHING???
+        return self.send_cmd("RES", ProScan3Man.WAIT_FOR_1LINE, "S" if b_stage_z else "Z", f"{resolution:.2f}")
+
+    def get_resolution(self, axis: str):
+        #FIXME: DOC: NO RESPONSE????? WAIT FOR NOTHING???
+        allowed_axis = ("X", "Y", "S", "Z", "A", "F", "F1", "F2")
+        if axis not in allowed_axis:
+            ProScan3_logger.error(f"Invalid axis: <{axis}>", extra={"component": "ProScan3"})
+            raise ValueError(f"{axis} is not allowed as parameter for RES, only {allowed_axis}")
+        return float(self.send_cmd("RES", ProScan3Man.WAIT_FOR_1LINE, axis))
+
+    def restore_index_of_stage(self):
+        #WARNING: check doc
+        return self.send_cmd("RIS", ProScan3Man.WAIT_FOR_1LINE)
+
+    def set_index_of_stage(self):
+        #WARNING: check doc
+        return self.send_cmd("SIS", ProScan3Man.WAIT_FOR_1LINE)
+
+    class Unit_type(Enum):
+        UNIFIED = 1
+        INTRINSIC = 2
+        MICRONS = 3
+
+    def set_max_stage_acc(self, acc: int, acc_type: ProScan3Man.Unit_type):
+        if acc_typpe == self.Unit_type.UNIFIED and not 1 <= acc <= 1000:
+            ProScan3_logger.error(f"Stage max acceleration (UNIFIED) {acc} out of range [1, 1000]", extra={"component": "ProScan3"})
+            raise ValueError(f"Stage max acceleration (UNIFIED) {acc} out of range [1, 1000]")
+        else:
+            if acc_type == self.Unit_type.UNIFIED:
+                return self.send_cmd("SAS", ProScan3Man.WAIT_FOR_1LINE, acc)
+            elif acc_type == self.Unit_type.INTRINSIC:
+                return self.send_cmd("SAS,n,i", ProScan3Man.WAIT_FOR_1LINE, acc)
+            else:
+                #elif acc_type == self.Unit_type.MICRONS:
+                return self.send_cmd("SAS,n,u", ProScan3Man.WAIT_FOR_1LINE, acc)
+
+    def get_max_stage_acc(self, acc_type: ProScan3Man.Unit_type):
+        if acc_type == ProScan3Man.Unit_type.UNIFIED:
+            return int(self.send_cmd("SAS", ProScan3Man.WAIT_FOR_1LINE))
+        elif acc_type == ProScan3Man.Unit_type.INTRINSIC:
+            return int(self.send_cmd("SAS,i", ProScan3Man.WAIT_FOR_1LINE))
+        else: #if acc_type == ProScan3Man.Unit_type.UNIFIED:
+            return int(self.send_cmd("SAS,u", ProScan3Man.WAIT_FOR_1LINE))
+
+    def set_max_stage_speed(self, speed: int, speed_type: ProScan3Man.Unit_type):
+        if speed_typpe == self.Unit_type.UNIFIED and not 1 <= speed <= 1000:
+            ProScan3_logger.error(f"Stage max speed (UNIFIED) {speed} out of range [1, 1000]", extra={"component": "ProScan3"})
+            raise ValueError(f"Stage max speed (UNIFIED) {speed} out of range [1, 1000]")
+        else:
+            if speed_type == self.Unit_type.UNIFIED:
+                return self.send_cmd("SMS", ProScan3Man.WAIT_FOR_1LINE, speed)
+            elif speed_type == self.Unit_type.INTRINSIC:
+                return self.send_cmd("SMS,n,i", ProScan3Man.WAIT_FOR_1LINE, speed)
+            else:
+                #elif speed_type == self.Unit_type.MICRONS:
+                return self.send_cmd("SMS,n,u", ProScan3Man.WAIT_FOR_1LINE, speed)
+
+    def get_max_stage_speed(self, speed_type: ProScan3Man.Unit_type):
+        if speed_type == ProScan3Man.Unit_type.UNIFIED:
+            return int(self.send_cmd("SMS", ProScan3Man.WAIT_FOR_1LINE))
+        elif speed_type == ProScan3Man.Unit_type.INTRINSIC:
+            return int(self.send_cmd("SMS,i", ProScan3Man.WAIT_FOR_1LINE))
+        else: #if speed_type == ProScan3Man.Unit_type.UNIFIED:
+            return int(self.send_cmd("SMS,u", ProScan3Man.WAIT_FOR_1LINE))
+
+    def set_stage_scurve_value(self, c: int):
+        if 1 <= c <= 1000:
+            return self.send_cmd("SCS", ProScan3Man.WAIT_FOR_1LINE, c)
+        else:
+            ProScan3_logger.error(f"Stage S-curve value {c} out of range [1, 1000]", extra={"component": "ProScan3"})
+            raise ValueError(f"Stage S-curve value {c} out of range [1, 1000]")
+
+    def get_stage_scurve_value(self):
+        return int(self.send_cmd("SCS", ProScan3Man.WAIT_FOR_1LINE))
+
+    def get_stage_info(self):
+        return self.send_cmd("STAGE", ProScan3Man.WAIT_FOR_END)
+
+    def get_skew_angle(self):
+        #FIXME: DOC is not clear
+        return float(self.send_cmd("SKEW", ProScan3Man.WAIT_FOR_1LINE))
+
+    def set_stage_focus_to_zero(self):
+        #FIXME: DOC is not clear?? set current stage and focus position to ZERO?
+        return self.send_cmd("Z", ProScan3Man.WAIT_FOR_1LINE)
+
+    def turn_motor(self, motor: str | int, b_on_off: bool):
+        if (type(motor) is str and motor not in ProScan3Man.AXIS_ID.keys()) or \
+                (type(motor) is int and motor not in ProScan3Man.AXIS_ID.values()):
+            ProScan3_logger.error(f"Motor {motor} invalid ({ProScan3Man.AXIS_ID})", extra={"component": "ProScan3"})
+            raise ValueError(f"Motor {motor} invalid ({ProScan3Man.AXIS_ID})")
+        else:
+            return self.send_cmd("MOTOR", ProScan3Man.WAIT_FOR_1LINE, motor, 1 if b_on_off else 0)
+
+    def set_curr_pos_as_sw_limit(self, axis: str | int, b_low_high: bool):
+        if (type(axis) is str and axis not in ProScan3Man.AXIS_ID.keys()) or \
+                (type(axis) is int and axis not in ProScan3Man.AXIS_ID.values()):
+            ProScan3_logger.error(f"Axis {axis} invalid ({ProScan3Man.AXIS_ID})", extra={"component": "ProScan3"})
+            raise ValueError(f"Axis {axis} invalid ({ProScan3Man.AXIS_ID})")
+        else:
+            return self.send_cmd("SWLL" if b_low_high else "SWLH", ProScan3Man.WAIT_FOR_1LINE, axis)
+
+    def clear_curr_pos_as_sw_limit(self, axis: str | int):
+        if (type(axis) is str and axis not in ProScan3Man.AXIS_ID.keys()) or \
+                (type(axis) is int and axis not in ProScan3Man.AXIS_ID.values()):
+            ProScan3_logger.error(f"Axis {axis} invalid ({ProScan3Man.AXIS_ID})", extra={"component": "ProScan3"})
+            raise ValueError(f"Axis {axis} invalid ({ProScan3Man.AXIS_ID})")
+        else:
+            return self.send_cmd("SWLC", ProScan3Man.WAIT_FOR_1LINE, axis)
+
+    def move_xy_at_speed(self, x_speed: int, y_speed: int):
+        return self.send_cmd("VS", ProScan3Man.WAIT_FOR_1LINE, x_speed, y_speed)
+
+
+    # Z Axis commands
+    def get_z_step_size(self):
+        return int(self.send_cmd("C", ProScan3Man.WAIT_FOR_1LINE))
+
+    def set_z_step_size(self, z_step: int):
+        return self.send_cmd("C", ProScan3Man.WAIT_FOR_1LINE, z_step)
+
+    def get_z_info(self):
+        return self.send_cmd("FOCUS", ProScan3Man.WAIT_FOR_END)
+
+    def set_max_z_acc(self, acc: int)
+        if not 1 <= acc <= 100:
+            ProScan3_logger.error(f"Focus max acceleration {acc} out of range [1, 100]", extra={"component": "ProScan3"})
+            raise ValueError(f"Focus max acceleration {acc} out of range [1, 100]")
+        else:
+            return self.send_cmd("SAZ", ProScan3Man.WAIT_FOR_1LINE, acc)
+
+    def get_max_z_acc(self):
+        return int(self.send_cmd("SAZ", ProScan3Man.WAIT_FOR_1LINE))
+
+    def set_max_z_speed(self, speed: int):
+        if not 1 <= speed <= 100:
+            ProScan3_logger.error(f"Focus max speed {speed} out of range [1, 100]", extra={"component": "ProScan3"})
+            raise ValueError(f"Focus max speed {speed} out of range [1, 100]")
+        else:
+            return self.send_cmd("SMZ", ProScan3Man.WAIT_FOR_1LINE, speed)
+
+    def get_max_z_speed(self):
+        return int(self.send_cmd("SMZ", ProScan3Man.WAIT_FOR_1LINE))
+
+    def set_z_scurve_value(self, c: int):
+        if 1 <= c <= 100:
+            return self.send_cmd("SCZ", ProScan3Man.WAIT_FOR_1LINE, c)
+        else:
+            ProScan3_logger.error(f"Stage S-curve value {c} out of range [1, 100]", extra={"component": "ProScan3"})
+            raise ValueError(f"Stage S-curve value {c} out of range [1, 100]")
+
+    def get_z_scurve_value(self):
+        return int(self.send_cmd("SCZ", ProScan3Man.WAIT_FOR_1LINE))
+
+    def set_unit_per_revolution(self, n_micros: int):
+        return self.send_cmd("UPR", ProScan3Man.WAIT_FOR_1LINE, "Z", n_micros)
+
+    def get_unit_per_revolution(self):
+        return int(self.send_cmd("UPR", ProScan3Man.WAIT_FOR_1LINE, "Z"))
+
+    def zplane_tracking_set_point(self, point_123: int):
+        if 1 <= point_123 <= 3:
+            return self.send_cmd("ZPLANE", ProScan3Man.WAIT_FOR_1LINE, point_123)
+        else:
+            ProScan3_logger.error(f"ZPLANE tracks 3 points (1, 2, 3) {point_123}", extra={"component": "ProScan3"})
+            raise ValueError(f"ZPLANE tracks 3 points (1, 2, 3) {point_123}")
+
+    def zplane_tracking(self, b_enable_disable: bool):
+        return self.send_cmd("ZPLANE", ProScan3Man.WAIT_FOR_1LINE, "E" if b_enable_disable else "D")
+
+    def zplane_tracking_status(self):
+        return self.send_cmd("ZPLANE", ProScan3Man.WAIT_FOR_1LINE) == "1"
+
+    # Filter Wheel Commands
+    # TODO: 
+
+    # Shutter Commands
+    # TODO: 
 
 
 def ask_selection(choices, prompt_str: str = 'Select: ', allow_invalid=False):
@@ -359,8 +580,8 @@ class ProScan3ConfigWindow(Ui_ProScan3_Config_Window):
     """
         ProScan3 Helper class with configuration window
     """
-    def __init__(self, ProScan3man: ProScan3Man):
-        self.ProScan3man = ProScan3man
+    def __init__(self, ps3_man: ProScan3Man):
+        self.ps3_man = ps3_man
         self.window = QWidget()
         Ui_ProScan3_Config_Window.__init__(self)
         self.setupUi(self.window)
@@ -377,122 +598,30 @@ class ProScan3ConfigWindow(Ui_ProScan3_Config_Window):
         self.parity_changed(self.comboBox_COM_Parity.currentText())
         self.conn_changed(self.comboBox_CONN.currentData())
 
-        self.radioButton_Interf_GPIB.clicked.connect(self.interface_changed)
-        self.radioButton_Interf_RS232.clicked.connect(self.interface_changed)
-
         self.refresh_comlist()
 
         # ProScan3 Settings
-        self.comboBox_TimeConstant.currentTextChanged.connect(
-            lambda t: self.ProScan3man.time_constant(False, ProScan3Man.time_constant_str2int(t)))
-        self.comboBox_Sensitivity.currentTextChanged.connect(
-            lambda t: self.ProScan3man.sensitivity(False, ProScan3Man.sensitivity_str2int(t)))
-        self.pushButton_SetHarmonic.clicked.connect(
-            lambda: self.ProScan3man.detection_harmonic(False, self.spinBox_Harmonic.value()))
-        self.comboBox_FilterSlope.currentIndexChanged.connect(
-            lambda i: self.ProScan3man.low_pass_filter_slope(False, i))
-
-        self.pushButton_GetX.clicked.connect(
-            lambda: self.lineEdit_X.setText(float2str(self.ProScan3man.get_axis_value(ProScan3Man.GET_AXIS_VALUE_X)))
-        )
-        self.pushButton_GetY.clicked.connect(
-            lambda: self.lineEdit_Y.setText(float2str(self.ProScan3man.get_axis_value(ProScan3Man.GET_AXIS_VALUE_Y)))
-        )
-        self.pushButton_GetR.clicked.connect(
-            lambda: self.lineEdit_R.setText(float2str(self.ProScan3man.get_axis_value(ProScan3Man.GET_AXIS_VALUE_R)))
-        )
-        self.pushButton_GetTheta.clicked.connect(
-            lambda: self.lineEdit_Theta.setText(float2str(self.ProScan3man.get_axis_value(ProScan3Man.GET_AXIS_VALUE_THETA)))
-        )
-        self.pushButton_GetAll.clicked.connect(self.snap_all_values)
-
-        self.lineEdit_phase.setValidator(
-            # FIXME: validation
-            QDoubleValidator(bottom=0.0, top=99.99, decimals=6))
-        self.pushButton_SetPhase.clicked.connect(self.set_phase_clicked)
-        self.pushButton_Autophase.clicked.connect(
-            lambda: self.lineEdit_phase.setText(f"{self.ProScan3man.ref_phase_shift(True):.4f}"))
-        self.radioButton_ref_src_external.toggled.connect(self.ref_src_changed)
-        self.radioButton_ref_src_internal.toggled.connect(self.ref_src_changed)
-
-        self.interface_changed()
-
-    def snap_all_values(self):
-        x, y, r, theta, f = self.ProScan3man.get_parameters_value(ProScan3Man.GET_PARAMETER_X,
-                                                               ProScan3Man.GET_PARAMETER_Y,
-                                                               ProScan3Man.GET_PARAMETER_R,
-                                                               ProScan3Man.GET_PARAMETER_THETA,
-                                                               ProScan3Man.GET_PARAMETER_REF_FREQ)
-        self.lineEdit_X.setText(float2str(x))
-        self.lineEdit_Y.setText(float2str(y))
-        self.lineEdit_R.setText(float2str(r))
-        self.lineEdit_Theta.setText(float2str(theta))
-        self.lineEdit_Frequency.setText(f"{f:.6f}")
-
-        self.refresh_comlist()
-
-    def ref_src_changed(self):
-        if self.radioButton_ref_src_external.isChecked():
-            self.radioButton_ref_src_internal.setChecked(False)
-            self.ProScan3man.ref_source(False, ProScan3Man.REF_SOURCE_EXTERNAL)
-            self.pushButton_SetFrequency.setEnabled(False)
-            self.lineEdit_Frequency.setText(f"{self.ProScan3man.ref_frequency(True): .6f}")
-
-        if self.radioButton_ref_src_internal.isChecked():
-            self.radioButton_ref_src_external.setChecked(False)
-            self.ProScan3man.ref_source(False, ProScan3Man.REF_SOURCE_INTERNAL)
-            self.lineEdit_Frequency.setText(f"{self.ProScan3man.ref_frequency(True): .6f}")
-            self.pushButton_SetFrequency.setEnabled(True)
-
-    def set_phase_clicked(self):
-        try:
-            if not self.lineEdit_phase.hasAcceptableInput():
-                raise ValueError("Not acceptable phase value")
-            new_phase = float(self.lineEdit_phase.text())
-            self.ProScan3man.ref_phase_shift(False, new_phase)
-            self.pushButton_SetPhase.setStyleSheet("background: green")
-        except ValueError as ve:
-            self.pushButton_SetPhase.setStyleSheet("background: red")
-            self.lineEdit_phase.setText(f"{self.ProScan3man.ref_phase_shift(True):.4f}")
-
-    def sync_current_settings(self):
-        if self.ProScan3man is not None:
-            self.comboBox_TimeConstant.setCurrentText(
-                ProScan3Man.time_constant_int2str(self.ProScan3man.time_constant(True)))
-            self.comboBox_Sensitivity.setCurrentText(
-                ProScan3Man.sensitivity_int2str(self.ProScan3man.sensitivity(True)))
-            self.comboBox_FilterSlope.setCurrentIndex(self.ProScan3man.low_pass_filter_slope(True))
-            self.lineEdit_phase.setText(f"{self.ProScan3man.ref_phase_shift(True):.4f}")
-            if self.ProScan3man.ref_source(True) == 1:
-                self.radioButton_ref_src_internal.setChecked(True)
-                self.radioButton_ref_src_external.setChecked(False)
-            else:
-                self.radioButton_ref_src_internal.setChecked(False)
-                self.radioButton_ref_src_external.setChecked(True)
-            self.ref_src_changed()
-            self.spinBox_Harmonic.setValue(self.ProScan3man.detection_harmonic(True))
-            self.snap_all_values()
 
     def conn_changed(self, i: int):
         if self.radioButton_Interf_RS232.isChecked():
-            self.ProScan3man.com_dev = self.comboBox_CONN.currentData()
+            self.ps3_man.com_dev = self.comboBox_CONN.currentData()
         elif self.radioButton_Interf_GPIB.isChecked():
-            self.ProScan3man.visa_dev = self.comboBox_CONN.currentText()
+            self.ps3_man.visa_dev = self.comboBox_CONN.currentText()
 
     def parity_changed(self, p: str):
         if p == 'None':
-            self.ProScan3man.ser_parity = serial.PARITY_NONE
+            self.ps3_man.ser_parity = serial.PARITY_NONE
         elif p == 'ODD':
-            self.ProScan3man.ser_parity = serial.PARITY_ODD
+            self.ps3_man.ser_parity = serial.PARITY_ODD
         elif p == 'EVEN':
-            self.ProScan3man.ser_parity = serial.PARITY_EVEN
+            self.ps3_man.ser_parity = serial.PARITY_EVEN
         else:
             raise ValueError(f"Unknown parity {p}")
 
     def baudrate_changed(self, b: int or str):
         if type(b) is str:
             b = int(b)
-        self.ProScan3man.ser_baudrate = b
+        self.ps3_man.ser_baudrate = b
 
     def refresh_comlist(self):
         self.comboBox_CONN.clear()
@@ -501,7 +630,7 @@ class ProScan3ConfigWindow(Ui_ProScan3_Config_Window):
             for com_dev in com_dict.keys():
                 self.comboBox_CONN.addItem(com_dev + ':' + com_dict[com_dev], com_dev)
         elif self.radioButton_Interf_GPIB.isChecked():
-            self.comboBox_CONN.addItems(self.ProScan3man.visa_rm.list_resources())
+            self.comboBox_CONN.addItems(self.ps3_man.visa_rm.list_resources())
 
     def open_conn_clicked(self, state):
         if not state:  # post event state
@@ -513,7 +642,7 @@ class ProScan3ConfigWindow(Ui_ProScan3_Config_Window):
     def open_conn(self):
         global ProScan3_logger
         try:
-            self.ProScan3man.open()
+            self.ps3_man.open()
             self.pushButton_COM_Open.setText("Close")
             self.pushButton_COM_Open.setChecked(True)
             # Disable the COM configuration input
@@ -528,13 +657,10 @@ class ProScan3ConfigWindow(Ui_ProScan3_Config_Window):
             # update current settings
             self.sync_current_settings()
             ProScan3_logger.info(f"ProScan3 COM connection opened", extra={"component": "ProScan3"})
-            if self.radioButton_Interf_RS232.isChecked():
-                ProScan3_logger.debug(f"ProScan3 COM: {self.ProScan3man.com_dev} "
-                                   f"B:{self.ProScan3man.ser_baudrate} "
-                                   f"P:{self.ProScan3man.ser_parity} "
-                                   f"S:{self.ProScan3man.ser_stopbits}", extra={"component": "ProScan3"})
-            else:
-                ProScan3_logger.debug(f"ProScan3 Visa addr:: {self.ProScan3man.visa_dev} ", extra={"component": "ProScan3"})
+            ProScan3_logger.debug(f"ProScan3 COM: {self.ps3_man.com_dev} "
+                               f"B:{self.ps3_man.ser_baudrate} "
+                               f"P:{self.ps3_man.ser_parity} "
+                               f"S:{self.ps3_man.ser_stopbits}", extra={"component": "ProScan3"})
         except Exception as e:
             traceback.print_tb(e.__traceback__)
             ProScan3_logger.error(f"Failed to open ProScan3 COM connection", extra={"component": "ProScan3"})
@@ -542,15 +668,11 @@ class ProScan3ConfigWindow(Ui_ProScan3_Config_Window):
 
     def close_conn(self):
         global ProScan3_logger
-        self.ProScan3man.close()
+        self.ps3_man.close()
         # FIXME: stop all the ProScan3 update activities
         self.pushButton_COM_Open.setText("Open")
         self.pushButton_COM_Open.setChecked(False)
         # Enable the COM configuration input
-        self.comboBox_CONN.setDisabled(False)
-        if self.radioButton_Interf_RS232.isChecked():
-            self.comboBox_COM_BaudRate.setDisabled(False)
-            self.comboBox_COM_Parity.setDisabled(False)
         self.pushButton_COM_Refresh.setDisabled(False)
         # Disable the settings input
         self.groupBox_Settings.setDisabled(True)
@@ -564,16 +686,12 @@ class ProScan3ConfigWindow(Ui_ProScan3_Config_Window):
         self.window.hide()
 
     def get_current_settings(self, with_header: bool = True):
-        if self.ProScan3man.is_open():
+        if self.ps3_man.is_open():
             if with_header:
                 setting_str = "--------SRS ProScan3-------\n"
             else:
                 setting_str = ""
-            setting_str = setting_str + f"Time constant: {self.comboBox_TimeConstant.currentText()}\n" \
-                          f"Sensitivity: {self.comboBox_Sensitivity.currentText()}\n" \
-                          f"Filter Slope: {self.comboBox_FilterSlope.currentText()}\n" \
-                          f"Frequency: {self.lineEdit_Frequency.text()}\n" \
-                          f"Harmony: {self.spinBox_Harmonic.value()}\n"
+            setting_str = setting_str 
             return setting_str
         else:
             return ""
@@ -583,7 +701,7 @@ if __name__ == '__main__':
 
     app = QApplication([])
 
-    ProScan3_man = ProScan3Man()
+    ps3man = ProScan3Man()
     print(f'Starting...')
-    ProScan3_man.show_config_window()
+    ps3man.show_config_window()
     QApplication.instance().exec_()
