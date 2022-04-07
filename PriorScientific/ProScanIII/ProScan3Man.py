@@ -113,6 +113,18 @@ class ProScan3Man(QObject):
     def is_open(self):
         return self.ser is not None and self.ser.is_open
 
+    ERROR_CODE_DICT = {0: "NO_ERROR", 1: "NO_STAGE", 2: "NOT_IDLE", 3: "NO_DRIVE", 4: "STRING_PARSE", 5: "COMMAND_NOT_FOUND",
+            6: "INVALID_SHUTTER", 7: "NO_FOCUS", 8: "VALUE_OUT_OF_RANGE", 9: "INVALID_WHEEL", 10: "ARG1_OUT_OF_RANGE", 
+            11: "ARG2_OUT_OF_RANGE",12: "ARG3_OUT_OF_RANGE",13: "ARG4_OUT_OF_RANGE",14: "ARG5_OUT_OF_RANGE",15: "ARG6_OUT_OF_RANGE",
+            16: "INCORRECT_STATE", 17: "NO_FILTER_WHEEL", 18: "QUEUE_FULL", 19: "COMP_MODE_SET", 20: "SHUTTER_NOT_FITTED",
+            21: "INVALID_CHECKSUM", 22: "NOT_ROTARY", 40: "NO_FOURTH_AXIS", 41: "AUTOFOCUS_IN_PROG", 42: "NO_VIDEO",
+            43: "NO_ENCODER", 44: "SIS_NOT_DONE", 45: "NO_VACUUM_DETECTOR", 46: "NO_SHUTTLE", 47: "VACUUM_QUEUED",
+            48: "SIZ_NOT_DONE", 49: "NOT_SLIDE_LOADER", 50: "ALREADY_PRELOADED", 51: "STAGE_NOT_MAPPED", 52: "TRIGGER_NOT_FITTED",
+            52: "INTERPOLATOR_NOT_FITTED"}
+
+    class ProScan3Error(Exception):
+        pass
+
     WAIT_FOR_1LINE=1
     WAIT_FOR_END=2
     def send_cmd(self, cmd: str, wait_for: int, *args):
@@ -139,7 +151,22 @@ class ProScan3Man(QObject):
 
             ans_replaced = res.replace("\r", "\\r")
             ProScan3_logger.debug(f"Got answer: <{ans_replaced}>", extra={"component": "ProScan3"})
-            return res.strip()
+ 
+            if res.startswith("E,"):
+                # This is an error
+                err_code_m = re.match(r"\s*\d+", res[2:])
+                if err_code_m is not None:
+                    err_code = int(err_code_m[0])
+                    if err_code not in ProScan3Man.ERROR_CODE_DICT.keys():
+                        err_msg = f"UNKNOWN ERROR CODE {err_code}"
+                    else:
+                        err_msg = ProScan3Man.ERROR_CODE_DICT[err_code]
+                else:
+                    err_msg = res[2:]
+
+                raise ProScan3Man.ProScan3Error(err_msg)
+
+           return res.strip()
 
     def show_config_window(self):
         if self.config_window is None:
@@ -535,11 +562,127 @@ class ProScan3Man(QObject):
     def zplane_tracking_status(self):
         return self.send_cmd("ZPLANE", ProScan3Man.WAIT_FOR_1LINE) == "1"
 
+    class FilterWheelCommand(Enum):
+        NEXT_FILTER = 0
+        PREVIOUS_FILTER = 1
+        REPORT_FILTER_POS = 2 
+        HOME_ROUTINE = 3 
+        SET_STARTUP_AUTOHOME = 4 
+        UNSET_STARTUP_AUTOHOME = 5
+
+        FW_CMD = ["N", "P", "F", "H", "A", "D"]
+
+        def __str__(self):
+            return FilterWheelCommand.FW_CMD[self.value]
+
+    @static_method
+    def _only_3_filter_wheel(fw_123: int):
+        if not 1 <= fw_123 <= 3:
+            ProScan3_logger.error(f"Max 3 Filter Wheel (1, 2, 3) {fw_123}", extra={"component": "ProScan3"})
+            raise ValueError(f"Max 3 Filter Wheel (1, 2, 3) {fw_123}")
+
     # Filter Wheel Commands
-    # TODO: 
+    def filter_wheel_command(self, fw_123: int, fw_cmd: ProScan3Man.FilterWheelCommand):
+        ProScan3Man._only_3_filter_wheel(fw_123)
+        return self.send_cmd("7", ProScan3Man.WAIT_FOR_1LINE, fw_cmd)
+
+    def filter_wheel_set_pos(self, f1: int, f2: int, f3: int):
+        #WARNING: only in COMP 0 mode
+        return self.send_cmd("7", ProScan3Man.WAIT_FOR_1LINE, f1, f2, f3)
+
+    def filter_wheel_enable_auto_shutter(self, b_enable_disable: bool):
+        return self.send_cmd("7", ProScan3Man.WAIT_FOR_1LINE, "C" if b_enable_disable else "D")
+
+    def filter_wheel_filter_tag(self, fw_123: int, fp: int, text: str | None = None):
+        # pass text = None to get tag
+        ProScan3Man._only_3_filter_wheel(fw_123)
+        if text is not None and len(text) > 6:
+            ProScan3_logger.warning(f"Filter Tag can only be 6 ch max, truncating {text} to {text[:6]}", extra={"component": "ProScan3"})
+            text = text[:6]
+        return self.send_cmd("7", ProScan3Man.WAIT_FOR_1LINE, fw_123, "T", "P", text)
+
+    def filter_wheel_get_info(self, fw_123: int):
+        ProScan3Man._only_3_filter_wheel(fw_123)
+        return self.send_cmd("FILTER", ProScan3Man.WAIT_FOR_END, fw_123)
+
+    def filter_wheel_n_pos(self, fw_123: int):
+        ProScan3Man._only_3_filter_wheel(fw_123)
+        return int(self.send_cmd("FPW", ProScan3Man.WAIT_FOR_1LINE, fw_123))
+
+    def filter_wheel_get_acc(self, fw_123: int):
+        ProScan3Man._only_3_filter_wheel(fw_123)
+        return int(self.send_cmd("SAF", ProScan3Man.WAIT_FOR_1LINE, fw_123))
+
+    def filter_wheel_set_acc(self, fw_123: int, perc: int):
+        ProScan3Man._only_3_filter_wheel(fw_123)
+        if not 1 <= perc <= 100:
+            ProScan3_logger.error(f"Filter Wheel acceleration percentage {perc} out of range [1, 100]", extra={"component": "ProScan3"})
+            raise ValueError(f"Filter Wheel acceleration percentage {perc} out of range [1, 100]")
+        return self.send_cmd("SAF", ProScan3Man.WAIT_FOR_1LINE, fw_123, perc)
+
+    def filter_wheel_get_scurve(self, fw_123: int):
+        ProScan3Man._only_3_filter_wheel(fw_123)
+        return int(self.send_cmd("SCF", ProScan3Man.WAIT_FOR_1LINE, fw_123))
+
+    def filter_wheel_set_scurve(self, fw_123: int, perc: int):
+        ProScan3Man._only_3_filter_wheel(fw_123)
+        if not 1 <= perc <= 100:
+            ProScan3_logger.error(f"Filter Wheel S-Curve setting {perc} out of range [1, 100]", extra={"component": "ProScan3"})
+            raise ValueError(f"Filter Wheel S-Curve setting {perc} out of range [1, 100]")
+        return self.send_cmd("SCF", ProScan3Man.WAIT_FOR_1LINE, fw_123, perc)
+
+    def filter_wheel_get_max_speed(self, fw_123: int):
+        ProScan3Man._only_3_filter_wheel(fw_123)
+        return int(self.send_cmd("SMF", ProScan3Man.WAIT_FOR_1LINE, fw_123))
+
+    def filter_wheel_set_max_speed(self, fw_123: int, perc: int):
+        ProScan3Man._only_3_filter_wheel(fw_123)
+        if not 1 <= perc <= 100:
+            ProScan3_logger.error(f"Filter Wheel max speed {perc} out of range [1, 100]", extra={"component": "ProScan3"})
+            raise ValueError(f"Filter Wheel max speed {perc} out of range [1, 100]")
+        return self.send_cmd("SMF", ProScan3Man.WAIT_FOR_1LINE, fw_123, perc)
 
     # Shutter Commands
-    # TODO: 
+    @static_method
+    def _only_3_shutter(sht_123: int):
+        if not 1 <= sht_123 <= 3:
+            ProScan3_logger.error(f"Max 3 Shutters (1, 2, 3) {sht_123}", extra={"component": "ProScan3"})
+            raise ValueError(f"Max 3 Shutters (1, 2, 3) {sht_123}")
+
+    def shutter_switch(self, sht_123: int, b_open_close: bool, duration_ms: int | None):
+        ProScan3Man._only_3_shutter(sht_123)
+        return self.send_cmd("8", ProScan3Man.WAIT_FOR_1LINE, sht_123, 0 if b_open_close else 1, duration_ms)
+
+    def shutter_startup_state(self, s1_open_close: bool, s2_open_close: bool, s3_open_close: bool):
+        return self.send_cmd("8", ProScan3Man.WAIT_FOR_1LINE, 0, 
+                0 if s1_open_close else 1, 
+                0 if s2_open_close else 1, 
+                0 if s3_open_close else 1)
+
+    def shutter_status_open(self, sht_123: int) -> bool:
+        # 0 is open
+        ProScan3Man._only_3_shutter(sht_123)
+        return int(self.send_cmd("8", ProScan3Man.WAIT_FOR_1LINE, sht_123)) == 0
+
+    def shutter_get_info(self, sht_123: int):
+        ProScan3Man._only_3_shutter(sht_123)
+        return self.send_cmd("Shutter", ProScan3Man.WAIT_FOR_END, sht_123)
+
+    # NOT IMPLEMENTED: Lumen Pro Commands, Pattern Commands, OEM Commands
+
+    def get_stage_mapping_status(self, b_with_4_values: bool):
+        ans = self.send_cmd("CORRECT", ProScan3Man.WAIT_FOR_1LINE, "?" if b_with_4_values else None)
+        return re.split(r"[,\s]+", ans)
+
+    def enable_stage_mapping(self, b_enable_disable: bool):
+        return self.send_cmd("CORRECT", ProScan3Man.WAIT_FOR_1LINE, "E" if b_enable_disable else "D")
+
+    def start_stage_mapping(self):
+        # Needs a SIS command first
+        return self.send_cmd("CORRECT", ProScan3Man.WAIT_FOR_1LINE, "M")
+
+    def get_error_state(self):
+        return self.send_cmd("ERRORSTAT", ProScan3Man.WAIT_FOR_END)
 
 
 def ask_selection(choices, prompt_str: str = 'Select: ', allow_invalid=False):

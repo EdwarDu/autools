@@ -1,2 +1,2 @@
 #!/bin/sh
-pyuic5 priorscan3_config.ui -o priorscan3_config_ui.py
+pyuic5 proscan3_config.ui -o proscan3_config_ui.py
