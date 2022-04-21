@@ -111,23 +111,24 @@ def gen_points_snake(canvas_size: Iterable[float], start_pt: Iterable[float], st
     curr_x, curr_y = start_x, start_y
     acc_degree = 0
 
-    sim_logger.debug(f"snake starts at ({curr_x:.2f}, {curr_y:.2f})")
+    sim_logger.debug(f"snake starts at ({curr_x:.4f}, {curr_y:.4f})")
     while True:
         len_margin = next(len_margins_it)
         dist =  next(dist_it)
 
-        sim_logger.debug(f"trying to bound in box from ({curr_x:.2f}, {curr_y:.2f}) in direction ({dir_x:.2f}, {dir_y:.2f}) with len_margin {len_margin:.2f}")
+        sim_logger.debug(f"trying to bound in box from ({curr_x:.4f}, {curr_y:.4f}) in "
+                f"direction ({dir_x:.4f}, {dir_y:.4f}) with len_margin {len_margin:.4f}")
         bound, next_x, next_y = bound_line_in_box(canvas_width, canvas_height, curr_x, curr_y, dir_x, dir_y, len_margin)
 
         if bound is None:
             # Can't go on, break now
-            sim_logger.info(f"snake can't go on, stopping at ({curr_x:.2f}, {curr_y:.2f})")
+            sim_logger.info(f"snake can't go on, stopping at ({curr_x:.4f}, {curr_y:.4f})")
             break
         else:
-            sim_logger.debug(f"snake goes to ({next_x:.2f}, {next_y:.2f}){':boop!' if bound else ''}")
+            sim_logger.debug(f"snake goes to ({next_x:.4f}, {next_y:.4f}){':boop!' if bound else ''}")
             curr_x, curr_y = next_x, next_y
 
-        yield (curr_x, curr_y)
+        yield (curr_x, curr_y, seg_idx)
 
         acc_degree += next(angles_it)
 
@@ -139,26 +140,27 @@ def gen_points_snake(canvas_size: Iterable[float], start_pt: Iterable[float], st
             acc_degree += 360
 
         dir_x, dir_y = rotate_point(start_dir_x, start_dir_y, acc_degree)
-        sim_logger.debug(f"snake turns as ({dir_x:.2f}, {dir_y:.2f}) - {acc_degree:.2f}")
-        sim_logger.debug(f"trying to bound in box from ({curr_x:.2f}, {curr_y:.2f}) in direction ({dir_x:.2f}, {dir_y:.2f}) with len_margin {dist:.2f}")
+        sim_logger.debug(f"snake turns as ({dir_x:.4f}, {dir_y:.4f}) - {acc_degree:.4f}")
+        sim_logger.debug(f"trying to bound in box from ({curr_x:.4f}, {curr_y:.4f}) "
+                f"in direction ({dir_x:.4f}, {dir_y:.4f}) with len_margin {dist:.4f}")
         bound, next_x, next_y = bound_line_in_box(canvas_width, canvas_height, curr_x, curr_y, dir_x, dir_y, dist)
 
         if bound is None:
             # Can't go on, break now
-            sim_logger.info(f"snake can't go on, stopping at ({curr_x:.2f}, {curr_y:.2f})")
+            sim_logger.info(f"snake can't go on, stopping at ({curr_x:.4f}, {curr_y:.4f})")
             break
         else:
             if bound:
                 # dist line, must not be clipped
-                sim_logger.info(f"snake turn seg must be satisfied, stopping at ({curr_x:.2f}, {curr_y:.2f})")
+                sim_logger.info(f"snake turn seg must be satisfied, stopping at ({curr_x:.4f}, {curr_y:.4f})")
                 # FIXME: This can be optimized/fixed/resolved by back the previous line a bit, but requires more calculation
                 #   may not be worth to do it anyway
                 # This will happen if the direction is not horizontal or vertical
                 break
-            sim_logger.debug(f"snake goes to ({next_x:.2f}, {next_y:.2f}){':boop!' if bound else ''}")
+            sim_logger.debug(f"snake goes to ({next_x:.4f}, {next_y:.4f}){':boop!' if bound else ''}")
             curr_x, curr_y = next_x, next_y
 
-        yield (curr_x, curr_y)
+        yield (curr_x, curr_y, seg_idx)
 
         acc_degree += next(angles_it)
         if acc_degree > 360:
@@ -167,12 +169,13 @@ def gen_points_snake(canvas_size: Iterable[float], start_pt: Iterable[float], st
             acc_degree += 360
 
         dir_x, dir_y = rotate_point(start_dir_x, start_dir_y, acc_degree)
-        sim_logger.debug(f"snake turns as ({dir_x:.2f}, {dir_y:.2f}) - {acc_degree:.2f}")
+        sim_logger.debug(f"snake turns as ({dir_x:.4f}, {dir_y:.4f}) - {acc_degree:.4f}")
         seg_idx += 1
 
 
 def gen_circle_from_point(canvas_size: Iterable[float], center_pt: Iterable[float], start_pt: Iterable[float], 
-        step_degree: float, cover_degree: float = 360, min_step: float = 0):
+        step_degree: float, cover_degree: float = 360, min_step: float = 0, distri_leftover_degree: bool = False):
+    assert(cover_degree > 0)
     canvas_width, canvas_height = canvas_size
     center_x, center_y = center_pt
     start_x, start_y = start_pt
@@ -181,13 +184,23 @@ def gen_circle_from_point(canvas_size: Iterable[float], center_pt: Iterable[floa
     step_dist = math.sin(step_degree/360 * math.pi) * radius * 2
     if abs(step_dist) < min_step:
         min_degree = math.asin(abs(min_step)/2/radius) / math.pi *360
-        n_steps = int(360/min_degree)
-        if step_degree < 0:
-            step_degree = -360.0/n_steps
-        else:
-            step_degree = 360 / n_steps
+        n_steps = int(cover_degree/min_degree)
+        step_degree = (-cover_degree if step_degree < 0 else cover_degree)/n_steps
         # adjust to even it out
-        sim_logger.warning(f"can't move a distance of {abs(step_dist):.2f} < {min_step:.2f}, adjusting step_degree to {step_degree:.2f}")
+        sim_logger.warning(f"can't move a distance of {abs(step_dist):.4f} < {min_step:.4f}, "
+                f"adjusting step_degree to {step_degree:.4f}")
+
+    step_degree_abs = abs(step_degree)
+
+    if distri_leftover_degree:
+        degree_leftover = cover_degree - int(cover_degree / step_degree_abs) * step_degree_abs
+        if degree_leftover > 1e-12:
+            # we have leftover, distribute it by increasing the step_degree
+            n_steps = int(cover_degree / step_degree_abs)
+            step_degree = (-cover_degree if step_degree < 0 else cover_degree)/n_steps
+            step_degree_abs = abs(step_degree)
+            sim_logger.warning(f"to distribute last leftover degree, adjusting step_degree to {step_degree:.4f}")
+
 
     curr_x, curr_y = start_x, start_y
     curr_degree = math.asin((start_y - center_y) / radius) / math.pi * 180
@@ -197,17 +210,27 @@ def gen_circle_from_point(canvas_size: Iterable[float], center_pt: Iterable[floa
         else:
             curr_degree = -180 - curr_degree
 
-    sim_logger.info(f"circle starts at {curr_degree:.2f} at ({curr_x:.2f}, {curr_y:.2f})")
+    sim_logger.info(f"circle starts at {curr_degree:.4f} at ({curr_x:.4f}, {curr_y:.4f})")
 
     acc_degree = 0
 
     while True:
-        degree_left = abs(cover_degree) - acc_degree
-        if degree_left < step_degree:
-            raise ValueError(f"can't move even smaller than adjusted degree {step_degree:.2f}")
-        elif step_degree < degree_left < 2*step_degree:
-            move_degree = degree_left if step_degree > 0 else -degree_left
-            sim_logger.warning(f"circle goes by {move_degree:.2f} towards finish, instead of {step_degree:.2f}")
+        degree_left = cover_degree - acc_degree
+        if degree_left < step_degree_abs + 1e-9:
+            leftover_dist = radius * 2 * math.sin(degree_left / 360 * math.pi)
+            if leftover_dist < min_step:
+                raise ValueError(f"can't move even smaller than adjusted degree {step_degree:.4f}")
+            else:
+                move_degree = degree_left if step_degree > 0 else -degree_left
+        elif step_degree_abs < degree_left < 2*step_degree_abs:
+            leftover_dist = radius * 2 * math.sin( (degree_left - step_degree_abs) / 360 * math.pi)
+            if leftover_dist < min_step:
+                move_degree = degree_left if step_degree > 0 else -degree_left
+                sim_logger.warning(f"circle goes by {move_degree:.4f} towards finish, instead of {step_degree:.4f}, "
+                        f"diff {move_degree - step_degree}")
+            else:
+                # it is okay to leave the leftover as it is
+                move_degree = step_degree
         else:
             move_degree = step_degree
         n_x, n_y = rotate_point(curr_x - center_x, curr_y - center_y, move_degree)
@@ -215,36 +238,40 @@ def gen_circle_from_point(canvas_size: Iterable[float], center_pt: Iterable[floa
         n_y += center_y
         acc_degree += abs(move_degree)
         curr_degree += move_degree
-        sim_logger.debug(f"circle going by {move_degree if step_degree > 0 else -move_degree:.2f} degree to "
-                f"({n_x:.2f}, {n_y:.2f}), now at {curr_degree:.2f}")
+        sim_logger.debug(f"circle going by {move_degree if step_degree > 0 else -move_degree:.4f} degree to "
+                f"({n_x:.4f}, {n_y:.4f}), now at {curr_degree:.4f}")
         if 0 <= n_x <= canvas_width and 0 <= n_y <= canvas_height:
             yield (n_x, n_y, curr_degree)
             curr_x, curr_y = n_x, n_y
         else: 
-            sim_logger.info(f"circle going outside canvas ({n_x:.2f}, {n_y:.2f}), stopping at ({curr_x:.2f}, {curr_y:.2f})")
+            sim_logger.info(f"circle going outside canvas ({n_x:.4f}, {n_y:.4f}), stopping at ({curr_x:.4f}, {curr_y:.4f})")
             break
-        if acc_degree >= cover_degree:
+        # 1e-12 is added as eps to allow float point calculation error margin
+        if acc_degree + 1e-12 >= cover_degree:
             return curr_x, curr_y, curr_degree
 
 
-def gen_circle_from_radius(canvas_size: Iterable[float], center_pt: Iterable[float], 
-        radius: float, start_degree: float, step_degree: float, cover_degree: float = 360, min_step: float = 0):
+def gen_circle_from_radius(canvas_size: Iterable[float], center_pt: Iterable[float], radius: float, start_degree: float, 
+        step_degree: float, cover_degree: float = 360, min_step: float = 0, distri_leftover_degree: bool = False):
     center_x, center_y = center_pt
     start_x = center_x + radius * math.cos(start_degree/180*math.pi)
     start_y = center_y + radius * math.sin(start_degree/180*math.pi)
     yield (start_x, start_y, start_degree)
-    res = yield from gen_circle_from_point(canvas_size, center_pt, (start_x, start_y), step_degree, cover_degree, min_step)
+    res = yield from gen_circle_from_point(canvas_size, center_pt, (start_x, start_y), step_degree, 
+            cover_degree, min_step, distri_leftover_degree)
     return res
 
 
-def gen_circle_from_degree(canvas_size: Iterable[float], start_pt: Iterable[float], 
-        radius: float, start_degree: float, step_degree: float, cover_degree: float = 360, min_step: float = 0):
+def gen_circle_from_degree(canvas_size: Iterable[float], start_pt: Iterable[float], radius: float, start_degree: float, 
+        step_degree: float, cover_degree: float = 360, min_step: float = 0, distri_leftover_degree: bool = False):
     start_x, start_y = start_pt
     center_x = start_x - radius * math.cos(start_degree/180*math.pi)
     center_y = start_y - radius * math.sin(start_degree/180*math.pi)
-    sim_logger.debug(f"gen_circle_from_degree ({start_x:.2f}, {start_y:.2f}), start_degree {start_degree:.2f}, radius {radius:.2f}, center at ({center_x:.2f}, {center_y:.2f})") 
+    sim_logger.debug(f"gen_circle_from_degree ({start_x:.4f}, {start_y:.4f}), start_degree {start_degree:.4f}, "
+            f"radius {radius:.4f}, center at ({center_x:.4f}, {center_y:.4f})") 
 
-    res = yield from gen_circle_from_point(canvas_size, (center_x, center_y), start_pt, step_degree, cover_degree, min_step)
+    res = yield from gen_circle_from_point(canvas_size, (center_x, center_y), start_pt, step_degree, 
+            cover_degree, min_step, distri_leftover_degree)
     return res
 
 
@@ -279,15 +306,20 @@ def dump_pattern_to_file(points_gen: Iterator[Tuple[float]], offset_v: Iterable[
     ja_to_start=False
     while True:
         try:
-            pt_x, pt_y = next(points_gen)[:2]
+            pt_x, pt_y, extra_info = next(points_gen)
+            if type(extra_info) is float:
+                extra_s = f"{extra_info:.4f}"
+            else:
+                extra_s = f"{extra_info}"
+
             if first_is_start and not ja_to_start:
-                print('#include "DrawInactive.txt', file=f_output)
-                print(f"ja ( {pt_x+offset_x:.4f}, {pt_y+offset_y:.4f} ); ", file=f_output)
-                print('#include "DrawActive.txt', file=f_output)
+                print('#include "DrawInactive.txt"', file=f_output)
+                print(f"ja ( {pt_x+offset_x:.4f}, {pt_y+offset_y:.4f} ); // {extra_s} ", file=f_output)
+                print('#include "DrawActive.txt"', file=f_output)
                 print('MovingSpeed (4); // <----- YOU MAY WANT TO CHANGE THIS', file=f_output)
                 ja_to_start=True
             else:
-                print(f"ma ( {pt_x+offset_x:.4f}, {pt_y+offset_y:.4f} ); ", file=f_output)
+                print(f"ma ( {pt_x+offset_x:.4f}, {pt_y+offset_y:.4f} ); // {extra_s} ", file=f_output)
         except StopIteration:
             break
 
@@ -306,10 +338,10 @@ if __name__ == "__main__":
     canvas_offsets = (-20, -20)
     points_gen = gen_points_snake(canvas_s, snake_head, snake_first_goes, cycle([90, 90, -90, -90]), repeat(2), repeat(30))
     with open("./snake_30x30_d2.txt", "w") as f_snake:
-        print('#include "DrawInactive.txt', file=f_snake)
+        print('#include "DrawInactive.txt"', file=f_snake)
         # jump to snake starting point
         print(f'ja ( {snake_head[0] + canvas_offsets[0]:.4f}, {snake_head[1] + canvas_offsets[1]:.4f} );', file=f_snake)
-        print('#include "DrawActive.txt', file=f_snake)
+        print('#include "DrawActive.txt"', file=f_snake)
         print('MovingSpeed (4);', file=f_snake)
         # for snake pattern the first point generated is not the start_point
         dump_pattern_to_file(points_gen, canvas_offsets, f_snake, False)
@@ -330,8 +362,8 @@ if __name__ == "__main__":
     #        yield 60
     #        r_idx += 1
 
-    p_x, p_y = snake_head
-    points_gen = gen_points_snake(canvas_s, snake_head, snake_first_goes, cycle([90, 90, -90, -90]), repeat(2), repeat(30))
+    #p_x, p_y = snake_head
+    #points_gen = gen_points_snake(canvas_s, snake_head, snake_first_goes, cycle([90, 90, -90, -90]), repeat(2), repeat(30))
     # points_gen = gen_spiral(canvas_s, (p_x, p_y), radius_gen_spiral(), 0, 10, cover_degree_gen_spiral(), 0)
     #points_gen = gen_circle_from_radius(canvas_s, (p_x, p_y), 300, 0, 10, 360, 0)
     #p_x = None # avoid plotting the first center to start_pt
@@ -341,29 +373,46 @@ if __name__ == "__main__":
     fig_ax.set_ylim(bottom=-1, top=canvas_s[1]+1)
     fig_ax.set_aspect(1)
     
-    while True:
-        try:
-            n_x, n_y = next(points_gen)[:2]
-            if p_x is not None:
-                fig_ax.plot( (p_x, n_x), (p_y, n_y), '-')
-            plt.pause(0.1)
-            p_x, p_y = n_x, n_y
-        except StopIteration:
-            break
+    #while True:
+    #    try:
+    #        n_x, n_y = next(points_gen)[:2]
+    #        if p_x is not None:
+    #            fig_ax.plot( (p_x, n_x), (p_y, n_y), '-')
+    #        plt.pause(0.1)
+    #        p_x, p_y = n_x, n_y
+    #    except StopIteration:
+    #        break
 
-    plt.pause(3)
+    #plt.pause(3)
 
-    fig_ax.clear()
-    fig_ax.set_xlim(left=-1, right=canvas_s[0]+1)
-    fig_ax.set_ylim(bottom=-1, top=canvas_s[1]+1)
-    fig_ax.set_aspect(1)
+    #fig_ax.clear()
+    #fig_ax.set_xlim(left=-1, right=canvas_s[0]+1)
+    #fig_ax.set_ylim(bottom=-1, top=canvas_s[1]+1)
+    #fig_ax.set_aspect(1)
 
     circle_center=(15, 15)
     with open("./circles_30x30_15_15_r5_r8.txt", "w") as f_circles:
-        points_gen = gen_circle_from_radius(canvas_s, circle_center, 5, 0, 1, 360, 0.01)
+        points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=5, start_degree=0, step_degree=10, cover_degree=360, min_step=0.01)
         dump_pattern_to_file(points_gen, canvas_offsets, f_circles, True)
 
-        points_gen = gen_circle_from_radius(canvas_s, circle_center, 5, 0, 1, 360, 0.01)
+        #points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=5, start_degree=0, step_degree=10, cover_degree=360, min_step=0.01)
+        #p_x = None
+        #while True:
+        #    try:
+        #        n_x, n_y = next(points_gen)[:2]
+        #        if p_x is not None:
+        #            fig_ax.plot( (p_x, n_x), (p_y, n_y), '-')
+        #        plt.pause(0.01)
+        #        p_x, p_y = n_x, n_y
+        #    except StopIteration:
+        #        break
+
+        #plt.pause(1)
+
+        points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=8, start_degree=0, step_degree=-13, cover_degree=360, min_step=1.3)
+        dump_pattern_to_file(points_gen, canvas_offsets, f_circles, True)
+
+        points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=8, start_degree=0, step_degree=-13, cover_degree=360, min_step=1.3)
         p_x = None
         while True:
             try:
@@ -377,10 +426,10 @@ if __name__ == "__main__":
 
         plt.pause(1)
 
-        points_gen = gen_circle_from_radius(canvas_s, circle_center, 8, 90, -1, 360, 0.5)
+        points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=8, start_degree=0, step_degree=-13, cover_degree=360, min_step=1.3, distri_leftover_degree=True)
         dump_pattern_to_file(points_gen, canvas_offsets, f_circles, True)
 
-        points_gen = gen_circle_from_radius(canvas_s, circle_center, 8, 90, -1, 360, 0.5)
+        points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=8, start_degree=0, step_degree=-13, cover_degree=360, min_step=1.3, distri_leftover_degree=True)
         p_x = None
         while True:
             try:
@@ -392,6 +441,4 @@ if __name__ == "__main__":
             except StopIteration:
                 break
 
-        plt.pause(5)
-
-
+        plt.pause(1)
