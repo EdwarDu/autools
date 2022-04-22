@@ -182,8 +182,9 @@ def gen_circle_from_point(canvas_size: Iterable[float], center_pt: Iterable[floa
 
     radius = math.sqrt( (start_x - center_x)**2 + (start_y - center_y)**2 )
     step_dist = math.sin(step_degree/360 * math.pi) * radius * 2
+    min_degree = math.asin(abs(min_step)/2/radius) / math.pi *360
+
     if abs(step_dist) < min_step:
-        min_degree = math.asin(abs(min_step)/2/radius) / math.pi *360
         n_steps = int(cover_degree/min_degree)
         step_degree = (-cover_degree if step_degree < 0 else cover_degree)/n_steps
         # adjust to even it out
@@ -197,6 +198,8 @@ def gen_circle_from_point(canvas_size: Iterable[float], center_pt: Iterable[floa
         if degree_leftover > 1e-12:
             # we have leftover, distribute it by increasing the step_degree
             n_steps = int(cover_degree / step_degree_abs)
+            if cover_degree / (n_steps + 1) + 1e-12 >= min_degree:
+                n_steps += 1
             step_degree = (-cover_degree if step_degree < 0 else cover_degree)/n_steps
             step_degree_abs = abs(step_degree)
             sim_logger.warning(f"to distribute last leftover degree, adjusting step_degree to {step_degree:.4f}")
