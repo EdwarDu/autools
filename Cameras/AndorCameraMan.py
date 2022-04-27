@@ -1,6 +1,23 @@
 #!/usr/bin/python3
 
+import os
 import ctypes
+
+if os.name == "nt":
+    # preload DLLs for Andor3 in windows build
+    # this is not necessary if copied those .dll to a $PATH folder in Windows
+    win_dll_dir = os.path.abspath(
+                      os.path.join(
+                            os.path.dirname(os.path.abspath(__file__)), 
+                            "../AndorSDK3/WIN/"))
+    ctypes.CDLL(os.path.join(win_dll_dir, "atcore.dll"))
+    ctypes.CDLL(os.path.join(win_dll_dir, "atdevregcam.dll"))
+    ctypes.CDLL(os.path.join(win_dll_dir, "atdevsimcam.dll"))
+    ctypes.CDLL(os.path.join(win_dll_dir, "atmcd64d.dll"))
+    ctypes.CDLL(os.path.join(win_dll_dir, "atusb_libusb.dll"))
+    ctypes.CDLL(os.path.join(win_dll_dir, "atusb_libusb10.dll"))
+    ctypes.CDLL(os.path.join(win_dll_dir, "atspooler.dll"))
+
 import time
 from .CameraMan import CameraMan
 import numpy as np

@@ -116,6 +116,7 @@ cdef class Andor3Man:
 
     def __dealloc__(self):
         andor3.AT_FinaliseLibrary()
+        andor3_logger.info(f"Andor3 Library released", extra={"component": "Andor3"})
 
     def load_feature_map(self, feature_map: dict):
         self._feature_map = feature_map
