@@ -313,7 +313,12 @@ cdef class Andor3Man:
         cdef int i_count
         handle = 1 if self.is_sys_feature(feature) else self._c_dev_h
         ret = andor3.AT_GetEnumCount(handle, feature, &i_count)
-        if ret != andor3.AT_SUCCESS:
+        # FIXME: This should not happen, but it is happening for Zyla camera (in Windows at least)
+        if ret != andor3.AT_ERR_NOTIMPLEMENTED:
+            andor3_logger.error(f"Failed to get(e) count for {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
+            self._feature_map[feature]['b_implemented'] = False
+            return 0
+        elif ret != andor3.AT_SUCCESS:
             andor3_logger.error(f"Failed to get(e) count for {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to get(e) count for {feature}, {error_code_to_str(ret)}")
         andor3_logger.debug(f"{feature}(e) count = {i_count}", extra={"component": "Andor3"})

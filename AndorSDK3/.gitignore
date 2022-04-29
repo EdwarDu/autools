@@ -7,8 +7,7 @@
 !atcore_fake_dev.cpp
 !run.py
 !setup.py
-!LINUX/
-!WIN/
-!LINUX/**
-!WIN/**
-
+!cython/
+!cython/**
+!python3/
+!python3/**
