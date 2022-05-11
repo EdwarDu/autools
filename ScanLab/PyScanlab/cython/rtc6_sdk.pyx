@@ -104,7 +104,7 @@ cdef class RTC6Man:
     RTC6_WIN_VER_ERROR = 15
     RTC6_CONFIG_ERROR = 16
 
-    def __cinit__(self, cfg_path=os.path.dirname(os.path.abspath(__file__))):
+    def __cinit__(self, cfg_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")):
         """
         TODO: device initialization.
         """
@@ -174,7 +174,7 @@ cdef class RTC6Man:
 
     def load_correction_file(self, cor_file: Union[None, str], table_no: int, dim: int):
         if cor_file is None:
-            cor_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "Cor_1to1.ct5")
+            cor_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "Cor_1to1.ct5")
         
         if not os.path.exists(cor_file):
             rtc6_logger.error(f"Correction file {cor_file} does not exist", extra={"component": "rtc6"})

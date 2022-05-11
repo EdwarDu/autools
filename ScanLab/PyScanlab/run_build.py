@@ -1,4 +1,3 @@
-# This is the entry point to setup_j
 import os
 import platform
 import sys
@@ -26,14 +25,13 @@ else:
 if python3_path is None:
     ans = ""
     while not os.path.exists(ans):
-        ans = input(f"Input the python3.exe path to launch the setup_j app:")
+        ans = input(f"Input the python3.exe path:")
     python3_path = ans
 
-os.system(f"{python3_path} setup.py build_ext -i")
+os.system(f"{python3_path} setup.py build")
+os.system(f"{python3_path} -m pip install .")
 
 ans = input("If there is no error message, want to launch run.py to test the package? [y/N]")
 
 if ans.lower().startswith("y"):
     os.system(f"{python3_path} run.py")
-
-

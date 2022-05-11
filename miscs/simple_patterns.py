@@ -365,33 +365,32 @@ if __name__ == "__main__":
     #        yield 60
     #        r_idx += 1
 
-    #p_x, p_y = snake_head
-    #points_gen = gen_points_snake(canvas_s, snake_head, snake_first_goes, cycle([90, 90, -90, -90]), repeat(2), repeat(30))
+    p_x, p_y = snake_head
+    points_gen = gen_points_snake(canvas_s, snake_head, snake_first_goes, cycle([90, 90, -90, -90]), repeat(2), repeat(30))
     # points_gen = gen_spiral(canvas_s, (p_x, p_y), radius_gen_spiral(), 0, 10, cover_degree_gen_spiral(), 0)
-    #points_gen = gen_circle_from_radius(canvas_s, (p_x, p_y), 300, 0, 10, 360, 0)
-    #p_x = None # avoid plotting the first center to start_pt
+    p_x = None # avoid plotting the first center to start_pt
 
     fig, fig_ax = plt.subplots() 
     fig_ax.set_xlim(left=-1, right=canvas_s[0]+1)
     fig_ax.set_ylim(bottom=-1, top=canvas_s[1]+1)
     fig_ax.set_aspect(1)
-    
-    #while True:
-    #    try:
-    #        n_x, n_y = next(points_gen)[:2]
-    #        if p_x is not None:
-    #            fig_ax.plot( (p_x, n_x), (p_y, n_y), '-')
-    #        plt.pause(0.1)
-    #        p_x, p_y = n_x, n_y
-    #    except StopIteration:
-    #        break
 
-    #plt.pause(3)
+    while True:
+        try:
+            n_x, n_y = next(points_gen)[:2]
+            if p_x is not None:
+                fig_ax.plot( (p_x, n_x), (p_y, n_y), '-')
+            plt.pause(0.1)
+            p_x, p_y = n_x, n_y
+        except StopIteration:
+            break
 
-    #fig_ax.clear()
-    #fig_ax.set_xlim(left=-1, right=canvas_s[0]+1)
-    #fig_ax.set_ylim(bottom=-1, top=canvas_s[1]+1)
-    #fig_ax.set_aspect(1)
+    plt.pause(3)
+
+    fig_ax.clear()
+    fig_ax.set_xlim(left=-1, right=canvas_s[0]+1)
+    fig_ax.set_ylim(bottom=-1, top=canvas_s[1]+1)
+    fig_ax.set_aspect(1)
 
     circle_center=(15, 15)
     with open("./circles_30x30_15_15_r5_r8.txt", "w") as f_circles:

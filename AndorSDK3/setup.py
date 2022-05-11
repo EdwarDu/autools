@@ -17,6 +17,7 @@ if not __FAKE_DEV:
         ext_modules = [
             Extension('pyandor3.andor_sdk3', 
                       ["cython/andor_sdk3.pyx",],
+                      language = "c++",
                       libraries=["atcorem", ],
                       library_dirs=['python3/pyandor3/lib/WIN/', ],
                       include_dirs=['python3/pyandor3/inc/WIN/', ],
@@ -27,6 +28,7 @@ if not __FAKE_DEV:
         ext_modules = [
             Extension('pyandor3.andor_sdk3', 
                       ["cython/andor_sdk3.pyx",],
+                      language = "c++",
                       libraries=["atcore", ],
                       library_dirs=['python3/pyandor3/lib/LINUX/x86_64', ],
                       include_dirs=['python3/pyandor3/inc/LINUX/', ],
@@ -38,6 +40,7 @@ else:
     ext_modules = [
         Extension("pyandor3.andor_sdk3",
                   ["cython/andor_sdk3.pyx", "cython/atcore_fake_dev.cpp"],
+                  language = "c++",
                   include_dirs=["python3/pyandor3/inc/LINUX/", ]),
     ]
     lib_files=["",]
