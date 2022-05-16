@@ -5,4 +5,13 @@ class TwoDMapper:
 
     def __init__(self):
         
+# Reverse: AffineTransform using OpenCV
+#getAffineTransform() [1/2]
 
+#Mat cv::getAffineTransform  (   const Point2f   src[],
+#    const Point2f   dst[] 
+#)   
+
+#Python:
+
+#cv.getAffineTransform(  src, dst    ) ->    retval

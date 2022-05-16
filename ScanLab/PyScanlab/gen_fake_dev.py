@@ -24,14 +24,14 @@ with open(sys.argv[1], 'r') as f_header, open(sys.argv[2], 'w') as f_fake:
             print(line.replace(";", "{"), end='', file=f_fake)
             print("  // auto-gen dummy impl of function", file=f_fake)
             arg_list = func_match.group('arg_list')
-            print('  cout << __FUNCTION__ << " called" << ', end='', file=f_fake)
+            print('  cout << __FUNCTION__ << " called " << ', end='', file=f_fake)
             if arg_list.strip() != "" and arg_list.strip() != "void":
                 for arg in [x.strip() for x in re.split(",", arg_list)]:
                     arg_match = arg_re.match(arg)
                     arg_type = arg_match.group('arg_type')
                     arg_name = arg_match.group('arg_name')
                     print(f"    {arg_name} ---> {arg_type}", file=sys.stderr)
-                    print(f"\"{arg_name} = \" << {arg_name} << ", end='', file=f_fake)
+                    print(f"\" {arg_name} = \" << {arg_name} << ", end='', file=f_fake)
             print('endl;', file=f_fake)
             if func_ret_type == 'void':
                 print("  return;", file=f_fake)

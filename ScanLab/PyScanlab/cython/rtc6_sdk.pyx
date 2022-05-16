@@ -1,5 +1,7 @@
+# vim:  set syntax=python foldmethod=indent:
 #distutils: language = c++
-cimport rtc6_sdk as rtc6
+from libcpp cimport bool
+from rtc6_sdk cimport *
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
 import numpy as np
@@ -7,7 +9,7 @@ import logging
 import os
 from typing import Union
 
-#[FIXME]: For testing now, use split log
+#[FIXME]: For testing now, use split log, this is not good for packaging
 _SPLIT_LOG = True
 
 if _SPLIT_LOG:
@@ -27,7 +29,7 @@ else:
 class RTC6DevError(Exception):
     pass
 
-cdef class RTC6Man:
+cdef class RTC6Helper:
     """
     Cython class for wrapping API calls to RTC6_SDK
     [WARNING]:not all features will be implemented here
@@ -104,18 +106,34 @@ cdef class RTC6Man:
     RTC6_WIN_VER_ERROR = 15
     RTC6_CONFIG_ERROR = 16
 
-    def __cinit__(self, cfg_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")):
+    cdef int  cardno
+    cdef bool do_init
+    cdef UINT board_count
+
+    def __cinit__(self, do_init: bool, cardno: int = -1):
         """
         TODO: device initialization.
         """
-        err = rtc6.init_rtc6_dll()
-        if err == 0:
-            rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})
-        else:
-            rtc6_logger.info(f"RTC6 DLL Init Failed: {hex(err)}", extra={"component": "rtc6"})
+        self.do_init = do_init
+        self.cardno = cardno
+        if self.do_init:
+            err = _init_rtc6_dll(self.cardno)
+            if err == 0:
+                rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})
+            else:
+                rtc6_logger.info(f"RTC6 DLL Init Failed: {hex(err)}", extra={"component": "rtc6"})
 
-        rtc6.set_rtc6_mode()
+            _set_rtc6_mode(self.cardno)
 
+        self.board_count = _rtc6_count_cards(self.cardno)
+        if self.cardno > 0:
+            if self.cardno > self.board_count:
+                rtc6_logger.error(f"{cardno} is larger than number of RTC6 board count {self.board_count}")
+                raise ValueError(f"{cardno} is larger than number of RTC6 board count {self.board_count}")
+
+    def load_program_file(self, cfg_path: Union[str, None] = None):
+        if cfg_path is None:
+            cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
         rtc6_logger.info(f"Board reset with config dir: {cfg_path}", extra={"component": "rtc6"})
         if not os.path.exists(cfg_path) or \
             not os.path.exists(os.path.join(cfg_path, "RTC6OUT.out")) or \
@@ -125,16 +143,18 @@ cdef class RTC6Man:
                               f"does not exist in {cfg_path}", extra={"component": "rtc6"})
             raise FileNotFoundError()
 
-        err = rtc6.load_program_file(cfg_path.encode('utf-8'))
+        err = _load_program_file(self.cardno, cfg_path.encode('utf-8'))
+
         if err == 0:
             rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
         else:
             if err == 2:
-                err = rtc6.load_program_file(cfg_path.encode('utf-8'))
+                err = _load_program_file(self.cardno, cfg_path.encode('utf-8'))
+
             if err == 0:
                 rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
-            elif err in RTC6Man.ERR_CODES["load_program_file"].keys():
-                rtc6_logger.error(f"Device reset Failed: {RTC6Man.ERR_CODES['load_program_file'][err]}",
+            elif err in RTC6Helper.ERR_CODES["load_program_file"].keys():
+                rtc6_logger.error(f"Device reset Failed: {RTC6Helper.ERR_CODES['load_program_file'][err]}",
                                   extra={"component": "rtc6"})
                 if err == 2:
                     rtc6_logger.error(f"Power cycle required", extra={"component": "rtc6"})
@@ -143,8 +163,8 @@ cdef class RTC6Man:
                 rtc6_logger.error(f"Device reset Failed: unknown error code {err}", extra={"component": "rtc6"})
                 raise RTC6DevError(err)
 
-        rtc6.reset_error(-1)
-        
+        _reset_error(self.cardno, -1)
+
     def config_list(self, mem1: int, mem2: int):
         # 8,388,608 (2^23) storage positions
         # mem1 -> list1, mem2 -> list2., rest to protected list list3
@@ -170,8 +190,9 @@ cdef class RTC6Man:
         rtc6_logger.debug(f"setting mem1={actual_mem1}, mem2={actual_mem2}, "
                           f"list3={(1<<23)-actual_mem1-actual_mem2}", 
                           extra={"component": "rtc6"})
-        rtc6.config_list(mem1, mem2)
-
+        
+        _config_list(self.cardno, mem1, mem2)
+        
     def load_correction_file(self, cor_file: Union[None, str], table_no: int, dim: int):
         if cor_file is None:
             cor_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "Cor_1to1.ct5")
@@ -191,24 +212,24 @@ cdef class RTC6Man:
 
         cor_file_c = cor_file.encode('utf-8')
 
-        err = rtc6.load_correction_file(cor_file_c, table_no, dim)
+        err = _load_correction_file(self.cardno, cor_file_c, table_no, dim)
         if err == 0:
             rtc6_logger.info(f"Load correction file OKAY", extra={"component": "rtc6"})
-        elif err in RTC6Man.ERR_CODES["load_correction_file"].keys():
+        elif err in RTC6Helper.ERR_CODES["load_correction_file"].keys():
             if err != 12:
-                rtc6_logger.error(f"Load correction file Failed: {RTC6Man.ERR_CODES['load_correction_file'][err]}",
+                rtc6_logger.error(f"Load correction file Failed: {RTC6Helper.ERR_CODES['load_correction_file'][err]}",
                               extra={"component": "rtc6"})
                 if err == 11:
-                    last_err = rtc6.get_last_error()
-                    if RTC6Man.has_error(last_err, RTC6Man.RTC6_VERSION_MISMATCH):
-                        rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})
-                    elif RTC6Man.has_error(last_err, RTC6Man.RTC6_ACCESS_DENIED):
-                        rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_ACCESS_DENIED]}", extra={"component": "rtc6"})
+                    last_err = _get_last_error(self.cardno)
+                    if RTC6Helper.has_error(last_err, RTC6Helper.RTC6_VERSION_MISMATCH):
+                        rtc6_logger.error(f"{RTC6Helper.ERR_CODES['acc_err'][RTC6Helper.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})
+                    elif RTC6Helper.has_error(last_err, RTC6Helper.RTC6_ACCESS_DENIED):
+                        rtc6_logger.error(f"{RTC6Helper.ERR_CODES['acc_err'][RTC6Helper.RTC6_ACCESS_DENIED]}", extra={"component": "rtc6"})
                     else:
                         rtc6_logger.error(f"Unknown last error {hex(last_err)}")
                 raise RTC6DevError(err)
             else:
-                rtc6_logger.warning(f"Load correction file: {RTC6Man.ERR_CODES['load_correction_file'][err]}",
+                rtc6_logger.warning(f"Load correction file: {RTC6Helper.ERR_CODES['load_correction_file'][err]}",
                               extra={"component": "rtc6"})
         else:
             rtc6_logger.error(f"Load correction file Failed: unknown error code {err}", extra={"component": "rtc6"})
@@ -224,11 +245,26 @@ cdef class RTC6Man:
         if x != x1 or y != y1:
             rtc6_logger.warning(f"x or y is out of range [-524288, 524287], clipped", extra={"component": "rtc6"})
         rtc6_logger.debug(f"Going to ({x1},{y1})", extra={"component": "rtc6"})    
-        rtc6.goto_xy(x1, y1)
+        _goto_xy(self.cardno, x1, y1)
+
+    def get_error(self):
+        return _get_error(self.cardno)
+
+    def get_last_error(self):
+        return _get_last_error(self.cardno)
+
+    def set_laser(self, b_enable: bool):
+        return _enable_laser(self.cardno) if b_enable else _disable_laser(self.cardno)
+        
+    def set_laser_sig(self, b_enable: bool):
+        return _laser_signal_on(self.cardno) if b_enable else _laser_signal_off(self.cardno)
+
+    def set_zoom(self, zoom: int):
+        return _set_zoom(self.cardno, zoom)
 
     def __dealloc__(self):
         """
         TODO: device finalise/close procedure
         """
-        rtc6.free_rtc6_dll()
-
+        if self.do_init:
+            _free_rtc6_dll(self.cardno)

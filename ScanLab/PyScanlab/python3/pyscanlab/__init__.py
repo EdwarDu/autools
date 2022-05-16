@@ -1,6 +1,8 @@
-__all__ = ['RTC6Man', ]
+__all__ = ['RTC6Helper', "rtc6_sdk"]
 
-from pyscanlab.rtc6_sdk import RTC6Man
+# allow raw function call to rtc6 (too many functions to handle in the python3 with wrapper for now)
+from pyscanlab import rtc6_sdk
+from pyscanlab.rtc6_sdk import RTC6Helper
 
 import os
 import re

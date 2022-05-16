@@ -1,4 +1,4 @@
-from andor_sdk3 import Andor3Man
+from pyandor3 import Andor3Man
 
 a3man = Andor3Man()
 

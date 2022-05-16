@@ -11,7 +11,7 @@ __FAKE_DEV = True
 if not __FAKE_DEV:
     ext_modules = [
         Extension('pyscanlab.rtc6_sdk', 
-                  ["cython/rtc6_sdk.pyx", ],
+                  ["cython/rtc6_sdk.pyx", "cython/rtc6_wrapper.cpp"],
                   language = "c++",
                   libraries=["RTC6DLLx64", ],
                   library_dirs=['python3/pyscanlab/lib/',],
@@ -22,7 +22,7 @@ if not __FAKE_DEV:
 else:
     ext_modules = [
         Extension('pyscanlab.rtc6_sdk',
-                  ["cython/rtc6_sdk.pyx", "cython/rtc6_fake_dev.cpp"],
+                  ["cython/rtc6_sdk.pyx", "cython/rtc6_fake_dev.cpp", "cython/rtc6_wrapper.cpp"],
                   language = "c++",
                   libraries=[],
                   library_dirs=['python3/pyscanlab/lib/',],

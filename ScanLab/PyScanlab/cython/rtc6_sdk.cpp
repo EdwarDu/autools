@@ -692,6 +692,7 @@ static CYTHON_INLINE float __PYX_NAN() {
 /* Early includes */
 #include <stdint.h>
 #include "RTC6impl.hpp"
+#include "rtc6_wrapper.cpp"
 #ifdef _OPENMP
 #include <omp.h>
 #endif /* _OPENMP */
@@ -906,17 +907,20 @@ static const char *__pyx_f[] = {
 };
 
 /*--- Type declarations ---*/
-struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man;
+struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper;
 
-/* "cython/rtc6_sdk.pyx":30
+/* "cython/rtc6_sdk.pyx":32
  *     pass
  * 
- * cdef class RTC6Man:             # <<<<<<<<<<<<<<
+ * cdef class RTC6Helper:             # <<<<<<<<<<<<<<
  *     """
  *     Cython class for wrapping API calls to RTC6_SDK
  */
-struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man {
+struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper {
   PyObject_HEAD
+  int cardno;
+  bool do_init;
+  UINT board_count;
 };
 
 
@@ -1122,15 +1126,15 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObjec
         PyObject_Format(s, f))
 #endif
 
+/* IncludeStringH.proto */
+#include <string.h>
+
+/* JoinPyUnicode.proto */
+static PyObject* __Pyx_PyUnicode_Join(PyObject* value_tuple, Py_ssize_t value_count, Py_ssize_t result_ulength,
+                                      Py_UCS4 max_char);
+
 /* PyObjectCall2Args.proto */
 static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2);
-
-/* PyObjectCallNoArg.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func);
-#else
-#define __Pyx_PyObject_CallNoArg(func) __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL)
-#endif
 
 /* PyThreadStateGet.proto */
 #if CYTHON_FAST_THREAD_STATE
@@ -1171,6 +1175,13 @@ static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject 
 /* RaiseException.proto */
 static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
 
+/* PyObjectCallNoArg.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func);
+#else
+#define __Pyx_PyObject_CallNoArg(func) __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL)
+#endif
+
 /* DictGetItem.proto */
 #if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY
 static PyObject *__Pyx_PyDict_GetItem(PyObject *d, PyObject* key);
@@ -1209,13 +1220,6 @@ static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize
 static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
 static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
                                                      int is_list, int wraparound, int boundscheck);
-
-/* IncludeStringH.proto */
-#include <string.h>
-
-/* JoinPyUnicode.proto */
-static PyObject* __Pyx_PyUnicode_Join(PyObject* value_tuple, Py_ssize_t value_count, Py_ssize_t result_ulength,
-                                      Py_UCS4 max_char);
 
 /* PyIntCompare.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_EqObjC(PyObject *op1, PyObject *op2, long intval, long inplace);
@@ -1316,6 +1320,9 @@ static void __Pyx_AddTraceback(const char *funcname, int c_line,
 #define __Pyx_HAS_GCC_DIAGNOSTIC
 #endif
 
+/* CIntFromPy.proto */
+static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *);
+
 /* CIntToPy.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_uint32_t(uint32_t value);
 
@@ -1327,9 +1334,6 @@ static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value);
 
 /* CIntFromPy.proto */
 static CYTHON_INLINE long __Pyx_PyInt_As_long(PyObject *);
-
-/* CIntFromPy.proto */
-static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *);
 
 /* FastTypeChecks.proto */
 #if CYTHON_COMPILING_IN_CPYTHON
@@ -1351,6 +1355,8 @@ static int __Pyx_check_binary_version(void);
 static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
 
+/* Module declarations from 'libcpp' */
+
 /* Module declarations from 'rtc6_sdk' */
 
 /* Module declarations from 'cpython.mem' */
@@ -1358,7 +1364,7 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 /* Module declarations from 'cpython.pycapsule' */
 
 /* Module declarations from 'pyscanlab.rtc6_sdk' */
-static PyTypeObject *__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man = 0;
+static PyTypeObject *__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper = 0;
 #define __Pyx_MODULE_NAME "pyscanlab.rtc6_sdk"
 extern int __pyx_module_is_main_pyscanlab__rtc6_sdk;
 int __pyx_module_is_main_pyscanlab__rtc6_sdk = 0;
@@ -1366,15 +1372,15 @@ int __pyx_module_is_main_pyscanlab__rtc6_sdk = 0;
 /* Implementation of 'pyscanlab.rtc6_sdk' */
 static PyObject *__pyx_builtin_staticmethod;
 static PyObject *__pyx_builtin_hex;
-static PyObject *__pyx_builtin_IOError;
 static PyObject *__pyx_builtin_ValueError;
+static PyObject *__pyx_builtin_IOError;
 static PyObject *__pyx_builtin_TypeError;
 static const char __pyx_k_x[] = "x";
 static const char __pyx_k_y[] = "y";
-static const char __pyx_k__9[] = ",";
+static const char __pyx_k__8[] = ",";
+static const char __pyx_k__9[] = ")";
 static const char __pyx_k_np[] = "np";
 static const char __pyx_k_os[] = "os";
-static const char __pyx_k__10[] = ")";
 static const char __pyx_k_dim[] = "dim";
 static const char __pyx_k_doc[] = "__doc__";
 static const char __pyx_k_hex[] = "hex";
@@ -1400,6 +1406,7 @@ static const char __pyx_k_extra[] = "extra";
 static const char __pyx_k_list3[] = ", list3=";
 static const char __pyx_k_numpy[] = "numpy";
 static const char __pyx_k_utf_8[] = "utf-8";
+static const char __pyx_k_cardno[] = "cardno";
 static const char __pyx_k_encode[] = "encode";
 static const char __pyx_k_exists[] = "exists";
 static const char __pyx_k_import[] = "__import__";
@@ -1408,10 +1415,10 @@ static const char __pyx_k_module[] = "__module__";
 static const char __pyx_k_reduce[] = "__reduce__";
 static const char __pyx_k_typing[] = "typing";
 static const char __pyx_k_IOError[] = "IOError";
-static const char __pyx_k_RTC6Man[] = "RTC6Man";
 static const char __pyx_k_abspath[] = "abspath";
 static const char __pyx_k_acc_err[] = "acc_err";
 static const char __pyx_k_dirname[] = "dirname";
+static const char __pyx_k_do_init[] = "do_init";
 static const char __pyx_k_logging[] = "logging";
 static const char __pyx_k_prepare[] = "__prepare__";
 static const char __pyx_k_rtc6_ch[] = "rtc6_ch";
@@ -1439,6 +1446,7 @@ static const char __pyx_k_getLogger[] = "getLogger";
 static const char __pyx_k_has_error[] = "has_error";
 static const char __pyx_k_metaclass[] = "__metaclass__";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
+static const char __pyx_k_RTC6Helper[] = "RTC6Helper";
 static const char __pyx_k_ValueError[] = "ValueError";
 static const char __pyx_k_addHandler[] = "addHandler";
 static const char __pyx_k_error_code[] = "error_code";
@@ -1521,6 +1529,7 @@ static const char __pyx_k_RTC6DAT_dat_file_or_RTC6RBF_rbf[] = "RTC6DAT.dat file 
 static const char __pyx_k_RTC6_board_driver_not_found_get[] = "RTC6 board driver not found (get_last_error return code RTC6_ACCESS_DENIED)";
 static const char __pyx_k_Type_error_e_g_eth_command_sent[] = "Type error: e.g. eth command sent to a PCIe board";
 static const char __pyx_k_asctime_s_component_s_levelname[] = "%(asctime)s [%(component)s] - %(levelname)s - %(message)s";
+static const char __pyx_k_is_larger_than_number_of_RTC6_b[] = " is larger than number of RTC6 board count ";
 static const char __pyx_k_which_means_Mem1_2_23_Mem2_0_Li[] = ", which means Mem1=2^23, Mem2=0, List3=0";
 static const char __pyx_k_Access_denied_e_g_resevered_by_a[] = "Access denied (e.g. resevered by another program)";
 static const char __pyx_k_Access_error_the_board_is_reserv[] = "Access error: the board is reserved for another user program";
@@ -1600,7 +1609,7 @@ static PyObject *__pyx_kp_u_Power_cycle_required;
 static PyObject *__pyx_kp_u_RTC6DAT_dat;
 static PyObject *__pyx_kp_u_RTC6DAT_dat_file_or_RTC6RBF_rbf;
 static PyObject *__pyx_n_s_RTC6DevError;
-static PyObject *__pyx_n_s_RTC6Man;
+static PyObject *__pyx_n_s_RTC6Helper;
 static PyObject *__pyx_kp_u_RTC6OUT_out;
 static PyObject *__pyx_kp_u_RTC6RBF_rbf;
 static PyObject *__pyx_n_s_RTC6_ACCESS_DENIED;
@@ -1639,7 +1648,7 @@ static PyObject *__pyx_kp_u_Verify_memory_error;
 static PyObject *__pyx_kp_u_Version_error_RTC6_DLL_version_R;
 static PyObject *__pyx_kp_u_Version_error_dll_rbf_and_out_fi;
 static PyObject *__pyx_kp_u_Warning_3D_correction_table_or_D;
-static PyObject *__pyx_kp_u__10;
+static PyObject *__pyx_kp_u__8;
 static PyObject *__pyx_kp_u__9;
 static PyObject *__pyx_n_s_abspath;
 static PyObject *__pyx_n_u_acc_err;
@@ -1648,6 +1657,7 @@ static PyObject *__pyx_n_s_addHandler;
 static PyObject *__pyx_kp_u_asctime_s_component_s_levelname;
 static PyObject *__pyx_n_u_autools_setup_main;
 static PyObject *__pyx_n_s_bit_index;
+static PyObject *__pyx_n_s_cardno;
 static PyObject *__pyx_n_s_cfg_path;
 static PyObject *__pyx_n_s_cline_in_traceback;
 static PyObject *__pyx_n_u_component;
@@ -1658,6 +1668,7 @@ static PyObject *__pyx_n_s_debug;
 static PyObject *__pyx_n_s_dim;
 static PyObject *__pyx_kp_u_dim_2;
 static PyObject *__pyx_n_s_dirname;
+static PyObject *__pyx_n_s_do_init;
 static PyObject *__pyx_n_s_doc;
 static PyObject *__pyx_kp_u_does_not_exist;
 static PyObject *__pyx_n_s_encode;
@@ -1673,6 +1684,7 @@ static PyObject *__pyx_n_s_has_error;
 static PyObject *__pyx_n_s_hex;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_info;
+static PyObject *__pyx_kp_u_is_larger_than_number_of_RTC6_b;
 static PyObject *__pyx_n_s_join;
 static PyObject *__pyx_n_s_keys;
 static PyObject *__pyx_kp_u_list3;
@@ -1719,15 +1731,21 @@ static PyObject *__pyx_kp_u_which_means_Mem1_2_23_Mem2_0_Li;
 static PyObject *__pyx_n_s_x;
 static PyObject *__pyx_kp_u_x_or_y_is_out_of_range_524288_52;
 static PyObject *__pyx_n_s_y;
-static int __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man___cinit__(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *__pyx_v_self, PyObject *__pyx_v_cfg_path); /* proto */
-static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *__pyx_v_self, PyObject *__pyx_v_mem1, PyObject *__pyx_v_mem2); /* proto */
-static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *__pyx_v_self, PyObject *__pyx_v_cor_file, PyObject *__pyx_v_table_no, PyObject *__pyx_v_dim); /* proto */
-static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_6has_error(PyObject *__pyx_v_error_code, PyObject *__pyx_v_bit_index); /* proto */
-static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_8goto_xy(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *__pyx_v_self, PyObject *__pyx_v_x, PyObject *__pyx_v_y); /* proto */
-static void __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_10__dealloc__(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_12__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_14__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
-static PyObject *__pyx_tp_new_9pyscanlab_8rtc6_sdk_RTC6Man(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static int __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper___cinit__(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, bool __pyx_v_do_init, PyObject *__pyx_v_cardno); /* proto */
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_2load_program_file(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, PyObject *__pyx_v_cfg_path); /* proto */
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_4config_list(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, PyObject *__pyx_v_mem1, PyObject *__pyx_v_mem2); /* proto */
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_6load_correction_file(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, PyObject *__pyx_v_cor_file, PyObject *__pyx_v_table_no, PyObject *__pyx_v_dim); /* proto */
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_8has_error(PyObject *__pyx_v_error_code, PyObject *__pyx_v_bit_index); /* proto */
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_10goto_xy(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, PyObject *__pyx_v_x, PyObject *__pyx_v_y); /* proto */
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_12get_error(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_14get_last_error(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_16set_laser(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, bool __pyx_v_b_enable); /* proto */
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_18set_laser_sig(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, bool __pyx_v_b_enable); /* proto */
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_20set_zoom(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, PyObject *__pyx_v_zoom); /* proto */
+static void __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_22__dealloc__(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_24__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_26__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_tp_new_9pyscanlab_8rtc6_sdk_RTC6Helper(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_int_0;
 static PyObject *__pyx_int_1;
 static PyObject *__pyx_int_2;
@@ -1749,36 +1767,36 @@ static PyObject *__pyx_int_17;
 static PyObject *__pyx_int_18;
 static PyObject *__pyx_int_8388608;
 static PyObject *__pyx_int_neg_1;
-static PyObject *__pyx_k_;
+static PyObject *__pyx_tuple_;
 static PyObject *__pyx_tuple__2;
 static PyObject *__pyx_tuple__3;
 static PyObject *__pyx_tuple__4;
 static PyObject *__pyx_tuple__5;
 static PyObject *__pyx_tuple__6;
 static PyObject *__pyx_tuple__7;
-static PyObject *__pyx_tuple__8;
+static PyObject *__pyx_tuple__10;
 static PyObject *__pyx_tuple__11;
 static PyObject *__pyx_tuple__12;
 static PyObject *__pyx_tuple__13;
 static PyObject *__pyx_tuple__14;
 static PyObject *__pyx_tuple__15;
 static PyObject *__pyx_tuple__16;
-static PyObject *__pyx_tuple__17;
-static PyObject *__pyx_codeobj__18;
+static PyObject *__pyx_codeobj__17;
 /* Late includes */
 
-/* "cython/rtc6_sdk.pyx":107
- *     RTC6_CONFIG_ERROR = 16
+/* "cython/rtc6_sdk.pyx":113
+ *     cdef UINT board_count
  * 
- *     def __cinit__(self, cfg_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")):             # <<<<<<<<<<<<<<
+ *     def __cinit__(self, do_init: bool, cardno: int = -1):             # <<<<<<<<<<<<<<
  *         """
  *         TODO: device initialization.
  */
 
 /* Python wrapper */
-static int __pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static int __pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  PyObject *__pyx_v_cfg_path = 0;
+static int __pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static int __pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_1__cinit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  bool __pyx_v_do_init;
+  PyObject *__pyx_v_cardno = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -1786,9 +1804,419 @@ static int __pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_1__cinit__(PyObject *__pyx_v_s
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__ (wrapper)", 0);
   {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_do_init,&__pyx_n_s_cardno,0};
+    PyObject* values[2] = {0,0};
+    values[1] = ((PyObject *)__pyx_int_neg_1);
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_do_init)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cardno);
+          if (value) { values[1] = value; kw_args--; }
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 113, __pyx_L3_error)
+      }
+    } else {
+      switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+    }
+    __pyx_v_do_init = __Pyx_PyObject_IsTrue(values[0]); if (unlikely((__pyx_v_do_init == ((bool)-1)) && PyErr_Occurred())) __PYX_ERR(0, 113, __pyx_L3_error)
+    __pyx_v_cardno = values[1];
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 113, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return -1;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper___cinit__(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *)__pyx_v_self), __pyx_v_do_init, __pyx_v_cardno);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper___cinit__(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, bool __pyx_v_do_init, PyObject *__pyx_v_cardno) {
+  UINT __pyx_v_err;
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  int __pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
+  Py_ssize_t __pyx_t_7;
+  Py_UCS4 __pyx_t_8;
+  PyObject *__pyx_t_9 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__cinit__", 0);
+
+  /* "cython/rtc6_sdk.pyx":117
+ *         TODO: device initialization.
+ *         """
+ *         self.do_init = do_init             # <<<<<<<<<<<<<<
+ *         self.cardno = cardno
+ *         if self.do_init:
+ */
+  __pyx_v_self->do_init = __pyx_v_do_init;
+
+  /* "cython/rtc6_sdk.pyx":118
+ *         """
+ *         self.do_init = do_init
+ *         self.cardno = cardno             # <<<<<<<<<<<<<<
+ *         if self.do_init:
+ *             err = _init_rtc6_dll(self.cardno)
+ */
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_cardno); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 118, __pyx_L1_error)
+  __pyx_v_self->cardno = __pyx_t_1;
+
+  /* "cython/rtc6_sdk.pyx":119
+ *         self.do_init = do_init
+ *         self.cardno = cardno
+ *         if self.do_init:             # <<<<<<<<<<<<<<
+ *             err = _init_rtc6_dll(self.cardno)
+ *             if err == 0:
+ */
+  __pyx_t_2 = (__pyx_v_self->do_init != 0);
+  if (__pyx_t_2) {
+
+    /* "cython/rtc6_sdk.pyx":120
+ *         self.cardno = cardno
+ *         if self.do_init:
+ *             err = _init_rtc6_dll(self.cardno)             # <<<<<<<<<<<<<<
+ *             if err == 0:
+ *                 rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})
+ */
+    __pyx_v_err = _init_rtc6_dll(__pyx_v_self->cardno);
+
+    /* "cython/rtc6_sdk.pyx":121
+ *         if self.do_init:
+ *             err = _init_rtc6_dll(self.cardno)
+ *             if err == 0:             # <<<<<<<<<<<<<<
+ *                 rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})
+ *             else:
+ */
+    __pyx_t_2 = ((__pyx_v_err == 0) != 0);
+    if (__pyx_t_2) {
+
+      /* "cython/rtc6_sdk.pyx":122
+ *             err = _init_rtc6_dll(self.cardno)
+ *             if err == 0:
+ *                 rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
+ *             else:
+ *                 rtc6_logger.info(f"RTC6 DLL Init Failed: {hex(err)}", extra={"component": "rtc6"})
+ */
+      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 122, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_info); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 122, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 122, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 122, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      if (PyDict_SetItem(__pyx_t_5, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 122, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_extra, __pyx_t_5) < 0) __PYX_ERR(0, 122, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple_, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 122, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+      /* "cython/rtc6_sdk.pyx":121
+ *         if self.do_init:
+ *             err = _init_rtc6_dll(self.cardno)
+ *             if err == 0:             # <<<<<<<<<<<<<<
+ *                 rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})
+ *             else:
+ */
+      goto __pyx_L4;
+    }
+
+    /* "cython/rtc6_sdk.pyx":124
+ *                 rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})
+ *             else:
+ *                 rtc6_logger.info(f"RTC6 DLL Init Failed: {hex(err)}", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
+ * 
+ *             _set_rtc6_mode(self.cardno)
+ */
+    /*else*/ {
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 124, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 124, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_t_5 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 124, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_hex, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 124, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 124, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_t_4 = __Pyx_PyUnicode_Concat(__pyx_kp_u_RTC6_DLL_Init_Failed, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 124, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 124, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __Pyx_GIVEREF(__pyx_t_4);
+      PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4);
+      __pyx_t_4 = 0;
+      __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 124, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 124, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_6);
+      if (PyDict_SetItem(__pyx_t_6, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 124, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_extra, __pyx_t_6) < 0) __PYX_ERR(0, 124, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 124, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_6);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    }
+    __pyx_L4:;
+
+    /* "cython/rtc6_sdk.pyx":126
+ *                 rtc6_logger.info(f"RTC6 DLL Init Failed: {hex(err)}", extra={"component": "rtc6"})
+ * 
+ *             _set_rtc6_mode(self.cardno)             # <<<<<<<<<<<<<<
+ * 
+ *         self.board_count = _rtc6_count_cards(self.cardno)
+ */
+    _set_rtc6_mode(__pyx_v_self->cardno);
+
+    /* "cython/rtc6_sdk.pyx":119
+ *         self.do_init = do_init
+ *         self.cardno = cardno
+ *         if self.do_init:             # <<<<<<<<<<<<<<
+ *             err = _init_rtc6_dll(self.cardno)
+ *             if err == 0:
+ */
+  }
+
+  /* "cython/rtc6_sdk.pyx":128
+ *             _set_rtc6_mode(self.cardno)
+ * 
+ *         self.board_count = _rtc6_count_cards(self.cardno)             # <<<<<<<<<<<<<<
+ *         if self.cardno > 0:
+ *             if self.cardno > self.board_count:
+ */
+  __pyx_v_self->board_count = _rtc6_count_cards(__pyx_v_self->cardno);
+
+  /* "cython/rtc6_sdk.pyx":129
+ * 
+ *         self.board_count = _rtc6_count_cards(self.cardno)
+ *         if self.cardno > 0:             # <<<<<<<<<<<<<<
+ *             if self.cardno > self.board_count:
+ *                 rtc6_logger.error(f"{cardno} is larger than number of RTC6 board count {self.board_count}")
+ */
+  __pyx_t_2 = ((__pyx_v_self->cardno > 0) != 0);
+  if (__pyx_t_2) {
+
+    /* "cython/rtc6_sdk.pyx":130
+ *         self.board_count = _rtc6_count_cards(self.cardno)
+ *         if self.cardno > 0:
+ *             if self.cardno > self.board_count:             # <<<<<<<<<<<<<<
+ *                 rtc6_logger.error(f"{cardno} is larger than number of RTC6 board count {self.board_count}")
+ *                 raise ValueError(f"{cardno} is larger than number of RTC6 board count {self.board_count}")
+ */
+    __pyx_t_2 = ((__pyx_v_self->cardno > __pyx_v_self->board_count) != 0);
+    if (unlikely(__pyx_t_2)) {
+
+      /* "cython/rtc6_sdk.pyx":131
+ *         if self.cardno > 0:
+ *             if self.cardno > self.board_count:
+ *                 rtc6_logger.error(f"{cardno} is larger than number of RTC6 board count {self.board_count}")             # <<<<<<<<<<<<<<
+ *                 raise ValueError(f"{cardno} is larger than number of RTC6 board count {self.board_count}")
+ * 
+ */
+      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 131, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_error); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 131, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_t_4 = PyTuple_New(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 131, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_7 = 0;
+      __pyx_t_8 = 127;
+      __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_v_cardno, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 131, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_8 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_8) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_8;
+      __pyx_t_7 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
+      __Pyx_GIVEREF(__pyx_t_3);
+      PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3);
+      __pyx_t_3 = 0;
+      __Pyx_INCREF(__pyx_kp_u_is_larger_than_number_of_RTC6_b);
+      __pyx_t_7 += 43;
+      __Pyx_GIVEREF(__pyx_kp_u_is_larger_than_number_of_RTC6_b);
+      PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_kp_u_is_larger_than_number_of_RTC6_b);
+      __pyx_t_3 = __Pyx_PyInt_From_uint32_t(__pyx_v_self->board_count); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 131, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_9 = __Pyx_PyObject_FormatSimple(__pyx_t_3, __pyx_empty_unicode); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 131, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_t_8 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_9) > __pyx_t_8) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_9) : __pyx_t_8;
+      __pyx_t_7 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_9);
+      __Pyx_GIVEREF(__pyx_t_9);
+      PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_t_9);
+      __pyx_t_9 = 0;
+      __pyx_t_9 = __Pyx_PyUnicode_Join(__pyx_t_4, 3, __pyx_t_7, __pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 131, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_t_4 = NULL;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
+        __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_5);
+        if (likely(__pyx_t_4)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+          __Pyx_INCREF(__pyx_t_4);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_5, function);
+        }
+      }
+      __pyx_t_6 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_4, __pyx_t_9) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_9);
+      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 131, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_6);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+
+      /* "cython/rtc6_sdk.pyx":132
+ *             if self.cardno > self.board_count:
+ *                 rtc6_logger.error(f"{cardno} is larger than number of RTC6 board count {self.board_count}")
+ *                 raise ValueError(f"{cardno} is larger than number of RTC6 board count {self.board_count}")             # <<<<<<<<<<<<<<
+ * 
+ *     def load_program_file(self, cfg_path: Union[str, None] = None):
+ */
+      __pyx_t_6 = PyTuple_New(3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 132, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_6);
+      __pyx_t_7 = 0;
+      __pyx_t_8 = 127;
+      __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_cardno, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 132, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_8 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) > __pyx_t_8) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) : __pyx_t_8;
+      __pyx_t_7 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_5);
+      __Pyx_GIVEREF(__pyx_t_5);
+      PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5);
+      __pyx_t_5 = 0;
+      __Pyx_INCREF(__pyx_kp_u_is_larger_than_number_of_RTC6_b);
+      __pyx_t_7 += 43;
+      __Pyx_GIVEREF(__pyx_kp_u_is_larger_than_number_of_RTC6_b);
+      PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_kp_u_is_larger_than_number_of_RTC6_b);
+      __pyx_t_5 = __Pyx_PyInt_From_uint32_t(__pyx_v_self->board_count); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 132, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_9 = __Pyx_PyObject_FormatSimple(__pyx_t_5, __pyx_empty_unicode); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 132, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_t_8 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_9) > __pyx_t_8) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_9) : __pyx_t_8;
+      __pyx_t_7 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_9);
+      __Pyx_GIVEREF(__pyx_t_9);
+      PyTuple_SET_ITEM(__pyx_t_6, 2, __pyx_t_9);
+      __pyx_t_9 = 0;
+      __pyx_t_9 = __Pyx_PyUnicode_Join(__pyx_t_6, 3, __pyx_t_7, __pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 132, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_9); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 132, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_6);
+      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+      __Pyx_Raise(__pyx_t_6, 0, 0, 0);
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __PYX_ERR(0, 132, __pyx_L1_error)
+
+      /* "cython/rtc6_sdk.pyx":130
+ *         self.board_count = _rtc6_count_cards(self.cardno)
+ *         if self.cardno > 0:
+ *             if self.cardno > self.board_count:             # <<<<<<<<<<<<<<
+ *                 rtc6_logger.error(f"{cardno} is larger than number of RTC6 board count {self.board_count}")
+ *                 raise ValueError(f"{cardno} is larger than number of RTC6 board count {self.board_count}")
+ */
+    }
+
+    /* "cython/rtc6_sdk.pyx":129
+ * 
+ *         self.board_count = _rtc6_count_cards(self.cardno)
+ *         if self.cardno > 0:             # <<<<<<<<<<<<<<
+ *             if self.cardno > self.board_count:
+ *                 rtc6_logger.error(f"{cardno} is larger than number of RTC6 board count {self.board_count}")
+ */
+  }
+
+  /* "cython/rtc6_sdk.pyx":113
+ *     cdef UINT board_count
+ * 
+ *     def __cinit__(self, do_init: bool, cardno: int = -1):             # <<<<<<<<<<<<<<
+ *         """
+ *         TODO: device initialization.
+ */
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cython/rtc6_sdk.pyx":134
+ *                 raise ValueError(f"{cardno} is larger than number of RTC6 board count {self.board_count}")
+ * 
+ *     def load_program_file(self, cfg_path: Union[str, None] = None):             # <<<<<<<<<<<<<<
+ *         if cfg_path is None:
+ *             cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_3load_program_file(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_3load_program_file(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_cfg_path = 0;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("load_program_file (wrapper)", 0);
+  {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_cfg_path,0};
     PyObject* values[1] = {0};
-    values[0] = __pyx_k_;
+    values[0] = ((PyObject *)Py_None);
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
@@ -1807,7 +2235,7 @@ static int __pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_1__cinit__(PyObject *__pyx_v_s
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 107, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "load_program_file") < 0)) __PYX_ERR(0, 134, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -1821,198 +2249,639 @@ static int __pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_1__cinit__(PyObject *__pyx_v_s
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 107, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("load_program_file", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 134, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Man.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.load_program_file", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
-  return -1;
+  return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man___cinit__(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *)__pyx_v_self), __pyx_v_cfg_path);
+  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_2load_program_file(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *)__pyx_v_self), __pyx_v_cfg_path);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static int __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man___cinit__(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *__pyx_v_self, PyObject *__pyx_v_cfg_path) {
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_2load_program_file(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, PyObject *__pyx_v_cfg_path) {
   UINT __pyx_v_err;
-  int __pyx_r;
+  PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
-  PyObject *__pyx_t_2 = NULL;
+  int __pyx_t_2;
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
   PyObject *__pyx_t_5 = NULL;
-  int __pyx_t_6;
-  int __pyx_t_7;
+  PyObject *__pyx_t_6 = NULL;
+  PyObject *__pyx_t_7 = NULL;
   PyObject *__pyx_t_8 = NULL;
-  int __pyx_t_9;
+  PyObject *__pyx_t_9 = NULL;
   PyObject *__pyx_t_10 = NULL;
-  char const *__pyx_t_11;
+  int __pyx_t_11;
+  int __pyx_t_12;
+  char const *__pyx_t_13;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("__cinit__", 0);
+  __Pyx_RefNannySetupContext("load_program_file", 0);
+  __Pyx_INCREF(__pyx_v_cfg_path);
 
-  /* "cython/rtc6_sdk.pyx":111
- *         TODO: device initialization.
- *         """
- *         err = rtc6.init_rtc6_dll()             # <<<<<<<<<<<<<<
- *         if err == 0:
- *             rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})
- */
-  __pyx_v_err = init_rtc6_dll();
-
-  /* "cython/rtc6_sdk.pyx":112
- *         """
- *         err = rtc6.init_rtc6_dll()
- *         if err == 0:             # <<<<<<<<<<<<<<
- *             rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})
- *         else:
- */
-  __pyx_t_1 = ((__pyx_v_err == 0) != 0);
-  if (__pyx_t_1) {
-
-    /* "cython/rtc6_sdk.pyx":113
- *         err = rtc6.init_rtc6_dll()
- *         if err == 0:
- *             rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
- *         else:
- *             rtc6_logger.info(f"RTC6 DLL Init Failed: {hex(err)}", extra={"component": "rtc6"})
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 113, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 113, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 113, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 113, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 113, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_extra, __pyx_t_4) < 0) __PYX_ERR(0, 113, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__2, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 113, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-
-    /* "cython/rtc6_sdk.pyx":112
- *         """
- *         err = rtc6.init_rtc6_dll()
- *         if err == 0:             # <<<<<<<<<<<<<<
- *             rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})
- *         else:
- */
-    goto __pyx_L3;
-  }
-
-  /* "cython/rtc6_sdk.pyx":115
- *             rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})
- *         else:
- *             rtc6_logger.info(f"RTC6 DLL Init Failed: {hex(err)}", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
+  /* "cython/rtc6_sdk.pyx":135
  * 
- *         rtc6.set_rtc6_mode()
- */
-  /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 115, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 115, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 115, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_hex, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 115, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_t_3, __pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 115, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_kp_u_RTC6_DLL_Init_Failed, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 115, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 115, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_GIVEREF(__pyx_t_3);
-    PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3);
-    __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 115, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 115, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    if (PyDict_SetItem(__pyx_t_5, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 115, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_extra, __pyx_t_5) < 0) __PYX_ERR(0, 115, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 115, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  }
-  __pyx_L3:;
-
-  /* "cython/rtc6_sdk.pyx":117
- *             rtc6_logger.info(f"RTC6 DLL Init Failed: {hex(err)}", extra={"component": "rtc6"})
- * 
- *         rtc6.set_rtc6_mode()             # <<<<<<<<<<<<<<
- * 
+ *     def load_program_file(self, cfg_path: Union[str, None] = None):
+ *         if cfg_path is None:             # <<<<<<<<<<<<<<
+ *             cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
  *         rtc6_logger.info(f"Board reset with config dir: {cfg_path}", extra={"component": "rtc6"})
  */
-  set_rtc6_mode();
+  __pyx_t_1 = (__pyx_v_cfg_path == Py_None);
+  __pyx_t_2 = (__pyx_t_1 != 0);
+  if (__pyx_t_2) {
 
-  /* "cython/rtc6_sdk.pyx":119
- *         rtc6.set_rtc6_mode()
+    /* "cython/rtc6_sdk.pyx":136
+ *     def load_program_file(self, cfg_path: Union[str, None] = None):
+ *         if cfg_path is None:
+ *             cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")             # <<<<<<<<<<<<<<
+ *         rtc6_logger.info(f"Board reset with config dir: {cfg_path}", extra={"component": "rtc6"})
+ *         if not os.path.exists(cfg_path) or \
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_path); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_join); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_os); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_path); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_dirname); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_os); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_path); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_abspath); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_file); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __pyx_t_10 = NULL;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_8))) {
+      __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_8);
+      if (likely(__pyx_t_10)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_8);
+        __Pyx_INCREF(__pyx_t_10);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_8, function);
+      }
+    }
+    __pyx_t_7 = (__pyx_t_10) ? __Pyx_PyObject_Call2Args(__pyx_t_8, __pyx_t_10, __pyx_t_9) : __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_9);
+    __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __pyx_t_8 = NULL;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
+      __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_6);
+      if (likely(__pyx_t_8)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
+        __Pyx_INCREF(__pyx_t_8);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_6, function);
+      }
+    }
+    __pyx_t_5 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_6, __pyx_t_8, __pyx_t_7) : __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_7);
+    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __pyx_t_6 = NULL;
+    __pyx_t_11 = 0;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+      __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_4);
+      if (likely(__pyx_t_6)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+        __Pyx_INCREF(__pyx_t_6);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_4, function);
+        __pyx_t_11 = 1;
+      }
+    }
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(__pyx_t_4)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_t_5, __pyx_n_u_data};
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 136, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    } else
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
+      PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_t_5, __pyx_n_u_data};
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 136, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    } else
+    #endif
+    {
+      __pyx_t_7 = PyTuple_New(2+__pyx_t_11); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 136, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_7);
+      if (__pyx_t_6) {
+        __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6); __pyx_t_6 = NULL;
+      }
+      __Pyx_GIVEREF(__pyx_t_5);
+      PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_11, __pyx_t_5);
+      __Pyx_INCREF(__pyx_n_u_data);
+      __Pyx_GIVEREF(__pyx_n_u_data);
+      PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_11, __pyx_n_u_data);
+      __pyx_t_5 = 0;
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 136, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    }
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF_SET(__pyx_v_cfg_path, __pyx_t_3);
+    __pyx_t_3 = 0;
+
+    /* "cython/rtc6_sdk.pyx":135
  * 
+ *     def load_program_file(self, cfg_path: Union[str, None] = None):
+ *         if cfg_path is None:             # <<<<<<<<<<<<<<
+ *             cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+ *         rtc6_logger.info(f"Board reset with config dir: {cfg_path}", extra={"component": "rtc6"})
+ */
+  }
+
+  /* "cython/rtc6_sdk.pyx":137
+ *         if cfg_path is None:
+ *             cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
  *         rtc6_logger.info(f"Board reset with config dir: {cfg_path}", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *         if not os.path.exists(cfg_path) or \
  *             not os.path.exists(os.path.join(cfg_path, "RTC6OUT.out")) or \
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 119, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 137, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_cfg_path, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 119, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_4 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Board_reset_with_config_dir, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_info); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 137, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 119, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_GIVEREF(__pyx_t_4);
-  PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4);
-  __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 119, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 119, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 119, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_extra, __pyx_t_2) < 0) __PYX_ERR(0, 119, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 119, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_v_cfg_path, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_7 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Board_reset_with_config_dir, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_GIVEREF(__pyx_t_7);
+  PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_7);
+  __pyx_t_7 = 0;
+  __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 137, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_extra, __pyx_t_5) < 0) __PYX_ERR(0, 137, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "cython/rtc6_sdk.pyx":120
- * 
+  /* "cython/rtc6_sdk.pyx":138
+ *             cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
  *         rtc6_logger.info(f"Board reset with config dir: {cfg_path}", extra={"component": "rtc6"})
  *         if not os.path.exists(cfg_path) or \             # <<<<<<<<<<<<<<
  *             not os.path.exists(os.path.join(cfg_path, "RTC6OUT.out")) or \
  *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 120, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_path); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 120, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_os); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 138, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_path); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 138, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_exists); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 138, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
+    }
+  }
+  __pyx_t_5 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_3, __pyx_v_cfg_path) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_cfg_path);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 138, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_exists); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 120, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 138, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_12 = ((!__pyx_t_1) != 0);
+  if (!__pyx_t_12) {
+  } else {
+    __pyx_t_2 = __pyx_t_12;
+    goto __pyx_L5_bool_binop_done;
+  }
+
+  /* "cython/rtc6_sdk.pyx":139
+ *         rtc6_logger.info(f"Board reset with config dir: {cfg_path}", extra={"component": "rtc6"})
+ *         if not os.path.exists(cfg_path) or \
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6OUT.out")) or \             # <<<<<<<<<<<<<<
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_os); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_path); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_exists); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_path); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_join); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __pyx_t_6 = NULL;
+  __pyx_t_11 = 0;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(__pyx_t_6)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_6);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_4, function);
+      __pyx_t_11 = 1;
+    }
+  }
+  #if CYTHON_FAST_PYCALL
+  if (PyFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_v_cfg_path, __pyx_kp_u_RTC6OUT_out};
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 139, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_GOTREF(__pyx_t_3);
+  } else
+  #endif
+  #if CYTHON_FAST_PYCCALL
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_v_cfg_path, __pyx_kp_u_RTC6OUT_out};
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 139, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_GOTREF(__pyx_t_3);
+  } else
+  #endif
+  {
+    __pyx_t_8 = PyTuple_New(2+__pyx_t_11); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 139, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+    if (__pyx_t_6) {
+      __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
+    }
+    __Pyx_INCREF(__pyx_v_cfg_path);
+    __Pyx_GIVEREF(__pyx_v_cfg_path);
+    PyTuple_SET_ITEM(__pyx_t_8, 0+__pyx_t_11, __pyx_v_cfg_path);
+    __Pyx_INCREF(__pyx_kp_u_RTC6OUT_out);
+    __Pyx_GIVEREF(__pyx_kp_u_RTC6OUT_out);
+    PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_11, __pyx_kp_u_RTC6OUT_out);
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 139, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
+    }
+  }
+  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_1 = ((!__pyx_t_12) != 0);
+  if (!__pyx_t_1) {
+  } else {
+    __pyx_t_2 = __pyx_t_1;
+    goto __pyx_L5_bool_binop_done;
+  }
+
+  /* "cython/rtc6_sdk.pyx":140
+ *         if not os.path.exists(cfg_path) or \
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6OUT.out")) or \
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \             # <<<<<<<<<<<<<<
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):
+ *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_os); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 140, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_path); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 140, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_exists); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 140, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 140, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_path); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 140, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_8);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_join); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 140, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+  __pyx_t_8 = NULL;
+  __pyx_t_11 = 0;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(__pyx_t_8)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_8);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_4, function);
+      __pyx_t_11 = 1;
+    }
+  }
+  #if CYTHON_FAST_PYCALL
+  if (PyFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_cfg_path, __pyx_kp_u_RTC6RBF_rbf};
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 140, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_GOTREF(__pyx_t_3);
+  } else
+  #endif
+  #if CYTHON_FAST_PYCCALL
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_cfg_path, __pyx_kp_u_RTC6RBF_rbf};
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 140, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_GOTREF(__pyx_t_3);
+  } else
+  #endif
+  {
+    __pyx_t_6 = PyTuple_New(2+__pyx_t_11); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 140, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    if (__pyx_t_8) {
+      __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_8); __pyx_t_8 = NULL;
+    }
+    __Pyx_INCREF(__pyx_v_cfg_path);
+    __Pyx_GIVEREF(__pyx_v_cfg_path);
+    PyTuple_SET_ITEM(__pyx_t_6, 0+__pyx_t_11, __pyx_v_cfg_path);
+    __Pyx_INCREF(__pyx_kp_u_RTC6RBF_rbf);
+    __Pyx_GIVEREF(__pyx_kp_u_RTC6RBF_rbf);
+    PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_11, __pyx_kp_u_RTC6RBF_rbf);
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 140, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
+    }
+  }
+  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 140, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 140, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_12 = ((!__pyx_t_1) != 0);
+  if (!__pyx_t_12) {
+  } else {
+    __pyx_t_2 = __pyx_t_12;
+    goto __pyx_L5_bool_binop_done;
+  }
+
+  /* "cython/rtc6_sdk.pyx":141
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6OUT.out")) or \
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):             # <<<<<<<<<<<<<<
+ *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "
+ *                               f"does not exist in {cfg_path}", extra={"component": "rtc6"})
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_os); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_path); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_exists); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_path); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_join); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __pyx_t_6 = NULL;
+  __pyx_t_11 = 0;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_4);
+    if (likely(__pyx_t_6)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_6);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_4, function);
+      __pyx_t_11 = 1;
+    }
+  }
+  #if CYTHON_FAST_PYCALL
+  if (PyFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_v_cfg_path, __pyx_kp_u_RTC6DAT_dat};
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 141, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_GOTREF(__pyx_t_3);
+  } else
+  #endif
+  #if CYTHON_FAST_PYCCALL
+  if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
+    PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_v_cfg_path, __pyx_kp_u_RTC6DAT_dat};
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 141, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_GOTREF(__pyx_t_3);
+  } else
+  #endif
+  {
+    __pyx_t_8 = PyTuple_New(2+__pyx_t_11); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 141, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+    if (__pyx_t_6) {
+      __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
+    }
+    __Pyx_INCREF(__pyx_v_cfg_path);
+    __Pyx_GIVEREF(__pyx_v_cfg_path);
+    PyTuple_SET_ITEM(__pyx_t_8, 0+__pyx_t_11, __pyx_v_cfg_path);
+    __Pyx_INCREF(__pyx_kp_u_RTC6DAT_dat);
+    __Pyx_GIVEREF(__pyx_kp_u_RTC6DAT_dat);
+    PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_11, __pyx_kp_u_RTC6DAT_dat);
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 141, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_7);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_7, function);
+    }
+  }
+  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+  __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_1 = ((!__pyx_t_12) != 0);
+  __pyx_t_2 = __pyx_t_1;
+  __pyx_L5_bool_binop_done:;
+
+  /* "cython/rtc6_sdk.pyx":138
+ *             cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+ *         rtc6_logger.info(f"Board reset with config dir: {cfg_path}", extra={"component": "rtc6"})
+ *         if not os.path.exists(cfg_path) or \             # <<<<<<<<<<<<<<
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6OUT.out")) or \
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \
+ */
+  if (unlikely(__pyx_t_2)) {
+
+    /* "cython/rtc6_sdk.pyx":142
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):
+ *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "             # <<<<<<<<<<<<<<
+ *                               f"does not exist in {cfg_path}", extra={"component": "rtc6"})
+ *             raise FileNotFoundError()
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 142, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_error); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 142, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+    /* "cython/rtc6_sdk.pyx":143
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):
+ *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "
+ *                               f"does not exist in {cfg_path}", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
+ *             raise FileNotFoundError()
+ * 
+ */
+    __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_cfg_path, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 143, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+
+    /* "cython/rtc6_sdk.pyx":142
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):
+ *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "             # <<<<<<<<<<<<<<
+ *                               f"does not exist in {cfg_path}", extra={"component": "rtc6"})
+ *             raise FileNotFoundError()
+ */
+    __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_kp_u_At_least_one_of_the_RTC6OUT_out, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 142, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 142, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_GIVEREF(__pyx_t_3);
+    PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3);
+    __pyx_t_3 = 0;
+
+    /* "cython/rtc6_sdk.pyx":143
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):
+ *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "
+ *                               f"does not exist in {cfg_path}", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
+ *             raise FileNotFoundError()
+ * 
+ */
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 143, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 143, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 143, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_extra, __pyx_t_4) < 0) __PYX_ERR(0, 143, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+    /* "cython/rtc6_sdk.pyx":142
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):
+ *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "             # <<<<<<<<<<<<<<
+ *                               f"does not exist in {cfg_path}", extra={"component": "rtc6"})
+ *             raise FileNotFoundError()
+ */
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_5, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 142, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+    /* "cython/rtc6_sdk.pyx":144
+ *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "
+ *                               f"does not exist in {cfg_path}", extra={"component": "rtc6"})
+ *             raise FileNotFoundError()             # <<<<<<<<<<<<<<
+ * 
+ *         err = _load_program_file(self.cardno, cfg_path.encode('utf-8'))
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_FileNotFoundError); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_3 = __Pyx_PyObject_CallNoArg(__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_Raise(__pyx_t_3, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __PYX_ERR(0, 144, __pyx_L1_error)
+
+    /* "cython/rtc6_sdk.pyx":138
+ *             cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+ *         rtc6_logger.info(f"Board reset with config dir: {cfg_path}", extra={"component": "rtc6"})
+ *         if not os.path.exists(cfg_path) or \             # <<<<<<<<<<<<<<
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6OUT.out")) or \
+ *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \
+ */
+  }
+
+  /* "cython/rtc6_sdk.pyx":146
+ *             raise FileNotFoundError()
+ * 
+ *         err = _load_program_file(self.cardno, cfg_path.encode('utf-8'))             # <<<<<<<<<<<<<<
+ * 
+ *         if err == 0:
+ */
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_cfg_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
     __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_4);
@@ -2023,464 +2892,53 @@ static int __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man___cinit__(CYTHON_UNUSED struct
       __Pyx_DECREF_SET(__pyx_t_4, function);
     }
   }
-  __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_v_cfg_path) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_cfg_path);
+  __pyx_t_3 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_kp_u_utf_8) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_kp_u_utf_8);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 120, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 120, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_7 = ((!__pyx_t_6) != 0);
-  if (!__pyx_t_7) {
-  } else {
-    __pyx_t_1 = __pyx_t_7;
-    goto __pyx_L5_bool_binop_done;
-  }
-
-  /* "cython/rtc6_sdk.pyx":121
- *         rtc6_logger.info(f"Board reset with config dir: {cfg_path}", extra={"component": "rtc6"})
- *         if not os.path.exists(cfg_path) or \
- *             not os.path.exists(os.path.join(cfg_path, "RTC6OUT.out")) or \             # <<<<<<<<<<<<<<
- *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \
- *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 121, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_path); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 121, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_exists); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 121, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_os); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 121, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_path); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 121, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_join); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 121, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  __pyx_t_8 = NULL;
-  __pyx_t_9 = 0;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_8)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_8);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-      __pyx_t_9 = 1;
-    }
-  }
-  #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_3)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_cfg_path, __pyx_kp_u_RTC6OUT_out};
-    __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 121, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __Pyx_GOTREF(__pyx_t_5);
-  } else
-  #endif
-  #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_cfg_path, __pyx_kp_u_RTC6OUT_out};
-    __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 121, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __Pyx_GOTREF(__pyx_t_5);
-  } else
-  #endif
-  {
-    __pyx_t_10 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 121, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_10);
-    if (__pyx_t_8) {
-      __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
-    }
-    __Pyx_INCREF(__pyx_v_cfg_path);
-    __Pyx_GIVEREF(__pyx_v_cfg_path);
-    PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_9, __pyx_v_cfg_path);
-    __Pyx_INCREF(__pyx_kp_u_RTC6OUT_out);
-    __Pyx_GIVEREF(__pyx_kp_u_RTC6OUT_out);
-    PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_9, __pyx_kp_u_RTC6OUT_out);
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_10, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 121, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-      __Pyx_INCREF(__pyx_t_3);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_4, function);
-    }
-  }
-  __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 121, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 121, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_6 = ((!__pyx_t_7) != 0);
-  if (!__pyx_t_6) {
-  } else {
-    __pyx_t_1 = __pyx_t_6;
-    goto __pyx_L5_bool_binop_done;
-  }
-
-  /* "cython/rtc6_sdk.pyx":122
- *         if not os.path.exists(cfg_path) or \
- *             not os.path.exists(os.path.join(cfg_path, "RTC6OUT.out")) or \
- *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \             # <<<<<<<<<<<<<<
- *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):
- *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 122, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_path); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 122, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_exists); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 122, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_os); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 122, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_path); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 122, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
+  __pyx_t_13 = __Pyx_PyObject_AsString(__pyx_t_3); if (unlikely((!__pyx_t_13) && PyErr_Occurred())) __PYX_ERR(0, 146, __pyx_L1_error)
+  __pyx_v_err = _load_program_file(__pyx_v_self->cardno, __pyx_t_13);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_join); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 122, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  __pyx_t_10 = NULL;
-  __pyx_t_9 = 0;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_10)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_10);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-      __pyx_t_9 = 1;
-    }
-  }
-  #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_3)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_10, __pyx_v_cfg_path, __pyx_kp_u_RTC6RBF_rbf};
-    __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 122, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-    __Pyx_GOTREF(__pyx_t_5);
-  } else
-  #endif
-  #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_10, __pyx_v_cfg_path, __pyx_kp_u_RTC6RBF_rbf};
-    __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 122, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-    __Pyx_GOTREF(__pyx_t_5);
-  } else
-  #endif
-  {
-    __pyx_t_8 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 122, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    if (__pyx_t_10) {
-      __Pyx_GIVEREF(__pyx_t_10); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_10); __pyx_t_10 = NULL;
-    }
-    __Pyx_INCREF(__pyx_v_cfg_path);
-    __Pyx_GIVEREF(__pyx_v_cfg_path);
-    PyTuple_SET_ITEM(__pyx_t_8, 0+__pyx_t_9, __pyx_v_cfg_path);
-    __Pyx_INCREF(__pyx_kp_u_RTC6RBF_rbf);
-    __Pyx_GIVEREF(__pyx_kp_u_RTC6RBF_rbf);
-    PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_9, __pyx_kp_u_RTC6RBF_rbf);
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_8, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 122, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-      __Pyx_INCREF(__pyx_t_3);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_4, function);
-    }
-  }
-  __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 122, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 122, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_7 = ((!__pyx_t_6) != 0);
-  if (!__pyx_t_7) {
-  } else {
-    __pyx_t_1 = __pyx_t_7;
-    goto __pyx_L5_bool_binop_done;
-  }
 
-  /* "cython/rtc6_sdk.pyx":123
- *             not os.path.exists(os.path.join(cfg_path, "RTC6OUT.out")) or \
- *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \
- *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):             # <<<<<<<<<<<<<<
- *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "
- *                               f"does not exist in {cfg_path}", extra={"component": "rtc6"})
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 123, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_path); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 123, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_exists); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 123, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_os); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 123, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_path); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 123, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_join); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 123, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  __pyx_t_8 = NULL;
-  __pyx_t_9 = 0;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_8)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_8);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-      __pyx_t_9 = 1;
-    }
-  }
-  #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_3)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_cfg_path, __pyx_kp_u_RTC6DAT_dat};
-    __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 123, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __Pyx_GOTREF(__pyx_t_5);
-  } else
-  #endif
-  #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_cfg_path, __pyx_kp_u_RTC6DAT_dat};
-    __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 123, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __Pyx_GOTREF(__pyx_t_5);
-  } else
-  #endif
-  {
-    __pyx_t_10 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 123, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_10);
-    if (__pyx_t_8) {
-      __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
-    }
-    __Pyx_INCREF(__pyx_v_cfg_path);
-    __Pyx_GIVEREF(__pyx_v_cfg_path);
-    PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_9, __pyx_v_cfg_path);
-    __Pyx_INCREF(__pyx_kp_u_RTC6DAT_dat);
-    __Pyx_GIVEREF(__pyx_kp_u_RTC6DAT_dat);
-    PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_9, __pyx_kp_u_RTC6DAT_dat);
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_10, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 123, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-      __Pyx_INCREF(__pyx_t_3);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_4, function);
-    }
-  }
-  __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 123, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 123, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_6 = ((!__pyx_t_7) != 0);
-  __pyx_t_1 = __pyx_t_6;
-  __pyx_L5_bool_binop_done:;
-
-  /* "cython/rtc6_sdk.pyx":120
+  /* "cython/rtc6_sdk.pyx":148
+ *         err = _load_program_file(self.cardno, cfg_path.encode('utf-8'))
  * 
- *         rtc6_logger.info(f"Board reset with config dir: {cfg_path}", extra={"component": "rtc6"})
- *         if not os.path.exists(cfg_path) or \             # <<<<<<<<<<<<<<
- *             not os.path.exists(os.path.join(cfg_path, "RTC6OUT.out")) or \
- *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \
- */
-  if (unlikely(__pyx_t_1)) {
-
-    /* "cython/rtc6_sdk.pyx":124
- *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \
- *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):
- *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "             # <<<<<<<<<<<<<<
- *                               f"does not exist in {cfg_path}", extra={"component": "rtc6"})
- *             raise FileNotFoundError()
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 124, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_error); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 124, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-    /* "cython/rtc6_sdk.pyx":125
- *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):
- *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "
- *                               f"does not exist in {cfg_path}", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
- *             raise FileNotFoundError()
- * 
- */
-    __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_cfg_path, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 125, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-
-    /* "cython/rtc6_sdk.pyx":124
- *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \
- *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):
- *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "             # <<<<<<<<<<<<<<
- *                               f"does not exist in {cfg_path}", extra={"component": "rtc6"})
- *             raise FileNotFoundError()
- */
-    __pyx_t_5 = __Pyx_PyUnicode_Concat(__pyx_kp_u_At_least_one_of_the_RTC6OUT_out, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 124, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 124, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_GIVEREF(__pyx_t_5);
-    PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_5);
-    __pyx_t_5 = 0;
-
-    /* "cython/rtc6_sdk.pyx":125
- *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):
- *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "
- *                               f"does not exist in {cfg_path}", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
- *             raise FileNotFoundError()
- * 
- */
-    __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 125, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 125, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 125, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_extra, __pyx_t_3) < 0) __PYX_ERR(0, 125, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-    /* "cython/rtc6_sdk.pyx":124
- *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \
- *             not os.path.exists(os.path.join(cfg_path, "RTC6DAT.dat")):
- *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "             # <<<<<<<<<<<<<<
- *                               f"does not exist in {cfg_path}", extra={"component": "rtc6"})
- *             raise FileNotFoundError()
- */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 124, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-    /* "cython/rtc6_sdk.pyx":126
- *             rtc6_logger.error(f"At least one of the RTC6OUT.out, RTC6RBF.rbf and RTC6DAT.dat "
- *                               f"does not exist in {cfg_path}", extra={"component": "rtc6"})
- *             raise FileNotFoundError()             # <<<<<<<<<<<<<<
- * 
- *         err = rtc6.load_program_file(cfg_path.encode('utf-8'))
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_FileNotFoundError); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 126, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 126, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_Raise(__pyx_t_5, 0, 0, 0);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __PYX_ERR(0, 126, __pyx_L1_error)
-
-    /* "cython/rtc6_sdk.pyx":120
- * 
- *         rtc6_logger.info(f"Board reset with config dir: {cfg_path}", extra={"component": "rtc6"})
- *         if not os.path.exists(cfg_path) or \             # <<<<<<<<<<<<<<
- *             not os.path.exists(os.path.join(cfg_path, "RTC6OUT.out")) or \
- *             not os.path.exists(os.path.join(cfg_path, "RTC6RBF.rbf")) or \
- */
-  }
-
-  /* "cython/rtc6_sdk.pyx":128
- *             raise FileNotFoundError()
- * 
- *         err = rtc6.load_program_file(cfg_path.encode('utf-8'))             # <<<<<<<<<<<<<<
- *         if err == 0:
- *             rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
- */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_cfg_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 128, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_2)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_2);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-    }
-  }
-  __pyx_t_5 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_kp_u_utf_8) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_utf_8);
-  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 128, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_11 = __Pyx_PyObject_AsString(__pyx_t_5); if (unlikely((!__pyx_t_11) && PyErr_Occurred())) __PYX_ERR(0, 128, __pyx_L1_error)
-  __pyx_v_err = load_program_file(__pyx_t_11);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "cython/rtc6_sdk.pyx":129
- * 
- *         err = rtc6.load_program_file(cfg_path.encode('utf-8'))
  *         if err == 0:             # <<<<<<<<<<<<<<
  *             rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
  *         else:
  */
-  __pyx_t_1 = ((__pyx_v_err == 0) != 0);
-  if (__pyx_t_1) {
+  __pyx_t_2 = ((__pyx_v_err == 0) != 0);
+  if (__pyx_t_2) {
 
-    /* "cython/rtc6_sdk.pyx":130
- *         err = rtc6.load_program_file(cfg_path.encode('utf-8'))
+    /* "cython/rtc6_sdk.pyx":149
+ * 
  *         if err == 0:
  *             rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *         else:
  *             if err == 2:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 130, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 130, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 149, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 130, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_info); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 149, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 149, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 149, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 130, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 130, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_extra, __pyx_t_2) < 0) __PYX_ERR(0, 130, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__3, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 130, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
+    if (PyDict_SetItem(__pyx_t_5, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 149, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_extra, __pyx_t_5) < 0) __PYX_ERR(0, 149, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple__2, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 149, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "cython/rtc6_sdk.pyx":129
+    /* "cython/rtc6_sdk.pyx":148
+ *         err = _load_program_file(self.cardno, cfg_path.encode('utf-8'))
  * 
- *         err = rtc6.load_program_file(cfg_path.encode('utf-8'))
  *         if err == 0:             # <<<<<<<<<<<<<<
  *             rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
  *         else:
@@ -2488,235 +2946,235 @@ static int __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man___cinit__(CYTHON_UNUSED struct
     goto __pyx_L9;
   }
 
-  /* "cython/rtc6_sdk.pyx":132
+  /* "cython/rtc6_sdk.pyx":151
  *             rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
  *         else:
  *             if err == 2:             # <<<<<<<<<<<<<<
- *                 err = rtc6.load_program_file(cfg_path.encode('utf-8'))
- *             if err == 0:
+ *                 err = _load_program_file(self.cardno, cfg_path.encode('utf-8'))
+ * 
  */
   /*else*/ {
-    __pyx_t_1 = ((__pyx_v_err == 2) != 0);
-    if (__pyx_t_1) {
+    __pyx_t_2 = ((__pyx_v_err == 2) != 0);
+    if (__pyx_t_2) {
 
-      /* "cython/rtc6_sdk.pyx":133
+      /* "cython/rtc6_sdk.pyx":152
  *         else:
  *             if err == 2:
- *                 err = rtc6.load_program_file(cfg_path.encode('utf-8'))             # <<<<<<<<<<<<<<
+ *                 err = _load_program_file(self.cardno, cfg_path.encode('utf-8'))             # <<<<<<<<<<<<<<
+ * 
  *             if err == 0:
- *                 rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
  */
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_cfg_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 133, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_3 = NULL;
-      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
-        __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_5);
-        if (likely(__pyx_t_3)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-          __Pyx_INCREF(__pyx_t_3);
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_cfg_path, __pyx_n_s_encode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 152, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_4 = NULL;
+      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+        __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+        if (likely(__pyx_t_4)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+          __Pyx_INCREF(__pyx_t_4);
           __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_5, function);
+          __Pyx_DECREF_SET(__pyx_t_3, function);
         }
       }
-      __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_3, __pyx_kp_u_utf_8) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_kp_u_utf_8);
-      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 133, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_kp_u_utf_8) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_utf_8);
+      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 152, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_t_13 = __Pyx_PyObject_AsString(__pyx_t_5); if (unlikely((!__pyx_t_13) && PyErr_Occurred())) __PYX_ERR(0, 152, __pyx_L1_error)
+      __pyx_v_err = _load_program_file(__pyx_v_self->cardno, __pyx_t_13);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_11 = __Pyx_PyObject_AsString(__pyx_t_2); if (unlikely((!__pyx_t_11) && PyErr_Occurred())) __PYX_ERR(0, 133, __pyx_L1_error)
-      __pyx_v_err = load_program_file(__pyx_t_11);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "cython/rtc6_sdk.pyx":132
+      /* "cython/rtc6_sdk.pyx":151
  *             rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
  *         else:
  *             if err == 2:             # <<<<<<<<<<<<<<
- *                 err = rtc6.load_program_file(cfg_path.encode('utf-8'))
- *             if err == 0:
+ *                 err = _load_program_file(self.cardno, cfg_path.encode('utf-8'))
+ * 
  */
     }
 
-    /* "cython/rtc6_sdk.pyx":134
- *             if err == 2:
- *                 err = rtc6.load_program_file(cfg_path.encode('utf-8'))
+    /* "cython/rtc6_sdk.pyx":154
+ *                 err = _load_program_file(self.cardno, cfg_path.encode('utf-8'))
+ * 
  *             if err == 0:             # <<<<<<<<<<<<<<
  *                 rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
- *             elif err in RTC6Man.ERR_CODES["load_program_file"].keys():
+ *             elif err in RTC6Helper.ERR_CODES["load_program_file"].keys():
  */
-    __pyx_t_1 = ((__pyx_v_err == 0) != 0);
-    if (__pyx_t_1) {
+    __pyx_t_2 = ((__pyx_v_err == 0) != 0);
+    if (__pyx_t_2) {
 
-      /* "cython/rtc6_sdk.pyx":135
- *                 err = rtc6.load_program_file(cfg_path.encode('utf-8'))
+      /* "cython/rtc6_sdk.pyx":155
+ * 
  *             if err == 0:
  *                 rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
- *             elif err in RTC6Man.ERR_CODES["load_program_file"].keys():
- *                 rtc6_logger.error(f"Device reset Failed: {RTC6Man.ERR_CODES['load_program_file'][err]}",
+ *             elif err in RTC6Helper.ERR_CODES["load_program_file"].keys():
+ *                 rtc6_logger.error(f"Device reset Failed: {RTC6Helper.ERR_CODES['load_program_file'][err]}",
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 135, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_info); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 135, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 155, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 135, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 135, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      if (PyDict_SetItem(__pyx_t_3, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 135, __pyx_L1_error)
-      if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_extra, __pyx_t_3) < 0) __PYX_ERR(0, 135, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_tuple__3, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 135, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 155, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 155, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 155, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 155, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_extra, __pyx_t_4) < 0) __PYX_ERR(0, 155, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__2, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 155, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "cython/rtc6_sdk.pyx":134
- *             if err == 2:
- *                 err = rtc6.load_program_file(cfg_path.encode('utf-8'))
+      /* "cython/rtc6_sdk.pyx":154
+ *                 err = _load_program_file(self.cardno, cfg_path.encode('utf-8'))
+ * 
  *             if err == 0:             # <<<<<<<<<<<<<<
  *                 rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
- *             elif err in RTC6Man.ERR_CODES["load_program_file"].keys():
+ *             elif err in RTC6Helper.ERR_CODES["load_program_file"].keys():
  */
       goto __pyx_L11;
     }
 
-    /* "cython/rtc6_sdk.pyx":136
+    /* "cython/rtc6_sdk.pyx":156
  *             if err == 0:
  *                 rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
- *             elif err in RTC6Man.ERR_CODES["load_program_file"].keys():             # <<<<<<<<<<<<<<
- *                 rtc6_logger.error(f"Device reset Failed: {RTC6Man.ERR_CODES['load_program_file'][err]}",
+ *             elif err in RTC6Helper.ERR_CODES["load_program_file"].keys():             # <<<<<<<<<<<<<<
+ *                 rtc6_logger.error(f"Device reset Failed: {RTC6Helper.ERR_CODES['load_program_file'][err]}",
  *                                   extra={"component": "rtc6"})
  */
-    __pyx_t_3 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 136, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man), __pyx_n_s_ERR_CODES); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 136, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_t_5, __pyx_n_u_load_program_file); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 156, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_keys); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 136, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = NULL;
-    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_5);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-        __Pyx_INCREF(__pyx_t_4);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper), __pyx_n_s_ERR_CODES); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 156, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_7 = __Pyx_PyObject_Dict_GetItem(__pyx_t_3, __pyx_n_u_load_program_file); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 156, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_keys); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 156, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __pyx_t_7 = NULL;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_7)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_7);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_5, function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
       }
     }
-    __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 136, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_1 = (__Pyx_PySequence_ContainsTF(__pyx_t_3, __pyx_t_2, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_7) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
+    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 156, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_6 = (__pyx_t_1 != 0);
-    if (likely(__pyx_t_6)) {
+    __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_t_4, __pyx_t_5, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 156, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_1 = (__pyx_t_2 != 0);
+    if (likely(__pyx_t_1)) {
 
-      /* "cython/rtc6_sdk.pyx":137
+      /* "cython/rtc6_sdk.pyx":157
  *                 rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
- *             elif err in RTC6Man.ERR_CODES["load_program_file"].keys():
- *                 rtc6_logger.error(f"Device reset Failed: {RTC6Man.ERR_CODES['load_program_file'][err]}",             # <<<<<<<<<<<<<<
+ *             elif err in RTC6Helper.ERR_CODES["load_program_file"].keys():
+ *                 rtc6_logger.error(f"Device reset Failed: {RTC6Helper.ERR_CODES['load_program_file'][err]}",             # <<<<<<<<<<<<<<
  *                                   extra={"component": "rtc6"})
  *                 if err == 2:
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 137, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_error); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 137, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 157, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_error); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 157, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper), __pyx_n_s_ERR_CODES); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 157, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_5, __pyx_n_u_load_program_file); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 157, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man), __pyx_n_s_ERR_CODES); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 137, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_t_2, __pyx_n_u_load_program_file); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 137, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_err, UINT, 0, __Pyx_PyInt_From_uint32_t, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 137, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_2, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 137, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_3, __pyx_v_err, UINT, 0, __Pyx_PyInt_From_uint32_t, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 157, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Device_reset_Failed, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 137, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_5, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 157, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 137, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Device_reset_Failed, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 157, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_GIVEREF(__pyx_t_2);
-      PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_2);
-      __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 157, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_GIVEREF(__pyx_t_5);
+      PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_5);
+      __pyx_t_5 = 0;
 
-      /* "cython/rtc6_sdk.pyx":138
- *             elif err in RTC6Man.ERR_CODES["load_program_file"].keys():
- *                 rtc6_logger.error(f"Device reset Failed: {RTC6Man.ERR_CODES['load_program_file'][err]}",
+      /* "cython/rtc6_sdk.pyx":158
+ *             elif err in RTC6Helper.ERR_CODES["load_program_file"].keys():
+ *                 rtc6_logger.error(f"Device reset Failed: {RTC6Helper.ERR_CODES['load_program_file'][err]}",
  *                                   extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *                 if err == 2:
  *                     rtc6_logger.error(f"Power cycle required", extra={"component": "rtc6"})
  */
-      __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 138, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 138, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_4);
-      if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 138, __pyx_L1_error)
-      if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_extra, __pyx_t_4) < 0) __PYX_ERR(0, 138, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 158, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 158, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_7);
+      if (PyDict_SetItem(__pyx_t_7, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 158, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_extra, __pyx_t_7) < 0) __PYX_ERR(0, 158, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "cython/rtc6_sdk.pyx":137
+      /* "cython/rtc6_sdk.pyx":157
  *                 rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
- *             elif err in RTC6Man.ERR_CODES["load_program_file"].keys():
- *                 rtc6_logger.error(f"Device reset Failed: {RTC6Man.ERR_CODES['load_program_file'][err]}",             # <<<<<<<<<<<<<<
+ *             elif err in RTC6Helper.ERR_CODES["load_program_file"].keys():
+ *                 rtc6_logger.error(f"Device reset Failed: {RTC6Helper.ERR_CODES['load_program_file'][err]}",             # <<<<<<<<<<<<<<
  *                                   extra={"component": "rtc6"})
  *                 if err == 2:
  */
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 137, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 157, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_7);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "cython/rtc6_sdk.pyx":139
- *                 rtc6_logger.error(f"Device reset Failed: {RTC6Man.ERR_CODES['load_program_file'][err]}",
+      /* "cython/rtc6_sdk.pyx":159
+ *                 rtc6_logger.error(f"Device reset Failed: {RTC6Helper.ERR_CODES['load_program_file'][err]}",
  *                                   extra={"component": "rtc6"})
  *                 if err == 2:             # <<<<<<<<<<<<<<
  *                     rtc6_logger.error(f"Power cycle required", extra={"component": "rtc6"})
  *                 raise RTC6DevError(err)
  */
-      __pyx_t_6 = ((__pyx_v_err == 2) != 0);
-      if (__pyx_t_6) {
+      __pyx_t_1 = ((__pyx_v_err == 2) != 0);
+      if (__pyx_t_1) {
 
-        /* "cython/rtc6_sdk.pyx":140
+        /* "cython/rtc6_sdk.pyx":160
  *                                   extra={"component": "rtc6"})
  *                 if err == 2:
  *                     rtc6_logger.error(f"Power cycle required", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *                 raise RTC6DevError(err)
  *             else:
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 140, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_error); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 140, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_2);
-        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 140, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 140, __pyx_L1_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 160, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_7);
+        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_error); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 160, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        if (PyDict_SetItem(__pyx_t_5, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 140, __pyx_L1_error)
-        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_extra, __pyx_t_5) < 0) __PYX_ERR(0, 140, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 160, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_7);
+        __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 160, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
+        if (PyDict_SetItem(__pyx_t_3, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 160, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_extra, __pyx_t_3) < 0) __PYX_ERR(0, 160, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_tuple__3, __pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 160, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__4, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 140, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_5);
-        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-        /* "cython/rtc6_sdk.pyx":139
- *                 rtc6_logger.error(f"Device reset Failed: {RTC6Man.ERR_CODES['load_program_file'][err]}",
+        /* "cython/rtc6_sdk.pyx":159
+ *                 rtc6_logger.error(f"Device reset Failed: {RTC6Helper.ERR_CODES['load_program_file'][err]}",
  *                                   extra={"component": "rtc6"})
  *                 if err == 2:             # <<<<<<<<<<<<<<
  *                     rtc6_logger.error(f"Power cycle required", extra={"component": "rtc6"})
@@ -2724,47 +3182,47 @@ static int __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man___cinit__(CYTHON_UNUSED struct
  */
       }
 
-      /* "cython/rtc6_sdk.pyx":141
+      /* "cython/rtc6_sdk.pyx":161
  *                 if err == 2:
  *                     rtc6_logger.error(f"Power cycle required", extra={"component": "rtc6"})
  *                 raise RTC6DevError(err)             # <<<<<<<<<<<<<<
  *             else:
  *                 rtc6_logger.error(f"Device reset Failed: unknown error code {err}", extra={"component": "rtc6"})
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_RTC6DevError); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 141, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_2 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = NULL;
-      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
-        __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
-        if (likely(__pyx_t_3)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-          __Pyx_INCREF(__pyx_t_3);
+      __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_RTC6DevError); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 161, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_7);
+      __pyx_t_5 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 161, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_4 = NULL;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
+        __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_7);
+        if (likely(__pyx_t_4)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+          __Pyx_INCREF(__pyx_t_4);
           __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_4, function);
+          __Pyx_DECREF_SET(__pyx_t_7, function);
         }
       }
-      __pyx_t_5 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2);
-      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 141, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_Raise(__pyx_t_5, 0, 0, 0);
+      __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_4, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_5);
+      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __PYX_ERR(0, 141, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 161, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __Pyx_Raise(__pyx_t_3, 0, 0, 0);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __PYX_ERR(0, 161, __pyx_L1_error)
 
-      /* "cython/rtc6_sdk.pyx":136
+      /* "cython/rtc6_sdk.pyx":156
  *             if err == 0:
  *                 rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})
- *             elif err in RTC6Man.ERR_CODES["load_program_file"].keys():             # <<<<<<<<<<<<<<
- *                 rtc6_logger.error(f"Device reset Failed: {RTC6Man.ERR_CODES['load_program_file'][err]}",
+ *             elif err in RTC6Helper.ERR_CODES["load_program_file"].keys():             # <<<<<<<<<<<<<<
+ *                 rtc6_logger.error(f"Device reset Failed: {RTC6Helper.ERR_CODES['load_program_file'][err]}",
  *                                   extra={"component": "rtc6"})
  */
     }
 
-    /* "cython/rtc6_sdk.pyx":143
+    /* "cython/rtc6_sdk.pyx":163
  *                 raise RTC6DevError(err)
  *             else:
  *                 rtc6_logger.error(f"Device reset Failed: unknown error code {err}", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
@@ -2772,109 +3230,113 @@ static int __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man___cinit__(CYTHON_UNUSED struct
  * 
  */
     /*else*/ {
-      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 143, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 163, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_error); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 163, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_7);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_t_3 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 163, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_3, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 163, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_error); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 143, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Device_reset_Failed_unknown_erro, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 163, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 163, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __Pyx_GIVEREF(__pyx_t_3);
+      PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3);
+      __pyx_t_3 = 0;
+      __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 163, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 163, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 143, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_t_5, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 143, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Device_reset_Failed_unknown_erro, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 143, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 143, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_GIVEREF(__pyx_t_5);
-      PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_5);
-      __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 143, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 143, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      if (PyDict_SetItem(__pyx_t_3, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 143, __pyx_L1_error)
-      if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_extra, __pyx_t_3) < 0) __PYX_ERR(0, 143, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 143, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
+      if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 163, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_extra, __pyx_t_4) < 0) __PYX_ERR(0, 163, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_5, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 163, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "cython/rtc6_sdk.pyx":144
+      /* "cython/rtc6_sdk.pyx":164
  *             else:
  *                 rtc6_logger.error(f"Device reset Failed: unknown error code {err}", extra={"component": "rtc6"})
  *                 raise RTC6DevError(err)             # <<<<<<<<<<<<<<
  * 
- *         rtc6.reset_error(-1)
+ *         _reset_error(self.cardno, -1)
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_RTC6DevError); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 144, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_RTC6DevError); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 164, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_5 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 164, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_2 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 144, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = NULL;
-      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
-        __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_5);
-        if (likely(__pyx_t_4)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-          __Pyx_INCREF(__pyx_t_4);
+      __pyx_t_7 = NULL;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+        __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_3);
+        if (likely(__pyx_t_7)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+          __Pyx_INCREF(__pyx_t_7);
           __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_5, function);
+          __Pyx_DECREF_SET(__pyx_t_3, function);
         }
       }
-      __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_2);
-      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 144, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_4 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_7, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5);
+      __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __Pyx_Raise(__pyx_t_3, 0, 0, 0);
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 164, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __PYX_ERR(0, 144, __pyx_L1_error)
+      __Pyx_Raise(__pyx_t_4, 0, 0, 0);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __PYX_ERR(0, 164, __pyx_L1_error)
     }
     __pyx_L11:;
   }
   __pyx_L9:;
 
-  /* "cython/rtc6_sdk.pyx":146
+  /* "cython/rtc6_sdk.pyx":166
  *                 raise RTC6DevError(err)
  * 
- *         rtc6.reset_error(-1)             # <<<<<<<<<<<<<<
+ *         _reset_error(self.cardno, -1)             # <<<<<<<<<<<<<<
  * 
  *     def config_list(self, mem1: int, mem2: int):
  */
-  reset_error(-1);
+  _reset_error(__pyx_v_self->cardno, -1);
 
-  /* "cython/rtc6_sdk.pyx":107
- *     RTC6_CONFIG_ERROR = 16
+  /* "cython/rtc6_sdk.pyx":134
+ *                 raise ValueError(f"{cardno} is larger than number of RTC6 board count {self.board_count}")
  * 
- *     def __cinit__(self, cfg_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")):             # <<<<<<<<<<<<<<
- *         """
- *         TODO: device initialization.
+ *     def load_program_file(self, cfg_path: Union[str, None] = None):             # <<<<<<<<<<<<<<
+ *         if cfg_path is None:
+ *             cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
  */
 
   /* function exit code */
-  __pyx_r = 0;
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
   __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
+  __Pyx_XDECREF(__pyx_t_9);
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Man.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = -1;
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.load_program_file", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_cfg_path);
+  __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "cython/rtc6_sdk.pyx":148
- *         rtc6.reset_error(-1)
+/* "cython/rtc6_sdk.pyx":168
+ *         _reset_error(self.cardno, -1)
  * 
  *     def config_list(self, mem1: int, mem2: int):             # <<<<<<<<<<<<<<
  *         # 8,388,608 (2^23) storage positions
@@ -2882,8 +3344,8 @@ static int __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man___cinit__(CYTHON_UNUSED struct
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_3config_list(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_3config_list(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_5config_list(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_5config_list(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_mem1 = 0;
   PyObject *__pyx_v_mem2 = 0;
   int __pyx_lineno = 0;
@@ -2915,11 +3377,11 @@ static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_3config_list(PyObject *_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_mem2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("config_list", 1, 2, 2, 1); __PYX_ERR(0, 148, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("config_list", 1, 2, 2, 1); __PYX_ERR(0, 168, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "config_list") < 0)) __PYX_ERR(0, 148, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "config_list") < 0)) __PYX_ERR(0, 168, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -2932,20 +3394,20 @@ static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_3config_list(PyObject *_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("config_list", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 148, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("config_list", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 168, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Man.config_list", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.config_list", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *)__pyx_v_self), __pyx_v_mem1, __pyx_v_mem2);
+  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_4config_list(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *)__pyx_v_self), __pyx_v_mem1, __pyx_v_mem2);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *__pyx_v_self, PyObject *__pyx_v_mem1, PyObject *__pyx_v_mem2) {
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_4config_list(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, PyObject *__pyx_v_mem1, PyObject *__pyx_v_mem2) {
   PyObject *__pyx_v_actual_mem1 = NULL;
   PyObject *__pyx_v_actual_mem2 = NULL;
   PyObject *__pyx_r = NULL;
@@ -2966,41 +3428,41 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
   __Pyx_RefNannySetupContext("config_list", 0);
   __Pyx_INCREF(__pyx_v_mem1);
 
-  /* "cython/rtc6_sdk.pyx":151
+  /* "cython/rtc6_sdk.pyx":171
  *         # 8,388,608 (2^23) storage positions
  *         # mem1 -> list1, mem2 -> list2., rest to protected list list3
  *         if mem1 <= -1 or mem1 > 1<<23:             # <<<<<<<<<<<<<<
  *             rtc6_logger.warning(f"Mem1 is corrected to 2^23 from {mem1}, "
  *                                 f"which means Mem1=2^23, Mem2=0, List3=0", extra={"component": "rtc6"})
  */
-  __pyx_t_2 = PyObject_RichCompare(__pyx_v_mem1, __pyx_int_neg_1, Py_LE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 151, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 151, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_v_mem1, __pyx_int_neg_1, Py_LE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 171, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (!__pyx_t_3) {
   } else {
     __pyx_t_1 = __pyx_t_3;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_2 = PyObject_RichCompare(__pyx_v_mem1, __pyx_int_8388608, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 151, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 151, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_v_mem1, __pyx_int_8388608, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 171, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_1 = __pyx_t_3;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "cython/rtc6_sdk.pyx":152
+    /* "cython/rtc6_sdk.pyx":172
  *         # mem1 -> list1, mem2 -> list2., rest to protected list list3
  *         if mem1 <= -1 or mem1 > 1<<23:
  *             rtc6_logger.warning(f"Mem1 is corrected to 2^23 from {mem1}, "             # <<<<<<<<<<<<<<
  *                                 f"which means Mem1=2^23, Mem2=0, List3=0", extra={"component": "rtc6"})
  *             mem1 = -1
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_warning); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 152, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_warning); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
+    __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_5 = 0;
     __pyx_t_6 = 127;
@@ -3008,7 +3470,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
     __pyx_t_5 += 31;
     __Pyx_GIVEREF(__pyx_kp_u_Mem1_is_corrected_to_2_23_from);
     PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_kp_u_Mem1_is_corrected_to_2_23_from);
-    __pyx_t_7 = __Pyx_PyObject_FormatSimple(__pyx_v_mem1, __pyx_empty_unicode); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 152, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_FormatSimple(__pyx_v_mem1, __pyx_empty_unicode); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_6 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) > __pyx_t_6) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) : __pyx_t_6;
     __pyx_t_5 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_7);
@@ -3019,45 +3481,45 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
     __pyx_t_5 += 40;
     __Pyx_GIVEREF(__pyx_kp_u_which_means_Mem1_2_23_Mem2_0_Li);
     PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_kp_u_which_means_Mem1_2_23_Mem2_0_Li);
-    __pyx_t_7 = __Pyx_PyUnicode_Join(__pyx_t_2, 3, __pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 152, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyUnicode_Join(__pyx_t_2, 3, __pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
+    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_GIVEREF(__pyx_t_7);
     PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_7);
     __pyx_t_7 = 0;
 
-    /* "cython/rtc6_sdk.pyx":153
+    /* "cython/rtc6_sdk.pyx":173
  *         if mem1 <= -1 or mem1 > 1<<23:
  *             rtc6_logger.warning(f"Mem1 is corrected to 2^23 from {mem1}, "
  *                                 f"which means Mem1=2^23, Mem2=0, List3=0", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *             mem1 = -1
  *             actual_mem1 = 1<<23
  */
-    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 153, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 173, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 153, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 173, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    if (PyDict_SetItem(__pyx_t_8, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 153, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_extra, __pyx_t_8) < 0) __PYX_ERR(0, 153, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_8, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 173, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_extra, __pyx_t_8) < 0) __PYX_ERR(0, 173, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "cython/rtc6_sdk.pyx":152
+    /* "cython/rtc6_sdk.pyx":172
  *         # mem1 -> list1, mem2 -> list2., rest to protected list list3
  *         if mem1 <= -1 or mem1 > 1<<23:
  *             rtc6_logger.warning(f"Mem1 is corrected to 2^23 from {mem1}, "             # <<<<<<<<<<<<<<
  *                                 f"which means Mem1=2^23, Mem2=0, List3=0", extra={"component": "rtc6"})
  *             mem1 = -1
  */
-    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 152, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "cython/rtc6_sdk.pyx":154
+    /* "cython/rtc6_sdk.pyx":174
  *             rtc6_logger.warning(f"Mem1 is corrected to 2^23 from {mem1}, "
  *                                 f"which means Mem1=2^23, Mem2=0, List3=0", extra={"component": "rtc6"})
  *             mem1 = -1             # <<<<<<<<<<<<<<
@@ -3067,7 +3529,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
     __Pyx_INCREF(__pyx_int_neg_1);
     __Pyx_DECREF_SET(__pyx_v_mem1, __pyx_int_neg_1);
 
-    /* "cython/rtc6_sdk.pyx":155
+    /* "cython/rtc6_sdk.pyx":175
  *                                 f"which means Mem1=2^23, Mem2=0, List3=0", extra={"component": "rtc6"})
  *             mem1 = -1
  *             actual_mem1 = 1<<23             # <<<<<<<<<<<<<<
@@ -3077,7 +3539,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
     __Pyx_INCREF(__pyx_int_8388608);
     __pyx_v_actual_mem1 = __pyx_int_8388608;
 
-    /* "cython/rtc6_sdk.pyx":156
+    /* "cython/rtc6_sdk.pyx":176
  *             mem1 = -1
  *             actual_mem1 = 1<<23
  *             actual_mem2 = 0             # <<<<<<<<<<<<<<
@@ -3087,7 +3549,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
     __Pyx_INCREF(__pyx_int_0);
     __pyx_v_actual_mem2 = __pyx_int_0;
 
-    /* "cython/rtc6_sdk.pyx":151
+    /* "cython/rtc6_sdk.pyx":171
  *         # 8,388,608 (2^23) storage positions
  *         # mem1 -> list1, mem2 -> list2., rest to protected list list3
  *         if mem1 <= -1 or mem1 > 1<<23:             # <<<<<<<<<<<<<<
@@ -3097,7 +3559,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
     goto __pyx_L3;
   }
 
-  /* "cython/rtc6_sdk.pyx":158
+  /* "cython/rtc6_sdk.pyx":178
  *             actual_mem2 = 0
  *         else:
  *             if mem1 == 0:             # <<<<<<<<<<<<<<
@@ -3105,49 +3567,49 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
  *                 actual_mem1 = 1
  */
   /*else*/ {
-    __pyx_t_8 = __Pyx_PyInt_EqObjC(__pyx_v_mem1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_EqObjC(__pyx_v_mem1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 178, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 178, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     if (__pyx_t_1) {
 
-      /* "cython/rtc6_sdk.pyx":159
+      /* "cython/rtc6_sdk.pyx":179
  *         else:
  *             if mem1 == 0:
  *                 rtc6_logger.warning(f"Mem1 is corrected to 1 from {mem1}", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *                 actual_mem1 = 1
  *             else:
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 179, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_warning); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_warning); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 179, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_8 = __Pyx_PyObject_FormatSimple(__pyx_v_mem1, __pyx_empty_unicode); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_FormatSimple(__pyx_v_mem1, __pyx_empty_unicode); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 179, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Mem1_is_corrected_to_1_from, __pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Mem1_is_corrected_to_1_from, __pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 179, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_8 = PyTuple_New(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_8 = PyTuple_New(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 179, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_GIVEREF(__pyx_t_2);
       PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_2);
       __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 179, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 179, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 159, __pyx_L1_error)
-      if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_extra, __pyx_t_4) < 0) __PYX_ERR(0, 159, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 179, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_extra, __pyx_t_4) < 0) __PYX_ERR(0, 179, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 179, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "cython/rtc6_sdk.pyx":160
+      /* "cython/rtc6_sdk.pyx":180
  *             if mem1 == 0:
  *                 rtc6_logger.warning(f"Mem1 is corrected to 1 from {mem1}", extra={"component": "rtc6"})
  *                 actual_mem1 = 1             # <<<<<<<<<<<<<<
@@ -3157,7 +3619,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
       __Pyx_INCREF(__pyx_int_1);
       __pyx_v_actual_mem1 = __pyx_int_1;
 
-      /* "cython/rtc6_sdk.pyx":158
+      /* "cython/rtc6_sdk.pyx":178
  *             actual_mem2 = 0
  *         else:
  *             if mem1 == 0:             # <<<<<<<<<<<<<<
@@ -3167,7 +3629,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
       goto __pyx_L6;
     }
 
-    /* "cython/rtc6_sdk.pyx":162
+    /* "cython/rtc6_sdk.pyx":182
  *                 actual_mem1 = 1
  *             else:
  *                 actual_mem1 = mem1             # <<<<<<<<<<<<<<
@@ -3180,56 +3642,56 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
     }
     __pyx_L6:;
 
-    /* "cython/rtc6_sdk.pyx":163
+    /* "cython/rtc6_sdk.pyx":183
  *             else:
  *                 actual_mem1 = mem1
  *             if mem2 <= -1 or mem2 > (1<<23) - actual_mem1:             # <<<<<<<<<<<<<<
  *                 actual_mem2 = (1<<23) - actual_mem1
  *                 rtc6_logger.warning(f"Mem1 is corrected to {actual_mem1} from {mem2}",
  */
-    __pyx_t_4 = PyObject_RichCompare(__pyx_v_mem2, __pyx_int_neg_1, Py_LE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 163, __pyx_L1_error)
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 163, __pyx_L1_error)
+    __pyx_t_4 = PyObject_RichCompare(__pyx_v_mem2, __pyx_int_neg_1, Py_LE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 183, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (!__pyx_t_3) {
     } else {
       __pyx_t_1 = __pyx_t_3;
       goto __pyx_L8_bool_binop_done;
     }
-    __pyx_t_4 = __Pyx_PyInt_SubtractCObj(__pyx_int_8388608, __pyx_v_actual_mem1, 0x800000, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 163, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_SubtractCObj(__pyx_int_8388608, __pyx_v_actual_mem1, 0x800000, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 183, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = PyObject_RichCompare(__pyx_v_mem2, __pyx_t_4, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 163, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_v_mem2, __pyx_t_4, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 183, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 163, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 183, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_1 = __pyx_t_3;
     __pyx_L8_bool_binop_done:;
     if (__pyx_t_1) {
 
-      /* "cython/rtc6_sdk.pyx":164
+      /* "cython/rtc6_sdk.pyx":184
  *                 actual_mem1 = mem1
  *             if mem2 <= -1 or mem2 > (1<<23) - actual_mem1:
  *                 actual_mem2 = (1<<23) - actual_mem1             # <<<<<<<<<<<<<<
  *                 rtc6_logger.warning(f"Mem1 is corrected to {actual_mem1} from {mem2}",
  *                                     extra={"component": "rtc6"})
  */
-      __pyx_t_2 = __Pyx_PyInt_SubtractCObj(__pyx_int_8388608, __pyx_v_actual_mem1, 0x800000, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_SubtractCObj(__pyx_int_8388608, __pyx_v_actual_mem1, 0x800000, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 184, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __pyx_v_actual_mem2 = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "cython/rtc6_sdk.pyx":165
+      /* "cython/rtc6_sdk.pyx":185
  *             if mem2 <= -1 or mem2 > (1<<23) - actual_mem1:
  *                 actual_mem2 = (1<<23) - actual_mem1
  *                 rtc6_logger.warning(f"Mem1 is corrected to {actual_mem1} from {mem2}",             # <<<<<<<<<<<<<<
  *                                     extra={"component": "rtc6"})
  *             else:
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 165, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 185, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_warning); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 165, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_warning); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 185, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 165, __pyx_L1_error)
+      __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 185, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __pyx_t_5 = 0;
       __pyx_t_6 = 127;
@@ -3237,7 +3699,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
       __pyx_t_5 += 21;
       __Pyx_GIVEREF(__pyx_kp_u_Mem1_is_corrected_to);
       PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_kp_u_Mem1_is_corrected_to);
-      __pyx_t_8 = __Pyx_PyObject_FormatSimple(__pyx_v_actual_mem1, __pyx_empty_unicode); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 165, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_FormatSimple(__pyx_v_actual_mem1, __pyx_empty_unicode); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 185, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __pyx_t_6 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_8) > __pyx_t_6) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_8) : __pyx_t_6;
       __pyx_t_5 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_8);
@@ -3248,52 +3710,52 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
       __pyx_t_5 += 6;
       __Pyx_GIVEREF(__pyx_kp_u_from);
       PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_kp_u_from);
-      __pyx_t_8 = __Pyx_PyObject_FormatSimple(__pyx_v_mem2, __pyx_empty_unicode); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 165, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_FormatSimple(__pyx_v_mem2, __pyx_empty_unicode); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 185, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __pyx_t_6 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_8) > __pyx_t_6) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_8) : __pyx_t_6;
       __pyx_t_5 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_8);
       __Pyx_GIVEREF(__pyx_t_8);
       PyTuple_SET_ITEM(__pyx_t_2, 3, __pyx_t_8);
       __pyx_t_8 = 0;
-      __pyx_t_8 = __Pyx_PyUnicode_Join(__pyx_t_2, 4, __pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 165, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyUnicode_Join(__pyx_t_2, 4, __pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 185, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 165, __pyx_L1_error)
+      __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 185, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_GIVEREF(__pyx_t_8);
       PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_8);
       __pyx_t_8 = 0;
 
-      /* "cython/rtc6_sdk.pyx":166
+      /* "cython/rtc6_sdk.pyx":186
  *                 actual_mem2 = (1<<23) - actual_mem1
  *                 rtc6_logger.warning(f"Mem1 is corrected to {actual_mem1} from {mem2}",
  *                                     extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *             else:
  *                 actual_mem2 = mem2
  */
-      __pyx_t_8 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 166, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 186, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 166, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 186, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      if (PyDict_SetItem(__pyx_t_7, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 166, __pyx_L1_error)
-      if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_extra, __pyx_t_7) < 0) __PYX_ERR(0, 166, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_7, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 186, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_extra, __pyx_t_7) < 0) __PYX_ERR(0, 186, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "cython/rtc6_sdk.pyx":165
+      /* "cython/rtc6_sdk.pyx":185
  *             if mem2 <= -1 or mem2 > (1<<23) - actual_mem1:
  *                 actual_mem2 = (1<<23) - actual_mem1
  *                 rtc6_logger.warning(f"Mem1 is corrected to {actual_mem1} from {mem2}",             # <<<<<<<<<<<<<<
  *                                     extra={"component": "rtc6"})
  *             else:
  */
-      __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 165, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_2, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 185, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "cython/rtc6_sdk.pyx":163
+      /* "cython/rtc6_sdk.pyx":183
  *             else:
  *                 actual_mem1 = mem1
  *             if mem2 <= -1 or mem2 > (1<<23) - actual_mem1:             # <<<<<<<<<<<<<<
@@ -3303,7 +3765,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
       goto __pyx_L7;
     }
 
-    /* "cython/rtc6_sdk.pyx":168
+    /* "cython/rtc6_sdk.pyx":188
  *                                     extra={"component": "rtc6"})
  *             else:
  *                 actual_mem2 = mem2             # <<<<<<<<<<<<<<
@@ -3318,19 +3780,19 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
   }
   __pyx_L3:;
 
-  /* "cython/rtc6_sdk.pyx":170
+  /* "cython/rtc6_sdk.pyx":190
  *                 actual_mem2 = mem2
  * 
  *         rtc6_logger.debug(f"setting mem1={actual_mem1}, mem2={actual_mem2}, "             # <<<<<<<<<<<<<<
  *                           f"list3={(1<<23)-actual_mem1-actual_mem2}",
  *                           extra={"component": "rtc6"})
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_debug); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_debug); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = PyTuple_New(6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __pyx_t_5 = 0;
   __pyx_t_6 = 127;
@@ -3338,7 +3800,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
   __pyx_t_5 += 13;
   __Pyx_GIVEREF(__pyx_kp_u_setting_mem1);
   PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_kp_u_setting_mem1);
-  __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_actual_mem1, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_actual_mem1, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_6 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_6) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_6;
   __pyx_t_5 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
@@ -3349,7 +3811,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
   __pyx_t_5 += 7;
   __Pyx_GIVEREF(__pyx_kp_u_mem2_2);
   PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_kp_u_mem2_2);
-  __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_actual_mem2, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_actual_mem2, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_6 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_6) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_6;
   __pyx_t_5 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
@@ -3361,19 +3823,19 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
   __Pyx_GIVEREF(__pyx_kp_u_list3);
   PyTuple_SET_ITEM(__pyx_t_7, 4, __pyx_kp_u_list3);
 
-  /* "cython/rtc6_sdk.pyx":171
+  /* "cython/rtc6_sdk.pyx":191
  * 
  *         rtc6_logger.debug(f"setting mem1={actual_mem1}, mem2={actual_mem2}, "
  *                           f"list3={(1<<23)-actual_mem1-actual_mem2}",             # <<<<<<<<<<<<<<
  *                           extra={"component": "rtc6"})
- *         rtc6.config_list(mem1, mem2)
+ * 
  */
-  __pyx_t_2 = __Pyx_PyInt_SubtractCObj(__pyx_int_8388608, __pyx_v_actual_mem1, 0x800000, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_SubtractCObj(__pyx_int_8388608, __pyx_v_actual_mem1, 0x800000, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = PyNumber_Subtract(__pyx_t_2, __pyx_v_actual_mem2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 171, __pyx_L1_error)
+  __pyx_t_4 = PyNumber_Subtract(__pyx_t_2, __pyx_v_actual_mem2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 191, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_6 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_6) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_6;
@@ -3382,64 +3844,64 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
   PyTuple_SET_ITEM(__pyx_t_7, 5, __pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "cython/rtc6_sdk.pyx":170
+  /* "cython/rtc6_sdk.pyx":190
  *                 actual_mem2 = mem2
  * 
  *         rtc6_logger.debug(f"setting mem1={actual_mem1}, mem2={actual_mem2}, "             # <<<<<<<<<<<<<<
  *                           f"list3={(1<<23)-actual_mem1-actual_mem2}",
  *                           extra={"component": "rtc6"})
  */
-  __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_7, 6, __pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_7, 6, __pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "cython/rtc6_sdk.pyx":172
+  /* "cython/rtc6_sdk.pyx":192
  *         rtc6_logger.debug(f"setting mem1={actual_mem1}, mem2={actual_mem2}, "
  *                           f"list3={(1<<23)-actual_mem1-actual_mem2}",
  *                           extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
- *         rtc6.config_list(mem1, mem2)
  * 
+ *         _config_list(self.cardno, mem1, mem2)
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 172, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 172, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 172, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_extra, __pyx_t_4) < 0) __PYX_ERR(0, 172, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 192, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_extra, __pyx_t_4) < 0) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "cython/rtc6_sdk.pyx":170
+  /* "cython/rtc6_sdk.pyx":190
  *                 actual_mem2 = mem2
  * 
  *         rtc6_logger.debug(f"setting mem1={actual_mem1}, mem2={actual_mem2}, "             # <<<<<<<<<<<<<<
  *                           f"list3={(1<<23)-actual_mem1-actual_mem2}",
  *                           extra={"component": "rtc6"})
  */
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_7, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_7, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "cython/rtc6_sdk.pyx":173
- *                           f"list3={(1<<23)-actual_mem1-actual_mem2}",
+  /* "cython/rtc6_sdk.pyx":194
  *                           extra={"component": "rtc6"})
- *         rtc6.config_list(mem1, mem2)             # <<<<<<<<<<<<<<
+ * 
+ *         _config_list(self.cardno, mem1, mem2)             # <<<<<<<<<<<<<<
  * 
  *     def load_correction_file(self, cor_file: Union[None, str], table_no: int, dim: int):
  */
-  __pyx_t_9 = __Pyx_PyInt_As_uint32_t(__pyx_v_mem1); if (unlikely((__pyx_t_9 == ((UINT)-1)) && PyErr_Occurred())) __PYX_ERR(0, 173, __pyx_L1_error)
-  __pyx_t_10 = __Pyx_PyInt_As_uint32_t(__pyx_v_mem2); if (unlikely((__pyx_t_10 == ((UINT)-1)) && PyErr_Occurred())) __PYX_ERR(0, 173, __pyx_L1_error)
-  config_list(__pyx_t_9, __pyx_t_10);
+  __pyx_t_9 = __Pyx_PyInt_As_uint32_t(__pyx_v_mem1); if (unlikely((__pyx_t_9 == ((UINT)-1)) && PyErr_Occurred())) __PYX_ERR(0, 194, __pyx_L1_error)
+  __pyx_t_10 = __Pyx_PyInt_As_uint32_t(__pyx_v_mem2); if (unlikely((__pyx_t_10 == ((UINT)-1)) && PyErr_Occurred())) __PYX_ERR(0, 194, __pyx_L1_error)
+  _config_list(__pyx_v_self->cardno, __pyx_t_9, __pyx_t_10);
 
-  /* "cython/rtc6_sdk.pyx":148
- *         rtc6.reset_error(-1)
+  /* "cython/rtc6_sdk.pyx":168
+ *         _reset_error(self.cardno, -1)
  * 
  *     def config_list(self, mem1: int, mem2: int):             # <<<<<<<<<<<<<<
  *         # 8,388,608 (2^23) storage positions
@@ -3454,7 +3916,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Man.config_list", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.config_list", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_actual_mem1);
@@ -3465,8 +3927,8 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
   return __pyx_r;
 }
 
-/* "cython/rtc6_sdk.pyx":175
- *         rtc6.config_list(mem1, mem2)
+/* "cython/rtc6_sdk.pyx":196
+ *         _config_list(self.cardno, mem1, mem2)
  * 
  *     def load_correction_file(self, cor_file: Union[None, str], table_no: int, dim: int):             # <<<<<<<<<<<<<<
  *         if cor_file is None:
@@ -3474,8 +3936,8 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_2config_list(CYTHON_UNUS
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_5load_correction_file(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_5load_correction_file(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_7load_correction_file(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_7load_correction_file(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_cor_file = 0;
   PyObject *__pyx_v_table_no = 0;
   PyObject *__pyx_v_dim = 0;
@@ -3510,17 +3972,17 @@ static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_5load_correction_file(Py
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_table_no)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("load_correction_file", 1, 3, 3, 1); __PYX_ERR(0, 175, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("load_correction_file", 1, 3, 3, 1); __PYX_ERR(0, 196, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dim)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("load_correction_file", 1, 3, 3, 2); __PYX_ERR(0, 175, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("load_correction_file", 1, 3, 3, 2); __PYX_ERR(0, 196, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "load_correction_file") < 0)) __PYX_ERR(0, 175, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "load_correction_file") < 0)) __PYX_ERR(0, 196, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -3535,20 +3997,20 @@ static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_5load_correction_file(Py
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("load_correction_file", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 175, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("load_correction_file", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 196, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Man.load_correction_file", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.load_correction_file", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *)__pyx_v_self), __pyx_v_cor_file, __pyx_v_table_no, __pyx_v_dim);
+  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_6load_correction_file(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *)__pyx_v_self), __pyx_v_cor_file, __pyx_v_table_no, __pyx_v_dim);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *__pyx_v_self, PyObject *__pyx_v_cor_file, PyObject *__pyx_v_table_no, PyObject *__pyx_v_dim) {
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_6load_correction_file(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, PyObject *__pyx_v_cor_file, PyObject *__pyx_v_table_no, PyObject *__pyx_v_dim) {
   PyObject *__pyx_v_cor_file_c = NULL;
   UINT __pyx_v_err;
   UINT __pyx_v_last_err;
@@ -3576,7 +4038,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
   __Pyx_RefNannySetupContext("load_correction_file", 0);
   __Pyx_INCREF(__pyx_v_cor_file);
 
-  /* "cython/rtc6_sdk.pyx":176
+  /* "cython/rtc6_sdk.pyx":197
  * 
  *     def load_correction_file(self, cor_file: Union[None, str], table_no: int, dim: int):
  *         if cor_file is None:             # <<<<<<<<<<<<<<
@@ -3587,38 +4049,38 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "cython/rtc6_sdk.pyx":177
+    /* "cython/rtc6_sdk.pyx":198
  *     def load_correction_file(self, cor_file: Union[None, str], table_no: int, dim: int):
  *         if cor_file is None:
  *             cor_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "Cor_1to1.ct5")             # <<<<<<<<<<<<<<
  * 
  *         if not os.path.exists(cor_file):
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 198, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_path); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_path); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 198, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_join); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_join); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 198, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_os); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_os); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 198, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_path); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_path); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 198, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_dirname); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_dirname); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 198, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_os); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_os); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 198, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_path); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_path); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 198, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_abspath); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_abspath); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 198, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_file); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_file); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 198, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __pyx_t_10 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_8))) {
@@ -3633,7 +4095,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
     __pyx_t_7 = (__pyx_t_10) ? __Pyx_PyObject_Call2Args(__pyx_t_8, __pyx_t_10, __pyx_t_9) : __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_9);
     __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 177, __pyx_L1_error)
+    if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 198, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_t_8 = NULL;
@@ -3649,7 +4111,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
     __pyx_t_5 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_6, __pyx_t_8, __pyx_t_7) : __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_7);
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 177, __pyx_L1_error)
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 198, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_t_6 = NULL;
@@ -3667,7 +4129,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_4)) {
       PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_t_5, __pyx_n_u_data, __pyx_kp_u_Cor_1to1_ct5};
-      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 3+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 177, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 3+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 198, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -3676,14 +4138,14 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
       PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_t_5, __pyx_n_u_data, __pyx_kp_u_Cor_1to1_ct5};
-      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 3+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 177, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 3+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 198, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else
     #endif
     {
-      __pyx_t_7 = PyTuple_New(3+__pyx_t_11); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 177, __pyx_L1_error)
+      __pyx_t_7 = PyTuple_New(3+__pyx_t_11); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 198, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       if (__pyx_t_6) {
         __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -3697,7 +4159,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
       __Pyx_GIVEREF(__pyx_kp_u_Cor_1to1_ct5);
       PyTuple_SET_ITEM(__pyx_t_7, 2+__pyx_t_11, __pyx_kp_u_Cor_1to1_ct5);
       __pyx_t_5 = 0;
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 177, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 198, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
@@ -3705,7 +4167,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
     __Pyx_DECREF_SET(__pyx_v_cor_file, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "cython/rtc6_sdk.pyx":176
+    /* "cython/rtc6_sdk.pyx":197
  * 
  *     def load_correction_file(self, cor_file: Union[None, str], table_no: int, dim: int):
  *         if cor_file is None:             # <<<<<<<<<<<<<<
@@ -3714,19 +4176,19 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
  */
   }
 
-  /* "cython/rtc6_sdk.pyx":179
+  /* "cython/rtc6_sdk.pyx":200
  *             cor_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "Cor_1to1.ct5")
  * 
  *         if not os.path.exists(cor_file):             # <<<<<<<<<<<<<<
  *             rtc6_logger.error(f"Correction file {cor_file} does not exist", extra={"component": "rtc6"})
  *             raise IOError()
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 179, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_path); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 179, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_path); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_exists); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 179, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_exists); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __pyx_t_7 = NULL;
@@ -3741,27 +4203,27 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
   }
   __pyx_t_3 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_7, __pyx_v_cor_file) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_cor_file);
   __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 179, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 179, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_1 = ((!__pyx_t_2) != 0);
   if (unlikely(__pyx_t_1)) {
 
-    /* "cython/rtc6_sdk.pyx":180
+    /* "cython/rtc6_sdk.pyx":201
  * 
  *         if not os.path.exists(cor_file):
  *             rtc6_logger.error(f"Correction file {cor_file} does not exist", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *             raise IOError()
  *         if not 1 <= table_no <= 8:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_error); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_error); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyTuple_New(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_3 = PyTuple_New(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_12 = 0;
     __pyx_t_13 = 127;
@@ -3769,7 +4231,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
     __pyx_t_12 += 16;
     __Pyx_GIVEREF(__pyx_kp_u_Correction_file);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_kp_u_Correction_file);
-    __pyx_t_7 = __Pyx_PyObject_FormatSimple(__pyx_v_cor_file, __pyx_empty_unicode); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_FormatSimple(__pyx_v_cor_file, __pyx_empty_unicode); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_13 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) > __pyx_t_13) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) : __pyx_t_13;
     __pyx_t_12 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_7);
@@ -3780,42 +4242,42 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
     __pyx_t_12 += 15;
     __Pyx_GIVEREF(__pyx_kp_u_does_not_exist);
     PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_kp_u_does_not_exist);
-    __pyx_t_7 = __Pyx_PyUnicode_Join(__pyx_t_3, 3, __pyx_t_12, __pyx_t_13); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyUnicode_Join(__pyx_t_3, 3, __pyx_t_12, __pyx_t_13); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_7);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_7);
     __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (PyDict_SetItem(__pyx_t_5, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 180, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_extra, __pyx_t_5) < 0) __PYX_ERR(0, 180, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_5, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 201, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_extra, __pyx_t_5) < 0) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "cython/rtc6_sdk.pyx":181
+    /* "cython/rtc6_sdk.pyx":202
  *         if not os.path.exists(cor_file):
  *             rtc6_logger.error(f"Correction file {cor_file} does not exist", extra={"component": "rtc6"})
  *             raise IOError()             # <<<<<<<<<<<<<<
  *         if not 1 <= table_no <= 8:
  *             rtc6_logger.error(f"Table no. should be [1,8]", extra={"component": "rtc6"})
  */
-    __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_builtin_IOError); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 181, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_builtin_IOError); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 202, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_Raise(__pyx_t_5, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __PYX_ERR(0, 181, __pyx_L1_error)
+    __PYX_ERR(0, 202, __pyx_L1_error)
 
-    /* "cython/rtc6_sdk.pyx":179
+    /* "cython/rtc6_sdk.pyx":200
  *             cor_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "Cor_1to1.ct5")
  * 
  *         if not os.path.exists(cor_file):             # <<<<<<<<<<<<<<
@@ -3824,62 +4286,62 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
  */
   }
 
-  /* "cython/rtc6_sdk.pyx":182
+  /* "cython/rtc6_sdk.pyx":203
  *             rtc6_logger.error(f"Correction file {cor_file} does not exist", extra={"component": "rtc6"})
  *             raise IOError()
  *         if not 1 <= table_no <= 8:             # <<<<<<<<<<<<<<
  *             rtc6_logger.error(f"Table no. should be [1,8]", extra={"component": "rtc6"})
  *             raise ValueError()
  */
-  __pyx_t_5 = PyObject_RichCompare(__pyx_int_1, __pyx_v_table_no, Py_LE); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 182, __pyx_L1_error)
+  __pyx_t_5 = PyObject_RichCompare(__pyx_int_1, __pyx_v_table_no, Py_LE); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 203, __pyx_L1_error)
   if (__Pyx_PyObject_IsTrue(__pyx_t_5)) {
     __Pyx_DECREF(__pyx_t_5);
-    __pyx_t_5 = PyObject_RichCompare(__pyx_v_table_no, __pyx_int_8, Py_LE); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 182, __pyx_L1_error)
+    __pyx_t_5 = PyObject_RichCompare(__pyx_v_table_no, __pyx_int_8, Py_LE); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 203, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 182, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 203, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_2 = ((!__pyx_t_1) != 0);
   if (unlikely(__pyx_t_2)) {
 
-    /* "cython/rtc6_sdk.pyx":183
+    /* "cython/rtc6_sdk.pyx":204
  *             raise IOError()
  *         if not 1 <= table_no <= 8:
  *             rtc6_logger.error(f"Table no. should be [1,8]", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *             raise ValueError()
  *         if dim not in (2, 3):
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 183, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_error); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_error); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 183, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_extra, __pyx_t_3) < 0) __PYX_ERR(0, 183, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 204, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_extra, __pyx_t_3) < 0) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_tuple__5, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_tuple__4, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "cython/rtc6_sdk.pyx":184
+    /* "cython/rtc6_sdk.pyx":205
  *         if not 1 <= table_no <= 8:
  *             rtc6_logger.error(f"Table no. should be [1,8]", extra={"component": "rtc6"})
  *             raise ValueError()             # <<<<<<<<<<<<<<
  *         if dim not in (2, 3):
  *             rtc6_logger.error(f"Dim should be 2 or 3", extra={"component": "rtc6"})
  */
-    __pyx_t_3 = __Pyx_PyObject_CallNoArg(__pyx_builtin_ValueError); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 184, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_CallNoArg(__pyx_builtin_ValueError); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 205, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 184, __pyx_L1_error)
+    __PYX_ERR(0, 205, __pyx_L1_error)
 
-    /* "cython/rtc6_sdk.pyx":182
+    /* "cython/rtc6_sdk.pyx":203
  *             rtc6_logger.error(f"Correction file {cor_file} does not exist", extra={"component": "rtc6"})
  *             raise IOError()
  *         if not 1 <= table_no <= 8:             # <<<<<<<<<<<<<<
@@ -3888,7 +4350,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
  */
   }
 
-  /* "cython/rtc6_sdk.pyx":185
+  /* "cython/rtc6_sdk.pyx":206
  *             rtc6_logger.error(f"Table no. should be [1,8]", extra={"component": "rtc6"})
  *             raise ValueError()
  *         if dim not in (2, 3):             # <<<<<<<<<<<<<<
@@ -3897,18 +4359,18 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
  */
   __Pyx_INCREF(__pyx_v_dim);
   __pyx_t_3 = __pyx_v_dim;
-  __pyx_t_5 = __Pyx_PyInt_NeObjC(__pyx_t_3, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_NeObjC(__pyx_t_3, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   if (__pyx_t_1) {
   } else {
     __pyx_t_2 = __pyx_t_1;
     goto __pyx_L7_bool_binop_done;
   }
-  __pyx_t_5 = __Pyx_PyInt_NeObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_NeObjC(__pyx_t_3, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_2 = __pyx_t_1;
   __pyx_L7_bool_binop_done:;
@@ -3916,45 +4378,45 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
   __pyx_t_1 = (__pyx_t_2 != 0);
   if (unlikely(__pyx_t_1)) {
 
-    /* "cython/rtc6_sdk.pyx":186
+    /* "cython/rtc6_sdk.pyx":207
  *             raise ValueError()
  *         if dim not in (2, 3):
  *             rtc6_logger.error(f"Dim should be 2 or 3", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *             raise ValueError()
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 186, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_error); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 186, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_error); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 207, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 186, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 207, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 186, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 207, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 186, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_extra, __pyx_t_7) < 0) __PYX_ERR(0, 186, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 207, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_extra, __pyx_t_7) < 0) __PYX_ERR(0, 207, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_tuple__6, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 186, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_tuple__5, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 207, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "cython/rtc6_sdk.pyx":187
+    /* "cython/rtc6_sdk.pyx":208
  *         if dim not in (2, 3):
  *             rtc6_logger.error(f"Dim should be 2 or 3", extra={"component": "rtc6"})
  *             raise ValueError()             # <<<<<<<<<<<<<<
  * 
  *         rtc6_logger.debug(f"Loading correction file {cor_file} to table {table_no}, dim={dim}",
  */
-    __pyx_t_7 = __Pyx_PyObject_CallNoArg(__pyx_builtin_ValueError); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 187, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_CallNoArg(__pyx_builtin_ValueError); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 208, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_Raise(__pyx_t_7, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __PYX_ERR(0, 187, __pyx_L1_error)
+    __PYX_ERR(0, 208, __pyx_L1_error)
 
-    /* "cython/rtc6_sdk.pyx":185
+    /* "cython/rtc6_sdk.pyx":206
  *             rtc6_logger.error(f"Table no. should be [1,8]", extra={"component": "rtc6"})
  *             raise ValueError()
  *         if dim not in (2, 3):             # <<<<<<<<<<<<<<
@@ -3963,19 +4425,19 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
  */
   }
 
-  /* "cython/rtc6_sdk.pyx":189
+  /* "cython/rtc6_sdk.pyx":210
  *             raise ValueError()
  * 
  *         rtc6_logger.debug(f"Loading correction file {cor_file} to table {table_no}, dim={dim}",             # <<<<<<<<<<<<<<
  *                           extra={"component": "rtc6"})
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_debug); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_debug); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = PyTuple_New(6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __pyx_t_12 = 0;
   __pyx_t_13 = 127;
@@ -3983,7 +4445,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
   __pyx_t_12 += 24;
   __Pyx_GIVEREF(__pyx_kp_u_Loading_correction_file);
   PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_kp_u_Loading_correction_file);
-  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_cor_file, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_cor_file, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_13 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) > __pyx_t_13) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) : __pyx_t_13;
   __pyx_t_12 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_5);
@@ -3994,7 +4456,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
   __pyx_t_12 += 10;
   __Pyx_GIVEREF(__pyx_kp_u_to_table);
   PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_kp_u_to_table);
-  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_table_no, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_table_no, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_13 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) > __pyx_t_13) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) : __pyx_t_13;
   __pyx_t_12 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_5);
@@ -4005,59 +4467,59 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
   __pyx_t_12 += 6;
   __Pyx_GIVEREF(__pyx_kp_u_dim_2);
   PyTuple_SET_ITEM(__pyx_t_7, 4, __pyx_kp_u_dim_2);
-  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_dim, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_dim, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_13 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) > __pyx_t_13) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) : __pyx_t_13;
   __pyx_t_12 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_5);
   PyTuple_SET_ITEM(__pyx_t_7, 5, __pyx_t_5);
   __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyUnicode_Join(__pyx_t_7, 6, __pyx_t_12, __pyx_t_13); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyUnicode_Join(__pyx_t_7, 6, __pyx_t_12, __pyx_t_13); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_GIVEREF(__pyx_t_5);
   PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5);
   __pyx_t_5 = 0;
 
-  /* "cython/rtc6_sdk.pyx":190
+  /* "cython/rtc6_sdk.pyx":211
  * 
  *         rtc6_logger.debug(f"Loading correction file {cor_file} to table {table_no}, dim={dim}",
  *                           extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  * 
  *         cor_file_c = cor_file.encode('utf-8')
  */
-  __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 190, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 190, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 190, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_extra, __pyx_t_4) < 0) __PYX_ERR(0, 190, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 211, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_extra, __pyx_t_4) < 0) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "cython/rtc6_sdk.pyx":189
+  /* "cython/rtc6_sdk.pyx":210
  *             raise ValueError()
  * 
  *         rtc6_logger.debug(f"Loading correction file {cor_file} to table {table_no}, dim={dim}",             # <<<<<<<<<<<<<<
  *                           extra={"component": "rtc6"})
  * 
  */
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "cython/rtc6_sdk.pyx":192
+  /* "cython/rtc6_sdk.pyx":213
  *                           extra={"component": "rtc6"})
  * 
  *         cor_file_c = cor_file.encode('utf-8')             # <<<<<<<<<<<<<<
  * 
- *         err = rtc6.load_correction_file(cor_file_c, table_no, dim)
+ *         err = _load_correction_file(self.cardno, cor_file_c, table_no, dim)
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_cor_file, __pyx_n_s_encode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_cor_file, __pyx_n_s_encode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_7 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
@@ -4071,84 +4533,84 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
   }
   __pyx_t_4 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_7, __pyx_kp_u_utf_8) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_kp_u_utf_8);
   __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 192, __pyx_L1_error)
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_v_cor_file_c = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "cython/rtc6_sdk.pyx":194
+  /* "cython/rtc6_sdk.pyx":215
  *         cor_file_c = cor_file.encode('utf-8')
  * 
- *         err = rtc6.load_correction_file(cor_file_c, table_no, dim)             # <<<<<<<<<<<<<<
+ *         err = _load_correction_file(self.cardno, cor_file_c, table_no, dim)             # <<<<<<<<<<<<<<
  *         if err == 0:
  *             rtc6_logger.info(f"Load correction file OKAY", extra={"component": "rtc6"})
  */
-  __pyx_t_14 = __Pyx_PyObject_AsString(__pyx_v_cor_file_c); if (unlikely((!__pyx_t_14) && PyErr_Occurred())) __PYX_ERR(0, 194, __pyx_L1_error)
-  __pyx_t_15 = __Pyx_PyInt_As_uint32_t(__pyx_v_table_no); if (unlikely((__pyx_t_15 == ((UINT)-1)) && PyErr_Occurred())) __PYX_ERR(0, 194, __pyx_L1_error)
-  __pyx_t_16 = __Pyx_PyInt_As_uint32_t(__pyx_v_dim); if (unlikely((__pyx_t_16 == ((UINT)-1)) && PyErr_Occurred())) __PYX_ERR(0, 194, __pyx_L1_error)
-  __pyx_v_err = load_correction_file(__pyx_t_14, __pyx_t_15, __pyx_t_16);
+  __pyx_t_14 = __Pyx_PyObject_AsString(__pyx_v_cor_file_c); if (unlikely((!__pyx_t_14) && PyErr_Occurred())) __PYX_ERR(0, 215, __pyx_L1_error)
+  __pyx_t_15 = __Pyx_PyInt_As_uint32_t(__pyx_v_table_no); if (unlikely((__pyx_t_15 == ((UINT)-1)) && PyErr_Occurred())) __PYX_ERR(0, 215, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyInt_As_uint32_t(__pyx_v_dim); if (unlikely((__pyx_t_16 == ((UINT)-1)) && PyErr_Occurred())) __PYX_ERR(0, 215, __pyx_L1_error)
+  __pyx_v_err = _load_correction_file(__pyx_v_self->cardno, __pyx_t_14, __pyx_t_15, __pyx_t_16);
 
-  /* "cython/rtc6_sdk.pyx":195
+  /* "cython/rtc6_sdk.pyx":216
  * 
- *         err = rtc6.load_correction_file(cor_file_c, table_no, dim)
+ *         err = _load_correction_file(self.cardno, cor_file_c, table_no, dim)
  *         if err == 0:             # <<<<<<<<<<<<<<
  *             rtc6_logger.info(f"Load correction file OKAY", extra={"component": "rtc6"})
- *         elif err in RTC6Man.ERR_CODES["load_correction_file"].keys():
+ *         elif err in RTC6Helper.ERR_CODES["load_correction_file"].keys():
  */
   __pyx_t_1 = ((__pyx_v_err == 0) != 0);
   if (__pyx_t_1) {
 
-    /* "cython/rtc6_sdk.pyx":196
- *         err = rtc6.load_correction_file(cor_file_c, table_no, dim)
+    /* "cython/rtc6_sdk.pyx":217
+ *         err = _load_correction_file(self.cardno, cor_file_c, table_no, dim)
  *         if err == 0:
  *             rtc6_logger.info(f"Load correction file OKAY", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
- *         elif err in RTC6Man.ERR_CODES["load_correction_file"].keys():
+ *         elif err in RTC6Helper.ERR_CODES["load_correction_file"].keys():
  *             if err != 12:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 196, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 217, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_info); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 196, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_info); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 217, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 196, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 217, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 196, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 217, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 196, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_extra, __pyx_t_7) < 0) __PYX_ERR(0, 196, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 217, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_extra, __pyx_t_7) < 0) __PYX_ERR(0, 217, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_tuple__7, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 196, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_tuple__6, __pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 217, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "cython/rtc6_sdk.pyx":195
+    /* "cython/rtc6_sdk.pyx":216
  * 
- *         err = rtc6.load_correction_file(cor_file_c, table_no, dim)
+ *         err = _load_correction_file(self.cardno, cor_file_c, table_no, dim)
  *         if err == 0:             # <<<<<<<<<<<<<<
  *             rtc6_logger.info(f"Load correction file OKAY", extra={"component": "rtc6"})
- *         elif err in RTC6Man.ERR_CODES["load_correction_file"].keys():
+ *         elif err in RTC6Helper.ERR_CODES["load_correction_file"].keys():
  */
     goto __pyx_L9;
   }
 
-  /* "cython/rtc6_sdk.pyx":197
+  /* "cython/rtc6_sdk.pyx":218
  *         if err == 0:
  *             rtc6_logger.info(f"Load correction file OKAY", extra={"component": "rtc6"})
- *         elif err in RTC6Man.ERR_CODES["load_correction_file"].keys():             # <<<<<<<<<<<<<<
+ *         elif err in RTC6Helper.ERR_CODES["load_correction_file"].keys():             # <<<<<<<<<<<<<<
  *             if err != 12:
- *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Man.ERR_CODES['load_correction_file'][err]}",
+ *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Helper.ERR_CODES['load_correction_file'][err]}",
  */
-  __pyx_t_7 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 197, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man), __pyx_n_s_ERR_CODES); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 197, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper), __pyx_n_s_ERR_CODES); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_5, __pyx_n_u_load_correction_file); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 197, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_5, __pyx_n_u_load_correction_file); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_keys); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 197, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_keys); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -4163,117 +4625,117 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
   }
   __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 197, __pyx_L1_error)
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_1 = (__Pyx_PySequence_ContainsTF(__pyx_t_7, __pyx_t_4, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 197, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PySequence_ContainsTF(__pyx_t_7, __pyx_t_4, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (likely(__pyx_t_2)) {
 
-    /* "cython/rtc6_sdk.pyx":198
+    /* "cython/rtc6_sdk.pyx":219
  *             rtc6_logger.info(f"Load correction file OKAY", extra={"component": "rtc6"})
- *         elif err in RTC6Man.ERR_CODES["load_correction_file"].keys():
+ *         elif err in RTC6Helper.ERR_CODES["load_correction_file"].keys():
  *             if err != 12:             # <<<<<<<<<<<<<<
- *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Man.ERR_CODES['load_correction_file'][err]}",
+ *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Helper.ERR_CODES['load_correction_file'][err]}",
  *                               extra={"component": "rtc6"})
  */
     __pyx_t_2 = ((__pyx_v_err != 12) != 0);
     if (__pyx_t_2) {
 
-      /* "cython/rtc6_sdk.pyx":199
- *         elif err in RTC6Man.ERR_CODES["load_correction_file"].keys():
+      /* "cython/rtc6_sdk.pyx":220
+ *         elif err in RTC6Helper.ERR_CODES["load_correction_file"].keys():
  *             if err != 12:
- *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Man.ERR_CODES['load_correction_file'][err]}",             # <<<<<<<<<<<<<<
+ *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Helper.ERR_CODES['load_correction_file'][err]}",             # <<<<<<<<<<<<<<
  *                               extra={"component": "rtc6"})
  *                 if err == 11:
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 199, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_error); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 199, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_error); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man), __pyx_n_s_ERR_CODES); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 199, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper), __pyx_n_s_ERR_CODES); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_t_4, __pyx_n_u_load_correction_file); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 199, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_t_4, __pyx_n_u_load_correction_file); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_err, UINT, 0, __Pyx_PyInt_From_uint32_t, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 199, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_5, __pyx_v_err, UINT, 0, __Pyx_PyInt_From_uint32_t, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 199, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Load_correction_file_Failed, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 199, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Load_correction_file_Failed, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 199, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "cython/rtc6_sdk.pyx":200
+      /* "cython/rtc6_sdk.pyx":221
  *             if err != 12:
- *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Man.ERR_CODES['load_correction_file'][err]}",
+ *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Helper.ERR_CODES['load_correction_file'][err]}",
  *                               extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *                 if err == 11:
- *                     last_err = rtc6.get_last_error()
+ *                     last_err = _get_last_error(self.cardno)
  */
-      __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 200, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 221, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 200, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 221, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      if (PyDict_SetItem(__pyx_t_3, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 200, __pyx_L1_error)
-      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_extra, __pyx_t_3) < 0) __PYX_ERR(0, 200, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_3, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 221, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_extra, __pyx_t_3) < 0) __PYX_ERR(0, 221, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "cython/rtc6_sdk.pyx":199
- *         elif err in RTC6Man.ERR_CODES["load_correction_file"].keys():
+      /* "cython/rtc6_sdk.pyx":220
+ *         elif err in RTC6Helper.ERR_CODES["load_correction_file"].keys():
  *             if err != 12:
- *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Man.ERR_CODES['load_correction_file'][err]}",             # <<<<<<<<<<<<<<
+ *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Helper.ERR_CODES['load_correction_file'][err]}",             # <<<<<<<<<<<<<<
  *                               extra={"component": "rtc6"})
  *                 if err == 11:
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_5, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 199, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_5, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "cython/rtc6_sdk.pyx":201
- *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Man.ERR_CODES['load_correction_file'][err]}",
+      /* "cython/rtc6_sdk.pyx":222
+ *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Helper.ERR_CODES['load_correction_file'][err]}",
  *                               extra={"component": "rtc6"})
  *                 if err == 11:             # <<<<<<<<<<<<<<
- *                     last_err = rtc6.get_last_error()
- *                     if RTC6Man.has_error(last_err, RTC6Man.RTC6_VERSION_MISMATCH):
+ *                     last_err = _get_last_error(self.cardno)
+ *                     if RTC6Helper.has_error(last_err, RTC6Helper.RTC6_VERSION_MISMATCH):
  */
       __pyx_t_2 = ((__pyx_v_err == 11) != 0);
       if (__pyx_t_2) {
 
-        /* "cython/rtc6_sdk.pyx":202
+        /* "cython/rtc6_sdk.pyx":223
  *                               extra={"component": "rtc6"})
  *                 if err == 11:
- *                     last_err = rtc6.get_last_error()             # <<<<<<<<<<<<<<
- *                     if RTC6Man.has_error(last_err, RTC6Man.RTC6_VERSION_MISMATCH):
- *                         rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})
+ *                     last_err = _get_last_error(self.cardno)             # <<<<<<<<<<<<<<
+ *                     if RTC6Helper.has_error(last_err, RTC6Helper.RTC6_VERSION_MISMATCH):
+ *                         rtc6_logger.error(f"{RTC6Helper.ERR_CODES['acc_err'][RTC6Helper.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})
  */
-        __pyx_v_last_err = get_last_error();
+        __pyx_v_last_err = _get_last_error(__pyx_v_self->cardno);
 
-        /* "cython/rtc6_sdk.pyx":203
+        /* "cython/rtc6_sdk.pyx":224
  *                 if err == 11:
- *                     last_err = rtc6.get_last_error()
- *                     if RTC6Man.has_error(last_err, RTC6Man.RTC6_VERSION_MISMATCH):             # <<<<<<<<<<<<<<
- *                         rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})
- *                     elif RTC6Man.has_error(last_err, RTC6Man.RTC6_ACCESS_DENIED):
+ *                     last_err = _get_last_error(self.cardno)
+ *                     if RTC6Helper.has_error(last_err, RTC6Helper.RTC6_VERSION_MISMATCH):             # <<<<<<<<<<<<<<
+ *                         rtc6_logger.error(f"{RTC6Helper.ERR_CODES['acc_err'][RTC6Helper.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})
+ *                     elif RTC6Helper.has_error(last_err, RTC6Helper.RTC6_ACCESS_DENIED):
  */
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man), __pyx_n_s_has_error); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper), __pyx_n_s_has_error); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 224, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_5 = __Pyx_PyInt_From_uint32_t(__pyx_v_last_err); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_uint32_t(__pyx_v_last_err); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 224, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_7 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man), __pyx_n_s_RTC6_VERSION_MISMATCH); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper), __pyx_n_s_RTC6_VERSION_MISMATCH); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 224, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         __pyx_t_6 = NULL;
         __pyx_t_11 = 0;
@@ -4290,7 +4752,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_4)) {
           PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_t_5, __pyx_t_7};
-          __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -4300,7 +4762,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
           PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_t_5, __pyx_t_7};
-          __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -4308,7 +4770,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
         } else
         #endif
         {
-          __pyx_t_8 = PyTuple_New(2+__pyx_t_11); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 203, __pyx_L1_error)
+          __pyx_t_8 = PyTuple_New(2+__pyx_t_11); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 224, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           if (__pyx_t_6) {
             __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -4319,82 +4781,82 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
           PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_11, __pyx_t_7);
           __pyx_t_5 = 0;
           __pyx_t_7 = 0;
-          __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         }
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 203, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 224, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         if (__pyx_t_2) {
 
-          /* "cython/rtc6_sdk.pyx":204
- *                     last_err = rtc6.get_last_error()
- *                     if RTC6Man.has_error(last_err, RTC6Man.RTC6_VERSION_MISMATCH):
- *                         rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
- *                     elif RTC6Man.has_error(last_err, RTC6Man.RTC6_ACCESS_DENIED):
- *                         rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_ACCESS_DENIED]}", extra={"component": "rtc6"})
+          /* "cython/rtc6_sdk.pyx":225
+ *                     last_err = _get_last_error(self.cardno)
+ *                     if RTC6Helper.has_error(last_err, RTC6Helper.RTC6_VERSION_MISMATCH):
+ *                         rtc6_logger.error(f"{RTC6Helper.ERR_CODES['acc_err'][RTC6Helper.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
+ *                     elif RTC6Helper.has_error(last_err, RTC6Helper.RTC6_ACCESS_DENIED):
+ *                         rtc6_logger.error(f"{RTC6Helper.ERR_CODES['acc_err'][RTC6Helper.RTC6_ACCESS_DENIED]}", extra={"component": "rtc6"})
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 204, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 225, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_error); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 204, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_error); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 225, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man), __pyx_n_s_ERR_CODES); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 204, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper), __pyx_n_s_ERR_CODES); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 225, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_t_3, __pyx_n_u_acc_err); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 204, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_t_3, __pyx_n_u_acc_err); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 225, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man), __pyx_n_s_RTC6_VERSION_MISMATCH); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 204, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper), __pyx_n_s_RTC6_VERSION_MISMATCH); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 225, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_7 = __Pyx_PyObject_GetItem(__pyx_t_8, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 204, __pyx_L1_error)
+          __pyx_t_7 = __Pyx_PyObject_GetItem(__pyx_t_8, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 225, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_7, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 204, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_7, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 225, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 204, __pyx_L1_error)
+          __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 225, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_GIVEREF(__pyx_t_3);
           PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_3);
           __pyx_t_3 = 0;
-          __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 204, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 225, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_8 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 204, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 225, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
-          if (PyDict_SetItem(__pyx_t_8, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 204, __pyx_L1_error)
-          if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_extra, __pyx_t_8) < 0) __PYX_ERR(0, 204, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_8, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_extra, __pyx_t_8) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, __pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 204, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, __pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 225, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-          /* "cython/rtc6_sdk.pyx":203
+          /* "cython/rtc6_sdk.pyx":224
  *                 if err == 11:
- *                     last_err = rtc6.get_last_error()
- *                     if RTC6Man.has_error(last_err, RTC6Man.RTC6_VERSION_MISMATCH):             # <<<<<<<<<<<<<<
- *                         rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})
- *                     elif RTC6Man.has_error(last_err, RTC6Man.RTC6_ACCESS_DENIED):
+ *                     last_err = _get_last_error(self.cardno)
+ *                     if RTC6Helper.has_error(last_err, RTC6Helper.RTC6_VERSION_MISMATCH):             # <<<<<<<<<<<<<<
+ *                         rtc6_logger.error(f"{RTC6Helper.ERR_CODES['acc_err'][RTC6Helper.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})
+ *                     elif RTC6Helper.has_error(last_err, RTC6Helper.RTC6_ACCESS_DENIED):
  */
           goto __pyx_L12;
         }
 
-        /* "cython/rtc6_sdk.pyx":205
- *                     if RTC6Man.has_error(last_err, RTC6Man.RTC6_VERSION_MISMATCH):
- *                         rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})
- *                     elif RTC6Man.has_error(last_err, RTC6Man.RTC6_ACCESS_DENIED):             # <<<<<<<<<<<<<<
- *                         rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_ACCESS_DENIED]}", extra={"component": "rtc6"})
+        /* "cython/rtc6_sdk.pyx":226
+ *                     if RTC6Helper.has_error(last_err, RTC6Helper.RTC6_VERSION_MISMATCH):
+ *                         rtc6_logger.error(f"{RTC6Helper.ERR_CODES['acc_err'][RTC6Helper.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})
+ *                     elif RTC6Helper.has_error(last_err, RTC6Helper.RTC6_ACCESS_DENIED):             # <<<<<<<<<<<<<<
+ *                         rtc6_logger.error(f"{RTC6Helper.ERR_CODES['acc_err'][RTC6Helper.RTC6_ACCESS_DENIED]}", extra={"component": "rtc6"})
  *                     else:
  */
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man), __pyx_n_s_has_error); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper), __pyx_n_s_has_error); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 226, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_7 = __Pyx_PyInt_From_uint32_t(__pyx_v_last_err); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PyInt_From_uint32_t(__pyx_v_last_err); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 226, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man), __pyx_n_s_RTC6_ACCESS_DENIED); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper), __pyx_n_s_RTC6_ACCESS_DENIED); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 226, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_5 = NULL;
         __pyx_t_11 = 0;
@@ -4411,7 +4873,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_3)) {
           PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_7, __pyx_t_4};
-          __pyx_t_8 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 205, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 226, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -4421,7 +4883,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
           PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_7, __pyx_t_4};
-          __pyx_t_8 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 205, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 226, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -4429,7 +4891,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
         } else
         #endif
         {
-          __pyx_t_6 = PyTuple_New(2+__pyx_t_11); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 205, __pyx_L1_error)
+          __pyx_t_6 = PyTuple_New(2+__pyx_t_11); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 226, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           if (__pyx_t_5) {
             __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -4440,92 +4902,92 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
           PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_11, __pyx_t_4);
           __pyx_t_7 = 0;
           __pyx_t_4 = 0;
-          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 205, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 226, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         }
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 226, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         if (__pyx_t_2) {
 
-          /* "cython/rtc6_sdk.pyx":206
- *                         rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})
- *                     elif RTC6Man.has_error(last_err, RTC6Man.RTC6_ACCESS_DENIED):
- *                         rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_ACCESS_DENIED]}", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
+          /* "cython/rtc6_sdk.pyx":227
+ *                         rtc6_logger.error(f"{RTC6Helper.ERR_CODES['acc_err'][RTC6Helper.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})
+ *                     elif RTC6Helper.has_error(last_err, RTC6Helper.RTC6_ACCESS_DENIED):
+ *                         rtc6_logger.error(f"{RTC6Helper.ERR_CODES['acc_err'][RTC6Helper.RTC6_ACCESS_DENIED]}", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *                     else:
  *                         rtc6_logger.error(f"Unknown last error {hex(last_err)}")
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 206, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 227, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
-          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_error); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 206, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_error); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 227, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man), __pyx_n_s_ERR_CODES); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 206, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper), __pyx_n_s_ERR_CODES); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 227, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
-          __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_8, __pyx_n_u_acc_err); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 206, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_8, __pyx_n_u_acc_err); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 227, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man), __pyx_n_s_RTC6_ACCESS_DENIED); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 206, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper), __pyx_n_s_RTC6_ACCESS_DENIED); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 227, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
-          __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_6, __pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 206, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_6, __pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 227, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __pyx_t_8 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_empty_unicode); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 206, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_empty_unicode); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 227, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 206, __pyx_L1_error)
+          __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 227, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_GIVEREF(__pyx_t_8);
           PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_8);
           __pyx_t_8 = 0;
-          __pyx_t_8 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 206, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 227, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
-          __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 206, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 227, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          if (PyDict_SetItem(__pyx_t_6, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 206, __pyx_L1_error)
-          if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_extra, __pyx_t_6) < 0) __PYX_ERR(0, 206, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_6, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 227, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_extra, __pyx_t_6) < 0) __PYX_ERR(0, 227, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 206, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 227, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-          /* "cython/rtc6_sdk.pyx":205
- *                     if RTC6Man.has_error(last_err, RTC6Man.RTC6_VERSION_MISMATCH):
- *                         rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})
- *                     elif RTC6Man.has_error(last_err, RTC6Man.RTC6_ACCESS_DENIED):             # <<<<<<<<<<<<<<
- *                         rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_ACCESS_DENIED]}", extra={"component": "rtc6"})
+          /* "cython/rtc6_sdk.pyx":226
+ *                     if RTC6Helper.has_error(last_err, RTC6Helper.RTC6_VERSION_MISMATCH):
+ *                         rtc6_logger.error(f"{RTC6Helper.ERR_CODES['acc_err'][RTC6Helper.RTC6_VERSION_MISMATCH]}", extra={"component": "rtc6"})
+ *                     elif RTC6Helper.has_error(last_err, RTC6Helper.RTC6_ACCESS_DENIED):             # <<<<<<<<<<<<<<
+ *                         rtc6_logger.error(f"{RTC6Helper.ERR_CODES['acc_err'][RTC6Helper.RTC6_ACCESS_DENIED]}", extra={"component": "rtc6"})
  *                     else:
  */
           goto __pyx_L12;
         }
 
-        /* "cython/rtc6_sdk.pyx":208
- *                         rtc6_logger.error(f"{RTC6Man.ERR_CODES['acc_err'][RTC6Man.RTC6_ACCESS_DENIED]}", extra={"component": "rtc6"})
+        /* "cython/rtc6_sdk.pyx":229
+ *                         rtc6_logger.error(f"{RTC6Helper.ERR_CODES['acc_err'][RTC6Helper.RTC6_ACCESS_DENIED]}", extra={"component": "rtc6"})
  *                     else:
  *                         rtc6_logger.error(f"Unknown last error {hex(last_err)}")             # <<<<<<<<<<<<<<
  *                 raise RTC6DevError(err)
  *             else:
  */
         /*else*/ {
-          __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 208, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 229, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
-          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_error); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 208, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_error); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 229, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __pyx_t_8 = __Pyx_PyInt_From_uint32_t(__pyx_v_last_err); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 208, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyInt_From_uint32_t(__pyx_v_last_err); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 229, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
-          __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_hex, __pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 208, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_hex, __pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 229, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __pyx_t_8 = __Pyx_PyObject_FormatSimple(__pyx_t_3, __pyx_empty_unicode); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 208, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_FormatSimple(__pyx_t_3, __pyx_empty_unicode); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 229, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Unknown_last_error, __pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 208, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Unknown_last_error, __pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 229, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __pyx_t_8 = NULL;
@@ -4541,32 +5003,32 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
           __pyx_t_6 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_8, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
           __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 208, __pyx_L1_error)
+          if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 229, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         }
         __pyx_L12:;
 
-        /* "cython/rtc6_sdk.pyx":201
- *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Man.ERR_CODES['load_correction_file'][err]}",
+        /* "cython/rtc6_sdk.pyx":222
+ *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Helper.ERR_CODES['load_correction_file'][err]}",
  *                               extra={"component": "rtc6"})
  *                 if err == 11:             # <<<<<<<<<<<<<<
- *                     last_err = rtc6.get_last_error()
- *                     if RTC6Man.has_error(last_err, RTC6Man.RTC6_VERSION_MISMATCH):
+ *                     last_err = _get_last_error(self.cardno)
+ *                     if RTC6Helper.has_error(last_err, RTC6Helper.RTC6_VERSION_MISMATCH):
  */
       }
 
-      /* "cython/rtc6_sdk.pyx":209
+      /* "cython/rtc6_sdk.pyx":230
  *                     else:
  *                         rtc6_logger.error(f"Unknown last error {hex(last_err)}")
  *                 raise RTC6DevError(err)             # <<<<<<<<<<<<<<
  *             else:
- *                 rtc6_logger.warning(f"Load correction file: {RTC6Man.ERR_CODES['load_correction_file'][err]}",
+ *                 rtc6_logger.warning(f"Load correction file: {RTC6Helper.ERR_CODES['load_correction_file'][err]}",
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_RTC6DevError); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 209, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_RTC6DevError); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 230, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_3 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 209, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 230, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_8 = NULL;
       if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
@@ -4581,78 +5043,78 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
       __pyx_t_6 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_8, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 209, __pyx_L1_error)
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 230, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_Raise(__pyx_t_6, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __PYX_ERR(0, 209, __pyx_L1_error)
+      __PYX_ERR(0, 230, __pyx_L1_error)
 
-      /* "cython/rtc6_sdk.pyx":198
+      /* "cython/rtc6_sdk.pyx":219
  *             rtc6_logger.info(f"Load correction file OKAY", extra={"component": "rtc6"})
- *         elif err in RTC6Man.ERR_CODES["load_correction_file"].keys():
+ *         elif err in RTC6Helper.ERR_CODES["load_correction_file"].keys():
  *             if err != 12:             # <<<<<<<<<<<<<<
- *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Man.ERR_CODES['load_correction_file'][err]}",
+ *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Helper.ERR_CODES['load_correction_file'][err]}",
  *                               extra={"component": "rtc6"})
  */
     }
 
-    /* "cython/rtc6_sdk.pyx":211
+    /* "cython/rtc6_sdk.pyx":232
  *                 raise RTC6DevError(err)
  *             else:
- *                 rtc6_logger.warning(f"Load correction file: {RTC6Man.ERR_CODES['load_correction_file'][err]}",             # <<<<<<<<<<<<<<
+ *                 rtc6_logger.warning(f"Load correction file: {RTC6Helper.ERR_CODES['load_correction_file'][err]}",             # <<<<<<<<<<<<<<
  *                               extra={"component": "rtc6"})
  *         else:
  */
     /*else*/ {
-      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 232, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_warning); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_warning); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 232, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man), __pyx_n_s_ERR_CODES); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper), __pyx_n_s_ERR_CODES); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 232, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_6, __pyx_n_u_load_correction_file); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_6, __pyx_n_u_load_correction_file); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 232, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_3, __pyx_v_err, UINT, 0, __Pyx_PyInt_From_uint32_t, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_3, __pyx_v_err, UINT, 0, __Pyx_PyInt_From_uint32_t, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 232, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_6, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_6, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 232, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_6 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Load_correction_file, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Load_correction_file, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 232, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 232, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_GIVEREF(__pyx_t_6);
       PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "cython/rtc6_sdk.pyx":212
+      /* "cython/rtc6_sdk.pyx":233
  *             else:
- *                 rtc6_logger.warning(f"Load correction file: {RTC6Man.ERR_CODES['load_correction_file'][err]}",
+ *                 rtc6_logger.warning(f"Load correction file: {RTC6Helper.ERR_CODES['load_correction_file'][err]}",
  *                               extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *         else:
  *             rtc6_logger.error(f"Load correction file Failed: unknown error code {err}", extra={"component": "rtc6"})
  */
-      __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 212, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 233, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_8 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 212, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 233, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      if (PyDict_SetItem(__pyx_t_8, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 212, __pyx_L1_error)
-      if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_extra, __pyx_t_8) < 0) __PYX_ERR(0, 212, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_8, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 233, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_extra, __pyx_t_8) < 0) __PYX_ERR(0, 233, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-      /* "cython/rtc6_sdk.pyx":211
+      /* "cython/rtc6_sdk.pyx":232
  *                 raise RTC6DevError(err)
  *             else:
- *                 rtc6_logger.warning(f"Load correction file: {RTC6Man.ERR_CODES['load_correction_file'][err]}",             # <<<<<<<<<<<<<<
+ *                 rtc6_logger.warning(f"Load correction file: {RTC6Helper.ERR_CODES['load_correction_file'][err]}",             # <<<<<<<<<<<<<<
  *                               extra={"component": "rtc6"})
  *         else:
  */
-      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 211, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 232, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -4660,17 +5122,17 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     }
 
-    /* "cython/rtc6_sdk.pyx":197
+    /* "cython/rtc6_sdk.pyx":218
  *         if err == 0:
  *             rtc6_logger.info(f"Load correction file OKAY", extra={"component": "rtc6"})
- *         elif err in RTC6Man.ERR_CODES["load_correction_file"].keys():             # <<<<<<<<<<<<<<
+ *         elif err in RTC6Helper.ERR_CODES["load_correction_file"].keys():             # <<<<<<<<<<<<<<
  *             if err != 12:
- *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Man.ERR_CODES['load_correction_file'][err]}",
+ *                 rtc6_logger.error(f"Load correction file Failed: {RTC6Helper.ERR_CODES['load_correction_file'][err]}",
  */
     goto __pyx_L9;
   }
 
-  /* "cython/rtc6_sdk.pyx":214
+  /* "cython/rtc6_sdk.pyx":235
  *                               extra={"component": "rtc6"})
  *         else:
  *             rtc6_logger.error(f"Load correction file Failed: unknown error code {err}", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
@@ -4678,48 +5140,48 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
  * 
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 214, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_error); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 214, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_error); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 214, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_8, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 214, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_8, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Load_correction_file_Failed_unkn, __pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 214, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Load_correction_file_Failed_unkn, __pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 214, __pyx_L1_error)
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_8);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_8);
     __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 214, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 214, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 214, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_extra, __pyx_t_4) < 0) __PYX_ERR(0, 214, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_4, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 235, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_extra, __pyx_t_4) < 0) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_3, __pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 214, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_3, __pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "cython/rtc6_sdk.pyx":215
+    /* "cython/rtc6_sdk.pyx":236
  *         else:
  *             rtc6_logger.error(f"Load correction file Failed: unknown error code {err}", extra={"component": "rtc6"})
  *             raise RTC6DevError(err)             # <<<<<<<<<<<<<<
  * 
  *     @staticmethod
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_RTC6DevError); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 215, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_RTC6DevError); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 236, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_3 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 215, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_uint32_t(__pyx_v_err); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 236, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_6 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_8))) {
@@ -4734,17 +5196,17 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
     __pyx_t_4 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_8, __pyx_t_6, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_3);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 215, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 236, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_Raise(__pyx_t_4, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __PYX_ERR(0, 215, __pyx_L1_error)
+    __PYX_ERR(0, 236, __pyx_L1_error)
   }
   __pyx_L9:;
 
-  /* "cython/rtc6_sdk.pyx":175
- *         rtc6.config_list(mem1, mem2)
+  /* "cython/rtc6_sdk.pyx":196
+ *         _config_list(self.cardno, mem1, mem2)
  * 
  *     def load_correction_file(self, cor_file: Union[None, str], table_no: int, dim: int):             # <<<<<<<<<<<<<<
  *         if cor_file is None:
@@ -4763,7 +5225,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_9);
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Man.load_correction_file", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.load_correction_file", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_cor_file_c);
@@ -4773,7 +5235,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
   return __pyx_r;
 }
 
-/* "cython/rtc6_sdk.pyx":218
+/* "cython/rtc6_sdk.pyx":239
  * 
  *     @staticmethod
  *     def has_error(error_code:int, bit_index: int):             # <<<<<<<<<<<<<<
@@ -4782,9 +5244,9 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_4load_correction_file(CY
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_7has_error(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_9pyscanlab_8rtc6_sdk_7RTC6Man_7has_error = {"has_error", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_7has_error, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_7has_error(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_9has_error(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_9pyscanlab_8rtc6_sdk_10RTC6Helper_9has_error = {"has_error", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_9has_error, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_9has_error(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_error_code = 0;
   PyObject *__pyx_v_bit_index = 0;
   int __pyx_lineno = 0;
@@ -4816,11 +5278,11 @@ static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_7has_error(CYTHON_UNUSED
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_bit_index)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("has_error", 1, 2, 2, 1); __PYX_ERR(0, 218, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("has_error", 1, 2, 2, 1); __PYX_ERR(0, 239, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "has_error") < 0)) __PYX_ERR(0, 218, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "has_error") < 0)) __PYX_ERR(0, 239, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -4833,20 +5295,20 @@ static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_7has_error(CYTHON_UNUSED
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("has_error", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 218, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("has_error", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 239, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Man.has_error", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.has_error", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_6has_error(__pyx_v_error_code, __pyx_v_bit_index);
+  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_8has_error(__pyx_v_error_code, __pyx_v_bit_index);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_6has_error(PyObject *__pyx_v_error_code, PyObject *__pyx_v_bit_index) {
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_8has_error(PyObject *__pyx_v_error_code, PyObject *__pyx_v_bit_index) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -4856,7 +5318,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_6has_error(PyObject *__p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("has_error", 0);
 
-  /* "cython/rtc6_sdk.pyx":219
+  /* "cython/rtc6_sdk.pyx":240
  *     @staticmethod
  *     def has_error(error_code:int, bit_index: int):
  *         return (error_code & (1<<bit_index)) != 0             # <<<<<<<<<<<<<<
@@ -4864,19 +5326,19 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_6has_error(PyObject *__p
  *     def goto_xy(self, x: int, y: int):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyNumber_Lshift(__pyx_int_1, __pyx_v_bit_index); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Lshift(__pyx_int_1, __pyx_v_bit_index); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 240, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyNumber_And(__pyx_v_error_code, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_And(__pyx_v_error_code, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 240, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_NeObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_NeObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 240, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "cython/rtc6_sdk.pyx":218
+  /* "cython/rtc6_sdk.pyx":239
  * 
  *     @staticmethod
  *     def has_error(error_code:int, bit_index: int):             # <<<<<<<<<<<<<<
@@ -4888,7 +5350,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_6has_error(PyObject *__p
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Man.has_error", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.has_error", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -4896,7 +5358,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_6has_error(PyObject *__p
   return __pyx_r;
 }
 
-/* "cython/rtc6_sdk.pyx":221
+/* "cython/rtc6_sdk.pyx":242
  *         return (error_code & (1<<bit_index)) != 0
  * 
  *     def goto_xy(self, x: int, y: int):             # <<<<<<<<<<<<<<
@@ -4905,8 +5367,8 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_6has_error(PyObject *__p
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_9goto_xy(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_9goto_xy(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_11goto_xy(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_11goto_xy(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_x = 0;
   PyObject *__pyx_v_y = 0;
   int __pyx_lineno = 0;
@@ -4938,11 +5400,11 @@ static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_9goto_xy(PyObject *__pyx
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("goto_xy", 1, 2, 2, 1); __PYX_ERR(0, 221, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("goto_xy", 1, 2, 2, 1); __PYX_ERR(0, 242, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "goto_xy") < 0)) __PYX_ERR(0, 221, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "goto_xy") < 0)) __PYX_ERR(0, 242, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -4955,20 +5417,20 @@ static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_9goto_xy(PyObject *__pyx
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("goto_xy", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 221, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("goto_xy", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 242, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Man.goto_xy", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.goto_xy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_8goto_xy(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *)__pyx_v_self), __pyx_v_x, __pyx_v_y);
+  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_10goto_xy(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *)__pyx_v_self), __pyx_v_x, __pyx_v_y);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_8goto_xy(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *__pyx_v_self, PyObject *__pyx_v_x, PyObject *__pyx_v_y) {
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_10goto_xy(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, PyObject *__pyx_v_x, PyObject *__pyx_v_y) {
   PyObject *__pyx_v_x1 = NULL;
   PyObject *__pyx_v_y1 = NULL;
   PyObject *__pyx_r = NULL;
@@ -4988,7 +5450,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_8goto_xy(CYTHON_UNUSED s
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("goto_xy", 0);
 
-  /* "cython/rtc6_sdk.pyx":222
+  /* "cython/rtc6_sdk.pyx":243
  * 
  *     def goto_xy(self, x: int, y: int):
  *         x1 = min(max(-524288, x), 524287)             # <<<<<<<<<<<<<<
@@ -4999,17 +5461,17 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_8goto_xy(CYTHON_UNUSED s
   __Pyx_INCREF(__pyx_v_x);
   __pyx_t_2 = __pyx_v_x;
   __pyx_t_3 = -524288L;
-  __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 222, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 243, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = PyObject_RichCompare(__pyx_t_2, __pyx_t_5, Py_GT); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 222, __pyx_L1_error)
+  __pyx_t_6 = PyObject_RichCompare(__pyx_t_2, __pyx_t_5, Py_GT); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 243, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 222, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 243, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   if (__pyx_t_7) {
     __Pyx_INCREF(__pyx_t_2);
     __pyx_t_4 = __pyx_t_2;
   } else {
-    __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 222, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 243, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_4 = __pyx_t_6;
     __pyx_t_6 = 0;
@@ -5018,14 +5480,14 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_8goto_xy(CYTHON_UNUSED s
   __Pyx_INCREF(__pyx_t_4);
   __pyx_t_2 = __pyx_t_4;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 222, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 243, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_5 = PyObject_RichCompare(__pyx_t_6, __pyx_t_2, Py_LT); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 222, __pyx_L1_error)
+  __pyx_t_5 = PyObject_RichCompare(__pyx_t_6, __pyx_t_2, Py_LT); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 243, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 222, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 243, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   if (__pyx_t_7) {
-    __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 222, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 243, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_4 = __pyx_t_5;
     __pyx_t_5 = 0;
@@ -5040,7 +5502,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_8goto_xy(CYTHON_UNUSED s
   __pyx_v_x1 = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "cython/rtc6_sdk.pyx":223
+  /* "cython/rtc6_sdk.pyx":244
  *     def goto_xy(self, x: int, y: int):
  *         x1 = min(max(-524288, x), 524287)
  *         y1 = min(max(-524288, y), 524287)             # <<<<<<<<<<<<<<
@@ -5051,17 +5513,17 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_8goto_xy(CYTHON_UNUSED s
   __Pyx_INCREF(__pyx_v_y);
   __pyx_t_2 = __pyx_v_y;
   __pyx_t_3 = -524288L;
-  __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = PyObject_RichCompare(__pyx_t_2, __pyx_t_5, Py_GT); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_6 = PyObject_RichCompare(__pyx_t_2, __pyx_t_5, Py_GT); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   if (__pyx_t_7) {
     __Pyx_INCREF(__pyx_t_2);
     __pyx_t_4 = __pyx_t_2;
   } else {
-    __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 223, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 244, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_4 = __pyx_t_6;
     __pyx_t_6 = 0;
@@ -5070,14 +5532,14 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_8goto_xy(CYTHON_UNUSED s
   __Pyx_INCREF(__pyx_t_4);
   __pyx_t_2 = __pyx_t_4;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_5 = PyObject_RichCompare(__pyx_t_6, __pyx_t_2, Py_LT); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_5 = PyObject_RichCompare(__pyx_t_6, __pyx_t_2, Py_LT); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   if (__pyx_t_7) {
-    __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 223, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 244, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_4 = __pyx_t_5;
     __pyx_t_5 = 0;
@@ -5092,54 +5554,54 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_8goto_xy(CYTHON_UNUSED s
   __pyx_v_y1 = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "cython/rtc6_sdk.pyx":224
+  /* "cython/rtc6_sdk.pyx":245
  *         x1 = min(max(-524288, x), 524287)
  *         y1 = min(max(-524288, y), 524287)
  *         if x != x1 or y != y1:             # <<<<<<<<<<<<<<
  *             rtc6_logger.warning(f"x or y is out of range [-524288, 524287], clipped", extra={"component": "rtc6"})
  *         rtc6_logger.debug(f"Going to ({x1},{y1})", extra={"component": "rtc6"})
  */
-  __pyx_t_2 = PyObject_RichCompare(__pyx_v_x, __pyx_v_x1, Py_NE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
-  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_v_x, __pyx_v_x1, Py_NE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 245, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (!__pyx_t_8) {
   } else {
     __pyx_t_7 = __pyx_t_8;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_2 = PyObject_RichCompare(__pyx_v_y, __pyx_v_y1, Py_NE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
-  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_v_y, __pyx_v_y1, Py_NE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 245, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_7 = __pyx_t_8;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_7) {
 
-    /* "cython/rtc6_sdk.pyx":225
+    /* "cython/rtc6_sdk.pyx":246
  *         y1 = min(max(-524288, y), 524287)
  *         if x != x1 or y != y1:
  *             rtc6_logger.warning(f"x or y is out of range [-524288, 524287], clipped", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *         rtc6_logger.debug(f"Going to ({x1},{y1})", extra={"component": "rtc6"})
- *         rtc6.goto_xy(x1, y1)
+ *         _goto_xy(self.cardno, x1, y1)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 225, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 246, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_warning); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 225, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_warning); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 246, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 225, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 246, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 225, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 246, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (PyDict_SetItem(__pyx_t_5, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_extra, __pyx_t_5) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_5, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 246, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_extra, __pyx_t_5) < 0) __PYX_ERR(0, 246, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple__8, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 225, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple__7, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 246, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "cython/rtc6_sdk.pyx":224
+    /* "cython/rtc6_sdk.pyx":245
  *         x1 = min(max(-524288, x), 524287)
  *         y1 = min(max(-524288, y), 524287)
  *         if x != x1 or y != y1:             # <<<<<<<<<<<<<<
@@ -5148,19 +5610,19 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_8goto_xy(CYTHON_UNUSED s
  */
   }
 
-  /* "cython/rtc6_sdk.pyx":226
+  /* "cython/rtc6_sdk.pyx":247
  *         if x != x1 or y != y1:
  *             rtc6_logger.warning(f"x or y is out of range [-524288, 524287], clipped", extra={"component": "rtc6"})
  *         rtc6_logger.debug(f"Going to ({x1},{y1})", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
- *         rtc6.goto_xy(x1, y1)
+ *         _goto_xy(self.cardno, x1, y1)
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyTuple_New(5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_9 = 0;
   __pyx_t_10 = 127;
@@ -5168,62 +5630,62 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_8goto_xy(CYTHON_UNUSED s
   __pyx_t_9 += 10;
   __Pyx_GIVEREF(__pyx_kp_u_Going_to);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_kp_u_Going_to);
-  __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_v_x1, __pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_v_x1, __pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_10 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) > __pyx_t_10) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) : __pyx_t_10;
   __pyx_t_9 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_4);
   __pyx_t_4 = 0;
-  __Pyx_INCREF(__pyx_kp_u__9);
+  __Pyx_INCREF(__pyx_kp_u__8);
   __pyx_t_9 += 1;
-  __Pyx_GIVEREF(__pyx_kp_u__9);
-  PyTuple_SET_ITEM(__pyx_t_5, 2, __pyx_kp_u__9);
-  __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_v_y1, __pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __Pyx_GIVEREF(__pyx_kp_u__8);
+  PyTuple_SET_ITEM(__pyx_t_5, 2, __pyx_kp_u__8);
+  __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_v_y1, __pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_10 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) > __pyx_t_10) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) : __pyx_t_10;
   __pyx_t_9 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_5, 3, __pyx_t_4);
   __pyx_t_4 = 0;
-  __Pyx_INCREF(__pyx_kp_u__10);
+  __Pyx_INCREF(__pyx_kp_u__9);
   __pyx_t_9 += 1;
-  __Pyx_GIVEREF(__pyx_kp_u__10);
-  PyTuple_SET_ITEM(__pyx_t_5, 4, __pyx_kp_u__10);
-  __pyx_t_4 = __Pyx_PyUnicode_Join(__pyx_t_5, 5, __pyx_t_9, __pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __Pyx_GIVEREF(__pyx_kp_u__9);
+  PyTuple_SET_ITEM(__pyx_t_5, 4, __pyx_kp_u__9);
+  __pyx_t_4 = __Pyx_PyUnicode_Join(__pyx_t_5, 5, __pyx_t_9, __pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_6, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 226, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_extra, __pyx_t_6) < 0) __PYX_ERR(0, 226, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_n_u_component, __pyx_n_u_rtc6) < 0) __PYX_ERR(0, 247, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_extra, __pyx_t_6) < 0) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, __pyx_t_4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "cython/rtc6_sdk.pyx":227
+  /* "cython/rtc6_sdk.pyx":248
  *             rtc6_logger.warning(f"x or y is out of range [-524288, 524287], clipped", extra={"component": "rtc6"})
  *         rtc6_logger.debug(f"Going to ({x1},{y1})", extra={"component": "rtc6"})
- *         rtc6.goto_xy(x1, y1)             # <<<<<<<<<<<<<<
+ *         _goto_xy(self.cardno, x1, y1)             # <<<<<<<<<<<<<<
  * 
- *     def __dealloc__(self):
+ *     def get_error(self):
  */
-  __pyx_t_1 = __Pyx_PyInt_As_long(__pyx_v_x1); if (unlikely((__pyx_t_1 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 227, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyInt_As_long(__pyx_v_y1); if (unlikely((__pyx_t_3 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 227, __pyx_L1_error)
-  goto_xy(__pyx_t_1, __pyx_t_3);
+  __pyx_t_1 = __Pyx_PyInt_As_long(__pyx_v_x1); if (unlikely((__pyx_t_1 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 248, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_As_long(__pyx_v_y1); if (unlikely((__pyx_t_3 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 248, __pyx_L1_error)
+  _goto_xy(__pyx_v_self->cardno, __pyx_t_1, __pyx_t_3);
 
-  /* "cython/rtc6_sdk.pyx":221
+  /* "cython/rtc6_sdk.pyx":242
  *         return (error_code & (1<<bit_index)) != 0
  * 
  *     def goto_xy(self, x: int, y: int):             # <<<<<<<<<<<<<<
@@ -5239,7 +5701,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_8goto_xy(CYTHON_UNUSED s
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Man.goto_xy", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.goto_xy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_x1);
@@ -5249,8 +5711,373 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_8goto_xy(CYTHON_UNUSED s
   return __pyx_r;
 }
 
-/* "cython/rtc6_sdk.pyx":229
- *         rtc6.goto_xy(x1, y1)
+/* "cython/rtc6_sdk.pyx":250
+ *         _goto_xy(self.cardno, x1, y1)
+ * 
+ *     def get_error(self):             # <<<<<<<<<<<<<<
+ *         return _get_error(self.cardno)
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_13get_error(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_13get_error(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("get_error (wrapper)", 0);
+  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_12get_error(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_12get_error(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("get_error", 0);
+
+  /* "cython/rtc6_sdk.pyx":251
+ * 
+ *     def get_error(self):
+ *         return _get_error(self.cardno)             # <<<<<<<<<<<<<<
+ * 
+ *     def get_last_error(self):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_uint32_t(_get_error(__pyx_v_self->cardno)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 251, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "cython/rtc6_sdk.pyx":250
+ *         _goto_xy(self.cardno, x1, y1)
+ * 
+ *     def get_error(self):             # <<<<<<<<<<<<<<
+ *         return _get_error(self.cardno)
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.get_error", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cython/rtc6_sdk.pyx":253
+ *         return _get_error(self.cardno)
+ * 
+ *     def get_last_error(self):             # <<<<<<<<<<<<<<
+ *         return _get_last_error(self.cardno)
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_15get_last_error(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_15get_last_error(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("get_last_error (wrapper)", 0);
+  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_14get_last_error(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_14get_last_error(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("get_last_error", 0);
+
+  /* "cython/rtc6_sdk.pyx":254
+ * 
+ *     def get_last_error(self):
+ *         return _get_last_error(self.cardno)             # <<<<<<<<<<<<<<
+ * 
+ *     def set_laser(self, b_enable: bool):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_uint32_t(_get_last_error(__pyx_v_self->cardno)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 254, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "cython/rtc6_sdk.pyx":253
+ *         return _get_error(self.cardno)
+ * 
+ *     def get_last_error(self):             # <<<<<<<<<<<<<<
+ *         return _get_last_error(self.cardno)
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.get_last_error", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cython/rtc6_sdk.pyx":256
+ *         return _get_last_error(self.cardno)
+ * 
+ *     def set_laser(self, b_enable: bool):             # <<<<<<<<<<<<<<
+ *         return _enable_laser(self.cardno) if b_enable else _disable_laser(self.cardno)
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_17set_laser(PyObject *__pyx_v_self, PyObject *__pyx_arg_b_enable); /*proto*/
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_17set_laser(PyObject *__pyx_v_self, PyObject *__pyx_arg_b_enable) {
+  bool __pyx_v_b_enable;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("set_laser (wrapper)", 0);
+  assert(__pyx_arg_b_enable); {
+    __pyx_v_b_enable = __Pyx_PyObject_IsTrue(__pyx_arg_b_enable); if (unlikely((__pyx_v_b_enable == ((bool)-1)) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.set_laser", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_16set_laser(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *)__pyx_v_self), ((bool)__pyx_v_b_enable));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_16set_laser(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, bool __pyx_v_b_enable) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("set_laser", 0);
+
+  /* "cython/rtc6_sdk.pyx":257
+ * 
+ *     def set_laser(self, b_enable: bool):
+ *         return _enable_laser(self.cardno) if b_enable else _disable_laser(self.cardno)             # <<<<<<<<<<<<<<
+ * 
+ *     def set_laser_sig(self, b_enable: bool):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  if ((__pyx_v_b_enable != 0)) {
+    __pyx_t_2 = __Pyx_void_to_None(_enable_laser(__pyx_v_self->cardno)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 257, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_1 = __pyx_t_2;
+    __pyx_t_2 = 0;
+  } else {
+    __pyx_t_2 = __Pyx_void_to_None(_disable_laser(__pyx_v_self->cardno)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 257, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_1 = __pyx_t_2;
+    __pyx_t_2 = 0;
+  }
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "cython/rtc6_sdk.pyx":256
+ *         return _get_last_error(self.cardno)
+ * 
+ *     def set_laser(self, b_enable: bool):             # <<<<<<<<<<<<<<
+ *         return _enable_laser(self.cardno) if b_enable else _disable_laser(self.cardno)
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.set_laser", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cython/rtc6_sdk.pyx":259
+ *         return _enable_laser(self.cardno) if b_enable else _disable_laser(self.cardno)
+ * 
+ *     def set_laser_sig(self, b_enable: bool):             # <<<<<<<<<<<<<<
+ *         return _laser_signal_on(self.cardno) if b_enable else _laser_signal_off(self.cardno)
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_19set_laser_sig(PyObject *__pyx_v_self, PyObject *__pyx_arg_b_enable); /*proto*/
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_19set_laser_sig(PyObject *__pyx_v_self, PyObject *__pyx_arg_b_enable) {
+  bool __pyx_v_b_enable;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("set_laser_sig (wrapper)", 0);
+  assert(__pyx_arg_b_enable); {
+    __pyx_v_b_enable = __Pyx_PyObject_IsTrue(__pyx_arg_b_enable); if (unlikely((__pyx_v_b_enable == ((bool)-1)) && PyErr_Occurred())) __PYX_ERR(0, 259, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.set_laser_sig", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_18set_laser_sig(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *)__pyx_v_self), ((bool)__pyx_v_b_enable));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_18set_laser_sig(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, bool __pyx_v_b_enable) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("set_laser_sig", 0);
+
+  /* "cython/rtc6_sdk.pyx":260
+ * 
+ *     def set_laser_sig(self, b_enable: bool):
+ *         return _laser_signal_on(self.cardno) if b_enable else _laser_signal_off(self.cardno)             # <<<<<<<<<<<<<<
+ * 
+ *     def set_zoom(self, zoom: int):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  if ((__pyx_v_b_enable != 0)) {
+    __pyx_t_2 = __Pyx_void_to_None(_laser_signal_on(__pyx_v_self->cardno)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 260, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_1 = __pyx_t_2;
+    __pyx_t_2 = 0;
+  } else {
+    __pyx_t_2 = __Pyx_void_to_None(_laser_signal_off(__pyx_v_self->cardno)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 260, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_1 = __pyx_t_2;
+    __pyx_t_2 = 0;
+  }
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "cython/rtc6_sdk.pyx":259
+ *         return _enable_laser(self.cardno) if b_enable else _disable_laser(self.cardno)
+ * 
+ *     def set_laser_sig(self, b_enable: bool):             # <<<<<<<<<<<<<<
+ *         return _laser_signal_on(self.cardno) if b_enable else _laser_signal_off(self.cardno)
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.set_laser_sig", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cython/rtc6_sdk.pyx":262
+ *         return _laser_signal_on(self.cardno) if b_enable else _laser_signal_off(self.cardno)
+ * 
+ *     def set_zoom(self, zoom: int):             # <<<<<<<<<<<<<<
+ *         return _set_zoom(self.cardno, zoom)
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_21set_zoom(PyObject *__pyx_v_self, PyObject *__pyx_v_zoom); /*proto*/
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_21set_zoom(PyObject *__pyx_v_self, PyObject *__pyx_v_zoom) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("set_zoom (wrapper)", 0);
+  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_20set_zoom(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *)__pyx_v_self), ((PyObject *)__pyx_v_zoom));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_20set_zoom(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, PyObject *__pyx_v_zoom) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  UINT __pyx_t_1;
+  PyObject *__pyx_t_2 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("set_zoom", 0);
+
+  /* "cython/rtc6_sdk.pyx":263
+ * 
+ *     def set_zoom(self, zoom: int):
+ *         return _set_zoom(self.cardno, zoom)             # <<<<<<<<<<<<<<
+ * 
+ *     def __dealloc__(self):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_As_uint32_t(__pyx_v_zoom); if (unlikely((__pyx_t_1 == ((UINT)-1)) && PyErr_Occurred())) __PYX_ERR(0, 263, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_void_to_None(_set_zoom(__pyx_v_self->cardno, __pyx_t_1)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_r = __pyx_t_2;
+  __pyx_t_2 = 0;
+  goto __pyx_L0;
+
+  /* "cython/rtc6_sdk.pyx":262
+ *         return _laser_signal_on(self.cardno) if b_enable else _laser_signal_off(self.cardno)
+ * 
+ *     def set_zoom(self, zoom: int):             # <<<<<<<<<<<<<<
+ *         return _set_zoom(self.cardno, zoom)
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.set_zoom", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cython/rtc6_sdk.pyx":265
+ *         return _set_zoom(self.cardno, zoom)
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
  *         """
@@ -5258,30 +6085,47 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_8goto_xy(CYTHON_UNUSED s
  */
 
 /* Python wrapper */
-static void __pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_11__dealloc__(PyObject *__pyx_v_self); /*proto*/
-static void __pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_11__dealloc__(PyObject *__pyx_v_self) {
+static void __pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_23__dealloc__(PyObject *__pyx_v_self); /*proto*/
+static void __pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_23__dealloc__(PyObject *__pyx_v_self) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__ (wrapper)", 0);
-  __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_10__dealloc__(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *)__pyx_v_self));
+  __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_22__dealloc__(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
 }
 
-static void __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_10__dealloc__(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *__pyx_v_self) {
+static void __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_22__dealloc__(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self) {
   __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "cython/rtc6_sdk.pyx":233
+  /* "cython/rtc6_sdk.pyx":269
  *         TODO: device finalise/close procedure
  *         """
- *         rtc6.free_rtc6_dll()             # <<<<<<<<<<<<<<
- * 
+ *         if self.do_init:             # <<<<<<<<<<<<<<
+ *             _free_rtc6_dll(self.cardno)
  */
-  free_rtc6_dll();
+  __pyx_t_1 = (__pyx_v_self->do_init != 0);
+  if (__pyx_t_1) {
 
-  /* "cython/rtc6_sdk.pyx":229
- *         rtc6.goto_xy(x1, y1)
+    /* "cython/rtc6_sdk.pyx":270
+ *         """
+ *         if self.do_init:
+ *             _free_rtc6_dll(self.cardno)             # <<<<<<<<<<<<<<
+ */
+    _free_rtc6_dll(__pyx_v_self->cardno);
+
+    /* "cython/rtc6_sdk.pyx":269
+ *         TODO: device finalise/close procedure
+ *         """
+ *         if self.do_init:             # <<<<<<<<<<<<<<
+ *             _free_rtc6_dll(self.cardno)
+ */
+  }
+
+  /* "cython/rtc6_sdk.pyx":265
+ *         return _set_zoom(self.cardno, zoom)
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
  *         """
@@ -5299,19 +6143,19 @@ static void __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_10__dealloc__(CYTHON_UNUSED s
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_13__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_13__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_25__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_25__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__reduce_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_12__reduce_cython__(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *)__pyx_v_self));
+  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_24__reduce_cython__(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_12__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *__pyx_v_self) {
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_24__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5326,7 +6170,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_12__reduce_cython__(CYTH
  * def __setstate_cython__(self, __pyx_state):
  *     raise TypeError("no default __reduce__ due to non-trivial __cinit__")
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 2, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 2, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_Raise(__pyx_t_1, 0, 0, 0);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -5341,7 +6185,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_12__reduce_cython__(CYTH
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Man.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
@@ -5356,19 +6200,19 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_12__reduce_cython__(CYTH
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_15__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
-static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_15__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_27__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
+static PyObject *__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_27__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__setstate_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_14__setstate_cython__(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
+  __pyx_r = __pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_26__setstate_cython__(((struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_14__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_10RTC6Helper_26__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5382,7 +6226,7 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_14__setstate_cython__(CY
  * def __setstate_cython__(self, __pyx_state):
  *     raise TypeError("no default __reduce__ due to non-trivial __cinit__")             # <<<<<<<<<<<<<<
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 4, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_Raise(__pyx_t_1, 0, 0, 0);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -5398,14 +6242,14 @@ static PyObject *__pyx_pf_9pyscanlab_8rtc6_sdk_7RTC6Man_14__setstate_cython__(CY
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Man.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pyscanlab.rtc6_sdk.RTC6Helper.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_tp_new_9pyscanlab_8rtc6_sdk_RTC6Man(PyTypeObject *t, PyObject *a, PyObject *k) {
+static PyObject *__pyx_tp_new_9pyscanlab_8rtc6_sdk_RTC6Helper(PyTypeObject *t, PyObject *a, PyObject *k) {
   PyObject *o;
   if (likely((t->tp_flags & Py_TPFLAGS_IS_ABSTRACT) == 0)) {
     o = (*t->tp_alloc)(t, 0);
@@ -5413,14 +6257,14 @@ static PyObject *__pyx_tp_new_9pyscanlab_8rtc6_sdk_RTC6Man(PyTypeObject *t, PyOb
     o = (PyObject *) PyBaseObject_Type.tp_new(t, __pyx_empty_tuple, 0);
   }
   if (unlikely(!o)) return 0;
-  if (unlikely(__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_1__cinit__(o, a, k) < 0)) goto bad;
+  if (unlikely(__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_1__cinit__(o, a, k) < 0)) goto bad;
   return o;
   bad:
   Py_DECREF(o); o = 0;
   return NULL;
 }
 
-static void __pyx_tp_dealloc_9pyscanlab_8rtc6_sdk_RTC6Man(PyObject *o) {
+static void __pyx_tp_dealloc_9pyscanlab_8rtc6_sdk_RTC6Helper(PyObject *o) {
   #if CYTHON_USE_TP_FINALIZE
   if (unlikely(PyType_HasFeature(Py_TYPE(o), Py_TPFLAGS_HAVE_FINALIZE) && Py_TYPE(o)->tp_finalize) && (!PyType_IS_GC(Py_TYPE(o)) || !_PyGC_FINALIZED(o))) {
     if (PyObject_CallFinalizerFromDealloc(o)) return;
@@ -5430,29 +6274,35 @@ static void __pyx_tp_dealloc_9pyscanlab_8rtc6_sdk_RTC6Man(PyObject *o) {
     PyObject *etype, *eval, *etb;
     PyErr_Fetch(&etype, &eval, &etb);
     __Pyx_SET_REFCNT(o, Py_REFCNT(o) + 1);
-    __pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_11__dealloc__(o);
+    __pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_23__dealloc__(o);
     __Pyx_SET_REFCNT(o, Py_REFCNT(o) - 1);
     PyErr_Restore(etype, eval, etb);
   }
   (*Py_TYPE(o)->tp_free)(o);
 }
 
-static PyMethodDef __pyx_methods_9pyscanlab_8rtc6_sdk_RTC6Man[] = {
-  {"config_list", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_3config_list, METH_VARARGS|METH_KEYWORDS, 0},
-  {"load_correction_file", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_5load_correction_file, METH_VARARGS|METH_KEYWORDS, 0},
-  {"has_error", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_7has_error, METH_VARARGS|METH_KEYWORDS, 0},
-  {"goto_xy", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_9goto_xy, METH_VARARGS|METH_KEYWORDS, 0},
-  {"__reduce_cython__", (PyCFunction)__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_13__reduce_cython__, METH_NOARGS, 0},
-  {"__setstate_cython__", (PyCFunction)__pyx_pw_9pyscanlab_8rtc6_sdk_7RTC6Man_15__setstate_cython__, METH_O, 0},
+static PyMethodDef __pyx_methods_9pyscanlab_8rtc6_sdk_RTC6Helper[] = {
+  {"load_program_file", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_3load_program_file, METH_VARARGS|METH_KEYWORDS, 0},
+  {"config_list", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_5config_list, METH_VARARGS|METH_KEYWORDS, 0},
+  {"load_correction_file", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_7load_correction_file, METH_VARARGS|METH_KEYWORDS, 0},
+  {"has_error", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_9has_error, METH_VARARGS|METH_KEYWORDS, 0},
+  {"goto_xy", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_11goto_xy, METH_VARARGS|METH_KEYWORDS, 0},
+  {"get_error", (PyCFunction)__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_13get_error, METH_NOARGS, 0},
+  {"get_last_error", (PyCFunction)__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_15get_last_error, METH_NOARGS, 0},
+  {"set_laser", (PyCFunction)__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_17set_laser, METH_O, 0},
+  {"set_laser_sig", (PyCFunction)__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_19set_laser_sig, METH_O, 0},
+  {"set_zoom", (PyCFunction)__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_21set_zoom, METH_O, 0},
+  {"__reduce_cython__", (PyCFunction)__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_25__reduce_cython__, METH_NOARGS, 0},
+  {"__setstate_cython__", (PyCFunction)__pyx_pw_9pyscanlab_8rtc6_sdk_10RTC6Helper_27__setstate_cython__, METH_O, 0},
   {0, 0, 0, 0}
 };
 
-static PyTypeObject __pyx_type_9pyscanlab_8rtc6_sdk_RTC6Man = {
+static PyTypeObject __pyx_type_9pyscanlab_8rtc6_sdk_RTC6Helper = {
   PyVarObject_HEAD_INIT(0, 0)
-  "pyscanlab.rtc6_sdk.RTC6Man", /*tp_name*/
-  sizeof(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Man), /*tp_basicsize*/
+  "pyscanlab.rtc6_sdk.RTC6Helper", /*tp_name*/
+  sizeof(struct __pyx_obj_9pyscanlab_8rtc6_sdk_RTC6Helper), /*tp_basicsize*/
   0, /*tp_itemsize*/
-  __pyx_tp_dealloc_9pyscanlab_8rtc6_sdk_RTC6Man, /*tp_dealloc*/
+  __pyx_tp_dealloc_9pyscanlab_8rtc6_sdk_RTC6Helper, /*tp_dealloc*/
   #if PY_VERSION_HEX < 0x030800b4
   0, /*tp_print*/
   #endif
@@ -5485,7 +6335,7 @@ static PyTypeObject __pyx_type_9pyscanlab_8rtc6_sdk_RTC6Man = {
   0, /*tp_weaklistoffset*/
   0, /*tp_iter*/
   0, /*tp_iternext*/
-  __pyx_methods_9pyscanlab_8rtc6_sdk_RTC6Man, /*tp_methods*/
+  __pyx_methods_9pyscanlab_8rtc6_sdk_RTC6Helper, /*tp_methods*/
   0, /*tp_members*/
   0, /*tp_getset*/
   0, /*tp_base*/
@@ -5495,7 +6345,7 @@ static PyTypeObject __pyx_type_9pyscanlab_8rtc6_sdk_RTC6Man = {
   0, /*tp_dictoffset*/
   0, /*tp_init*/
   0, /*tp_alloc*/
-  __pyx_tp_new_9pyscanlab_8rtc6_sdk_RTC6Man, /*tp_new*/
+  __pyx_tp_new_9pyscanlab_8rtc6_sdk_RTC6Helper, /*tp_new*/
   0, /*tp_free*/
   0, /*tp_is_gc*/
   0, /*tp_bases*/
@@ -5621,7 +6471,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_RTC6DAT_dat, __pyx_k_RTC6DAT_dat, sizeof(__pyx_k_RTC6DAT_dat), 0, 1, 0, 0},
   {&__pyx_kp_u_RTC6DAT_dat_file_or_RTC6RBF_rbf, __pyx_k_RTC6DAT_dat_file_or_RTC6RBF_rbf, sizeof(__pyx_k_RTC6DAT_dat_file_or_RTC6RBF_rbf), 0, 1, 0, 0},
   {&__pyx_n_s_RTC6DevError, __pyx_k_RTC6DevError, sizeof(__pyx_k_RTC6DevError), 0, 0, 1, 1},
-  {&__pyx_n_s_RTC6Man, __pyx_k_RTC6Man, sizeof(__pyx_k_RTC6Man), 0, 0, 1, 1},
+  {&__pyx_n_s_RTC6Helper, __pyx_k_RTC6Helper, sizeof(__pyx_k_RTC6Helper), 0, 0, 1, 1},
   {&__pyx_kp_u_RTC6OUT_out, __pyx_k_RTC6OUT_out, sizeof(__pyx_k_RTC6OUT_out), 0, 1, 0, 0},
   {&__pyx_kp_u_RTC6RBF_rbf, __pyx_k_RTC6RBF_rbf, sizeof(__pyx_k_RTC6RBF_rbf), 0, 1, 0, 0},
   {&__pyx_n_s_RTC6_ACCESS_DENIED, __pyx_k_RTC6_ACCESS_DENIED, sizeof(__pyx_k_RTC6_ACCESS_DENIED), 0, 0, 1, 1},
@@ -5660,7 +6510,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_Version_error_RTC6_DLL_version_R, __pyx_k_Version_error_RTC6_DLL_version_R, sizeof(__pyx_k_Version_error_RTC6_DLL_version_R), 0, 1, 0, 0},
   {&__pyx_kp_u_Version_error_dll_rbf_and_out_fi, __pyx_k_Version_error_dll_rbf_and_out_fi, sizeof(__pyx_k_Version_error_dll_rbf_and_out_fi), 0, 1, 0, 0},
   {&__pyx_kp_u_Warning_3D_correction_table_or_D, __pyx_k_Warning_3D_correction_table_or_D, sizeof(__pyx_k_Warning_3D_correction_table_or_D), 0, 1, 0, 0},
-  {&__pyx_kp_u__10, __pyx_k__10, sizeof(__pyx_k__10), 0, 1, 0, 0},
+  {&__pyx_kp_u__8, __pyx_k__8, sizeof(__pyx_k__8), 0, 1, 0, 0},
   {&__pyx_kp_u__9, __pyx_k__9, sizeof(__pyx_k__9), 0, 1, 0, 0},
   {&__pyx_n_s_abspath, __pyx_k_abspath, sizeof(__pyx_k_abspath), 0, 0, 1, 1},
   {&__pyx_n_u_acc_err, __pyx_k_acc_err, sizeof(__pyx_k_acc_err), 0, 1, 0, 1},
@@ -5669,6 +6519,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_asctime_s_component_s_levelname, __pyx_k_asctime_s_component_s_levelname, sizeof(__pyx_k_asctime_s_component_s_levelname), 0, 1, 0, 0},
   {&__pyx_n_u_autools_setup_main, __pyx_k_autools_setup_main, sizeof(__pyx_k_autools_setup_main), 0, 1, 0, 1},
   {&__pyx_n_s_bit_index, __pyx_k_bit_index, sizeof(__pyx_k_bit_index), 0, 0, 1, 1},
+  {&__pyx_n_s_cardno, __pyx_k_cardno, sizeof(__pyx_k_cardno), 0, 0, 1, 1},
   {&__pyx_n_s_cfg_path, __pyx_k_cfg_path, sizeof(__pyx_k_cfg_path), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
   {&__pyx_n_u_component, __pyx_k_component, sizeof(__pyx_k_component), 0, 1, 0, 1},
@@ -5679,6 +6530,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_dim, __pyx_k_dim, sizeof(__pyx_k_dim), 0, 0, 1, 1},
   {&__pyx_kp_u_dim_2, __pyx_k_dim_2, sizeof(__pyx_k_dim_2), 0, 1, 0, 0},
   {&__pyx_n_s_dirname, __pyx_k_dirname, sizeof(__pyx_k_dirname), 0, 0, 1, 1},
+  {&__pyx_n_s_do_init, __pyx_k_do_init, sizeof(__pyx_k_do_init), 0, 0, 1, 1},
   {&__pyx_n_s_doc, __pyx_k_doc, sizeof(__pyx_k_doc), 0, 0, 1, 1},
   {&__pyx_kp_u_does_not_exist, __pyx_k_does_not_exist, sizeof(__pyx_k_does_not_exist), 0, 1, 0, 0},
   {&__pyx_n_s_encode, __pyx_k_encode, sizeof(__pyx_k_encode), 0, 0, 1, 1},
@@ -5694,6 +6546,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_hex, __pyx_k_hex, sizeof(__pyx_k_hex), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_info, __pyx_k_info, sizeof(__pyx_k_info), 0, 0, 1, 1},
+  {&__pyx_kp_u_is_larger_than_number_of_RTC6_b, __pyx_k_is_larger_than_number_of_RTC6_b, sizeof(__pyx_k_is_larger_than_number_of_RTC6_b), 0, 1, 0, 0},
   {&__pyx_n_s_join, __pyx_k_join, sizeof(__pyx_k_join), 0, 0, 1, 1},
   {&__pyx_n_s_keys, __pyx_k_keys, sizeof(__pyx_k_keys), 0, 0, 1, 1},
   {&__pyx_kp_u_list3, __pyx_k_list3, sizeof(__pyx_k_list3), 0, 1, 0, 0},
@@ -5743,10 +6596,10 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_staticmethod = __Pyx_GetBuiltinName(__pyx_n_s_staticmethod); if (!__pyx_builtin_staticmethod) __PYX_ERR(0, 217, __pyx_L1_error)
-  __pyx_builtin_hex = __Pyx_GetBuiltinName(__pyx_n_s_hex); if (!__pyx_builtin_hex) __PYX_ERR(0, 115, __pyx_L1_error)
-  __pyx_builtin_IOError = __Pyx_GetBuiltinName(__pyx_n_s_IOError); if (!__pyx_builtin_IOError) __PYX_ERR(0, 181, __pyx_L1_error)
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 184, __pyx_L1_error)
+  __pyx_builtin_staticmethod = __Pyx_GetBuiltinName(__pyx_n_s_staticmethod); if (!__pyx_builtin_staticmethod) __PYX_ERR(0, 238, __pyx_L1_error)
+  __pyx_builtin_hex = __Pyx_GetBuiltinName(__pyx_n_s_hex); if (!__pyx_builtin_hex) __PYX_ERR(0, 124, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 132, __pyx_L1_error)
+  __pyx_builtin_IOError = __Pyx_GetBuiltinName(__pyx_n_s_IOError); if (!__pyx_builtin_IOError) __PYX_ERR(0, 202, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
@@ -5757,82 +6610,82 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "cython/rtc6_sdk.pyx":113
- *         err = rtc6.init_rtc6_dll()
- *         if err == 0:
- *             rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
- *         else:
- *             rtc6_logger.info(f"RTC6 DLL Init Failed: {hex(err)}", extra={"component": "rtc6"})
+  /* "cython/rtc6_sdk.pyx":122
+ *             err = _init_rtc6_dll(self.cardno)
+ *             if err == 0:
+ *                 rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
+ *             else:
+ *                 rtc6_logger.info(f"RTC6 DLL Init Failed: {hex(err)}", extra={"component": "rtc6"})
  */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_u_RTC6_DLL_Init_OKAY); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 113, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__2);
-  __Pyx_GIVEREF(__pyx_tuple__2);
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_u_RTC6_DLL_Init_OKAY); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 122, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple_);
+  __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "cython/rtc6_sdk.pyx":130
- *         err = rtc6.load_program_file(cfg_path.encode('utf-8'))
+  /* "cython/rtc6_sdk.pyx":149
+ * 
  *         if err == 0:
  *             rtc6_logger.info(f"Device reset OKAY", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *         else:
  *             if err == 2:
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_u_Device_reset_OKAY); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 130, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__3);
-  __Pyx_GIVEREF(__pyx_tuple__3);
+  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_u_Device_reset_OKAY); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__2);
+  __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "cython/rtc6_sdk.pyx":140
+  /* "cython/rtc6_sdk.pyx":160
  *                                   extra={"component": "rtc6"})
  *                 if err == 2:
  *                     rtc6_logger.error(f"Power cycle required", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *                 raise RTC6DevError(err)
  *             else:
  */
-  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_u_Power_cycle_required); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 140, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__4);
-  __Pyx_GIVEREF(__pyx_tuple__4);
+  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_u_Power_cycle_required); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 160, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__3);
+  __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "cython/rtc6_sdk.pyx":183
+  /* "cython/rtc6_sdk.pyx":204
  *             raise IOError()
  *         if not 1 <= table_no <= 8:
  *             rtc6_logger.error(f"Table no. should be [1,8]", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *             raise ValueError()
  *         if dim not in (2, 3):
  */
-  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_u_Table_no_should_be_1_8); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 183, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__5);
-  __Pyx_GIVEREF(__pyx_tuple__5);
+  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_u_Table_no_should_be_1_8); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 204, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__4);
+  __Pyx_GIVEREF(__pyx_tuple__4);
 
-  /* "cython/rtc6_sdk.pyx":186
+  /* "cython/rtc6_sdk.pyx":207
  *             raise ValueError()
  *         if dim not in (2, 3):
  *             rtc6_logger.error(f"Dim should be 2 or 3", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *             raise ValueError()
  * 
  */
-  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_u_Dim_should_be_2_or_3); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_u_Dim_should_be_2_or_3); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__5);
+  __Pyx_GIVEREF(__pyx_tuple__5);
+
+  /* "cython/rtc6_sdk.pyx":217
+ *         err = _load_correction_file(self.cardno, cor_file_c, table_no, dim)
+ *         if err == 0:
+ *             rtc6_logger.info(f"Load correction file OKAY", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
+ *         elif err in RTC6Helper.ERR_CODES["load_correction_file"].keys():
+ *             if err != 12:
+ */
+  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_u_Load_correction_file_OKAY); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 217, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
 
-  /* "cython/rtc6_sdk.pyx":196
- *         err = rtc6.load_correction_file(cor_file_c, table_no, dim)
- *         if err == 0:
- *             rtc6_logger.info(f"Load correction file OKAY", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
- *         elif err in RTC6Man.ERR_CODES["load_correction_file"].keys():
- *             if err != 12:
- */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_u_Load_correction_file_OKAY); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 196, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__7);
-  __Pyx_GIVEREF(__pyx_tuple__7);
-
-  /* "cython/rtc6_sdk.pyx":225
+  /* "cython/rtc6_sdk.pyx":246
  *         y1 = min(max(-524288, y), 524287)
  *         if x != x1 or y != y1:
  *             rtc6_logger.warning(f"x or y is out of range [-524288, 524287], clipped", extra={"component": "rtc6"})             # <<<<<<<<<<<<<<
  *         rtc6_logger.debug(f"Going to ({x1},{y1})", extra={"component": "rtc6"})
- *         rtc6.goto_xy(x1, y1)
+ *         _goto_xy(self.cardno, x1, y1)
  */
-  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_u_x_or_y_is_out_of_range_524288_52); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 225, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__8);
-  __Pyx_GIVEREF(__pyx_tuple__8);
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_u_x_or_y_is_out_of_range_524288_52); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 246, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__7);
+  __Pyx_GIVEREF(__pyx_tuple__7);
 
   /* "(tree fragment)":2
  * def __reduce_cython__(self):
@@ -5840,74 +6693,74 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * def __setstate_cython__(self, __pyx_state):
  *     raise TypeError("no default __reduce__ due to non-trivial __cinit__")
  */
-  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_s_no_default___reduce___due_to_non); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(1, 2, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__11);
-  __Pyx_GIVEREF(__pyx_tuple__11);
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_s_no_default___reduce___due_to_non); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(1, 2, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__10);
+  __Pyx_GIVEREF(__pyx_tuple__10);
 
   /* "(tree fragment)":4
  *     raise TypeError("no default __reduce__ due to non-trivial __cinit__")
  * def __setstate_cython__(self, __pyx_state):
  *     raise TypeError("no default __reduce__ due to non-trivial __cinit__")             # <<<<<<<<<<<<<<
  */
-  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_s_no_default___reduce___due_to_non); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(1, 4, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__12);
-  __Pyx_GIVEREF(__pyx_tuple__12);
+  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_s_no_default___reduce___due_to_non); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(1, 4, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__11);
+  __Pyx_GIVEREF(__pyx_tuple__11);
 
-  /* "cython/rtc6_sdk.pyx":14
+  /* "cython/rtc6_sdk.pyx":16
  * 
  * if _SPLIT_LOG:
  *     rtc6_logger = logging.getLogger("rtc6")             # <<<<<<<<<<<<<<
  *     rtc6_logger.setLevel(logging.DEBUG)
  *     rtc6_fh = logging.FileHandler("rtc6.log")
  */
-  __pyx_tuple__13 = PyTuple_Pack(1, __pyx_n_u_rtc6); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 14, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__13);
-  __Pyx_GIVEREF(__pyx_tuple__13);
+  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_n_u_rtc6); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 16, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__12);
+  __Pyx_GIVEREF(__pyx_tuple__12);
 
-  /* "cython/rtc6_sdk.pyx":16
+  /* "cython/rtc6_sdk.pyx":18
  *     rtc6_logger = logging.getLogger("rtc6")
  *     rtc6_logger.setLevel(logging.DEBUG)
  *     rtc6_fh = logging.FileHandler("rtc6.log")             # <<<<<<<<<<<<<<
  *     rtc6_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')
  *     rtc6_fh.setFormatter(rtc6_formatter)
  */
-  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_kp_u_rtc6_log); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 16, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__14);
-  __Pyx_GIVEREF(__pyx_tuple__14);
+  __pyx_tuple__13 = PyTuple_Pack(1, __pyx_kp_u_rtc6_log); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__13);
+  __Pyx_GIVEREF(__pyx_tuple__13);
 
-  /* "cython/rtc6_sdk.pyx":17
+  /* "cython/rtc6_sdk.pyx":19
  *     rtc6_logger.setLevel(logging.DEBUG)
  *     rtc6_fh = logging.FileHandler("rtc6.log")
  *     rtc6_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')             # <<<<<<<<<<<<<<
  *     rtc6_fh.setFormatter(rtc6_formatter)
  *     rtc6_logger.addHandler(rtc6_fh)
  */
-  __pyx_tuple__15 = PyTuple_Pack(1, __pyx_kp_u_asctime_s_component_s_levelname); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 17, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__15);
-  __Pyx_GIVEREF(__pyx_tuple__15);
+  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_kp_u_asctime_s_component_s_levelname); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__14);
+  __Pyx_GIVEREF(__pyx_tuple__14);
 
-  /* "cython/rtc6_sdk.pyx":25
+  /* "cython/rtc6_sdk.pyx":27
  *     rtc6_logger.addHandler(rtc6_ch)
  * else:
  *     rtc6_logger = logging.getLogger("autools_setup_main")             # <<<<<<<<<<<<<<
  * 
  * class RTC6DevError(Exception):
  */
-  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_n_u_autools_setup_main); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 25, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__16);
-  __Pyx_GIVEREF(__pyx_tuple__16);
+  __pyx_tuple__15 = PyTuple_Pack(1, __pyx_n_u_autools_setup_main); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__15);
+  __Pyx_GIVEREF(__pyx_tuple__15);
 
-  /* "cython/rtc6_sdk.pyx":218
+  /* "cython/rtc6_sdk.pyx":239
  * 
  *     @staticmethod
  *     def has_error(error_code:int, bit_index: int):             # <<<<<<<<<<<<<<
  *         return (error_code & (1<<bit_index)) != 0
  * 
  */
-  __pyx_tuple__17 = PyTuple_Pack(2, __pyx_n_s_error_code, __pyx_n_s_bit_index); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 218, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__17);
-  __Pyx_GIVEREF(__pyx_tuple__17);
-  __pyx_codeobj__18 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__17, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cython_rtc6_sdk_pyx, __pyx_n_s_has_error, 218, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__18)) __PYX_ERR(0, 218, __pyx_L1_error)
+  __pyx_tuple__16 = PyTuple_Pack(2, __pyx_n_s_error_code, __pyx_n_s_bit_index); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 239, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__16);
+  __Pyx_GIVEREF(__pyx_tuple__16);
+  __pyx_codeobj__17 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cython_rtc6_sdk_pyx, __pyx_n_s_has_error, 239, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__17)) __PYX_ERR(0, 239, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -5982,16 +6835,16 @@ static int __Pyx_modinit_type_init_code(void) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_init_code", 0);
   /*--- Type init code ---*/
-  if (PyType_Ready(&__pyx_type_9pyscanlab_8rtc6_sdk_RTC6Man) < 0) __PYX_ERR(0, 30, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_9pyscanlab_8rtc6_sdk_RTC6Helper) < 0) __PYX_ERR(0, 32, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
-  __pyx_type_9pyscanlab_8rtc6_sdk_RTC6Man.tp_print = 0;
+  __pyx_type_9pyscanlab_8rtc6_sdk_RTC6Helper.tp_print = 0;
   #endif
-  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_9pyscanlab_8rtc6_sdk_RTC6Man.tp_dictoffset && __pyx_type_9pyscanlab_8rtc6_sdk_RTC6Man.tp_getattro == PyObject_GenericGetAttr)) {
-    __pyx_type_9pyscanlab_8rtc6_sdk_RTC6Man.tp_getattro = __Pyx_PyObject_GenericGetAttr;
+  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_9pyscanlab_8rtc6_sdk_RTC6Helper.tp_dictoffset && __pyx_type_9pyscanlab_8rtc6_sdk_RTC6Helper.tp_getattro == PyObject_GenericGetAttr)) {
+    __pyx_type_9pyscanlab_8rtc6_sdk_RTC6Helper.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_RTC6Man, (PyObject *)&__pyx_type_9pyscanlab_8rtc6_sdk_RTC6Man) < 0) __PYX_ERR(0, 30, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_9pyscanlab_8rtc6_sdk_RTC6Man) < 0) __PYX_ERR(0, 30, __pyx_L1_error)
-  __pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man = &__pyx_type_9pyscanlab_8rtc6_sdk_RTC6Man;
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_RTC6Helper, (PyObject *)&__pyx_type_9pyscanlab_8rtc6_sdk_RTC6Helper) < 0) __PYX_ERR(0, 32, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_9pyscanlab_8rtc6_sdk_RTC6Helper) < 0) __PYX_ERR(0, 32, __pyx_L1_error)
+  __pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper = &__pyx_type_9pyscanlab_8rtc6_sdk_RTC6Helper;
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -6122,7 +6975,6 @@ static CYTHON_SMALL_CODE int __pyx_pymod_exec_rtc6_sdk(PyObject *__pyx_pyinit_mo
   int __pyx_t_3;
   PyObject *__pyx_t_4 = NULL;
   PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -6228,261 +7080,261 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "cython/rtc6_sdk.pyx":5
+  /* "cython/rtc6_sdk.pyx":7
  * from cpython.mem cimport PyMem_Malloc, PyMem_Free
  * from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
  * import numpy as np             # <<<<<<<<<<<<<<
  * import logging
  * import os
  */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 5, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cython/rtc6_sdk.pyx":6
+  /* "cython/rtc6_sdk.pyx":8
  * from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
  * import numpy as np
  * import logging             # <<<<<<<<<<<<<<
  * import os
  * from typing import Union
  */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_logging, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 6, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_logging, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_logging, __pyx_t_1) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_logging, __pyx_t_1) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cython/rtc6_sdk.pyx":7
+  /* "cython/rtc6_sdk.pyx":9
  * import numpy as np
  * import logging
  * import os             # <<<<<<<<<<<<<<
  * from typing import Union
  * 
  */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_os, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_os, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_os, __pyx_t_1) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_os, __pyx_t_1) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cython/rtc6_sdk.pyx":8
+  /* "cython/rtc6_sdk.pyx":10
  * import logging
  * import os
  * from typing import Union             # <<<<<<<<<<<<<<
  * 
- * #[FIXME]: For testing now, use split log
+ * #[FIXME]: For testing now, use split log, this is not good for packaging
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_Union);
   __Pyx_GIVEREF(__pyx_n_s_Union);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_Union);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_typing, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_typing, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_Union); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_Union); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_Union, __pyx_t_1) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_Union, __pyx_t_1) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "cython/rtc6_sdk.pyx":11
+  /* "cython/rtc6_sdk.pyx":13
  * 
- * #[FIXME]: For testing now, use split log
+ * #[FIXME]: For testing now, use split log, this is not good for packaging
  * _SPLIT_LOG = True             # <<<<<<<<<<<<<<
  * 
  * if _SPLIT_LOG:
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_SPLIT_LOG, Py_True) < 0) __PYX_ERR(0, 11, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_SPLIT_LOG, Py_True) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
 
-  /* "cython/rtc6_sdk.pyx":13
+  /* "cython/rtc6_sdk.pyx":15
  * _SPLIT_LOG = True
  * 
  * if _SPLIT_LOG:             # <<<<<<<<<<<<<<
  *     rtc6_logger = logging.getLogger("rtc6")
  *     rtc6_logger.setLevel(logging.DEBUG)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_SPLIT_LOG); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_SPLIT_LOG); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_3) {
 
-    /* "cython/rtc6_sdk.pyx":14
+    /* "cython/rtc6_sdk.pyx":16
  * 
  * if _SPLIT_LOG:
  *     rtc6_logger = logging.getLogger("rtc6")             # <<<<<<<<<<<<<<
  *     rtc6_logger.setLevel(logging.DEBUG)
  *     rtc6_fh = logging.FileHandler("rtc6.log")
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_logging); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_logging); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 16, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_getLogger); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_getLogger); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 16, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__13, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 16, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_rtc6_logger, __pyx_t_2) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_d, __pyx_n_s_rtc6_logger, __pyx_t_2) < 0) __PYX_ERR(0, 16, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "cython/rtc6_sdk.pyx":15
+    /* "cython/rtc6_sdk.pyx":17
  * if _SPLIT_LOG:
  *     rtc6_logger = logging.getLogger("rtc6")
  *     rtc6_logger.setLevel(logging.DEBUG)             # <<<<<<<<<<<<<<
  *     rtc6_fh = logging.FileHandler("rtc6.log")
  *     rtc6_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 17, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_setLevel); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_setLevel); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_logging); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_logging); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 17, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_DEBUG); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 15, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_DEBUG); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 17, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 17, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "cython/rtc6_sdk.pyx":16
+    /* "cython/rtc6_sdk.pyx":18
  *     rtc6_logger = logging.getLogger("rtc6")
  *     rtc6_logger.setLevel(logging.DEBUG)
  *     rtc6_fh = logging.FileHandler("rtc6.log")             # <<<<<<<<<<<<<<
  *     rtc6_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')
  *     rtc6_fh.setFormatter(rtc6_formatter)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_logging); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 16, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_logging); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 18, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_FileHandler); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 16, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_FileHandler); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 18, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple__14, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 16, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple__13, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 18, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_rtc6_fh, __pyx_t_2) < 0) __PYX_ERR(0, 16, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_d, __pyx_n_s_rtc6_fh, __pyx_t_2) < 0) __PYX_ERR(0, 18, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "cython/rtc6_sdk.pyx":17
+    /* "cython/rtc6_sdk.pyx":19
  *     rtc6_logger.setLevel(logging.DEBUG)
  *     rtc6_fh = logging.FileHandler("rtc6.log")
  *     rtc6_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')             # <<<<<<<<<<<<<<
  *     rtc6_fh.setFormatter(rtc6_formatter)
  *     rtc6_logger.addHandler(rtc6_fh)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_logging); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 17, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_logging); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Formatter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 17, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Formatter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 19, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple__15, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 17, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple__14, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_rtc6_formatter, __pyx_t_2) < 0) __PYX_ERR(0, 17, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_d, __pyx_n_s_rtc6_formatter, __pyx_t_2) < 0) __PYX_ERR(0, 19, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "cython/rtc6_sdk.pyx":18
+    /* "cython/rtc6_sdk.pyx":20
  *     rtc6_fh = logging.FileHandler("rtc6.log")
  *     rtc6_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')
  *     rtc6_fh.setFormatter(rtc6_formatter)             # <<<<<<<<<<<<<<
  *     rtc6_logger.addHandler(rtc6_fh)
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_fh); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 18, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_fh); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 20, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_setFormatter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 18, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_setFormatter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 20, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_formatter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 18, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_formatter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 20, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 18, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 20, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "cython/rtc6_sdk.pyx":19
+    /* "cython/rtc6_sdk.pyx":21
  *     rtc6_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')
  *     rtc6_fh.setFormatter(rtc6_formatter)
  *     rtc6_logger.addHandler(rtc6_fh)             # <<<<<<<<<<<<<<
  * 
  *     rtc6_ch = logging.StreamHandler()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 19, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_addHandler); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_addHandler); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_rtc6_fh); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 19, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_rtc6_fh); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 19, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 21, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "cython/rtc6_sdk.pyx":21
+    /* "cython/rtc6_sdk.pyx":23
  *     rtc6_logger.addHandler(rtc6_fh)
  * 
  *     rtc6_ch = logging.StreamHandler()             # <<<<<<<<<<<<<<
  *     rtc6_ch.setFormatter(rtc6_formatter)
  *     rtc6_logger.addHandler(rtc6_ch)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_logging); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 21, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_logging); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 23, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_StreamHandler); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_StreamHandler); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 23, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_CallNoArg(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 21, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_CallNoArg(__pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 23, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_rtc6_ch, __pyx_t_4) < 0) __PYX_ERR(0, 21, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_d, __pyx_n_s_rtc6_ch, __pyx_t_4) < 0) __PYX_ERR(0, 23, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "cython/rtc6_sdk.pyx":22
+    /* "cython/rtc6_sdk.pyx":24
  * 
  *     rtc6_ch = logging.StreamHandler()
  *     rtc6_ch.setFormatter(rtc6_formatter)             # <<<<<<<<<<<<<<
  *     rtc6_logger.addHandler(rtc6_ch)
  * else:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_rtc6_ch); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 22, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_rtc6_ch); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 24, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_setFormatter); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 22, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_setFormatter); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_rtc6_formatter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 22, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_rtc6_formatter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 24, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 22, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 24, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "cython/rtc6_sdk.pyx":23
+    /* "cython/rtc6_sdk.pyx":25
  *     rtc6_ch = logging.StreamHandler()
  *     rtc6_ch.setFormatter(rtc6_formatter)
  *     rtc6_logger.addHandler(rtc6_ch)             # <<<<<<<<<<<<<<
  * else:
  *     rtc6_logger = logging.getLogger("autools_setup_main")
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 23, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_logger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_addHandler); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 23, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_addHandler); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 25, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_ch); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 23, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rtc6_ch); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 23, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "cython/rtc6_sdk.pyx":13
+    /* "cython/rtc6_sdk.pyx":15
  * _SPLIT_LOG = True
  * 
  * if _SPLIT_LOG:             # <<<<<<<<<<<<<<
@@ -6492,7 +7344,7 @@ if (!__Pyx_RefNanny) {
     goto __pyx_L2;
   }
 
-  /* "cython/rtc6_sdk.pyx":25
+  /* "cython/rtc6_sdk.pyx":27
  *     rtc6_logger.addHandler(rtc6_ch)
  * else:
  *     rtc6_logger = logging.getLogger("autools_setup_main")             # <<<<<<<<<<<<<<
@@ -6500,388 +7352,331 @@ if (!__Pyx_RefNanny) {
  * class RTC6DevError(Exception):
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_logging); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_logging); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_getLogger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_getLogger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__16, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__15, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_rtc6_logger, __pyx_t_1) < 0) __PYX_ERR(0, 25, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_d, __pyx_n_s_rtc6_logger, __pyx_t_1) < 0) __PYX_ERR(0, 27, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
   __pyx_L2:;
 
-  /* "cython/rtc6_sdk.pyx":27
+  /* "cython/rtc6_sdk.pyx":29
  *     rtc6_logger = logging.getLogger("autools_setup_main")
  * 
  * class RTC6DevError(Exception):             # <<<<<<<<<<<<<<
  *     pass
  * 
  */
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])));
   __Pyx_GIVEREF(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])));
   PyTuple_SET_ITEM(__pyx_t_1, 0, ((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])));
-  __pyx_t_2 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 29, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_1, __pyx_n_s_RTC6DevError, __pyx_n_s_RTC6DevError, (PyObject *) NULL, __pyx_n_s_pyscanlab_rtc6_sdk, (PyObject *) NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_1, __pyx_n_s_RTC6DevError, __pyx_n_s_RTC6DevError, (PyObject *) NULL, __pyx_n_s_pyscanlab_rtc6_sdk, (PyObject *) NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 29, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_Py3ClassCreate(__pyx_t_2, __pyx_n_s_RTC6DevError, __pyx_t_1, __pyx_t_4, NULL, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_Py3ClassCreate(__pyx_t_2, __pyx_n_s_RTC6DevError, __pyx_t_1, __pyx_t_4, NULL, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 29, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_RTC6DevError, __pyx_t_5) < 0) __PYX_ERR(0, 27, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_RTC6DevError, __pyx_t_5) < 0) __PYX_ERR(0, 29, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cython/rtc6_sdk.pyx":38
+  /* "cython/rtc6_sdk.pyx":40
  * 
  *     ERR_CODES = {
  *         "load_program_file": {             # <<<<<<<<<<<<<<
  *             # if a renewed call does not bring success, then a power cycle is necessary
  *             2: "The board is not running.",
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 38, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
 
-  /* "cython/rtc6_sdk.pyx":40
+  /* "cython/rtc6_sdk.pyx":42
  *         "load_program_file": {
  *             # if a renewed call does not bring success, then a power cycle is necessary
  *             2: "The board is not running.",             # <<<<<<<<<<<<<<
  *             3: "RTC6DAT.dat file or RTC6RBF.rbf file not found",
  *             5: "Not enough Windows memory",
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(13); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(13); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_2, __pyx_kp_u_The_board_is_not_running) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_3, __pyx_kp_u_RTC6DAT_dat_file_or_RTC6RBF_rbf) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_5, __pyx_kp_u_Not_enough_Windows_memory) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_6, __pyx_kp_u_Access_error_the_board_is_reserv) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_7, __pyx_kp_u_Version_error_RTC6_DLL_version_R) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_8, __pyx_kp_u_RTC6_board_driver_not_found) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_9, __pyx_kp_u_Loading_of_RTC6OUT_out_or_RTC6ET) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_11, __pyx_kp_u_Firmware_error_loading_of_RTC6RB) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_12, __pyx_kp_u_Error_opening_reading_file_RTC6D) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_14, __pyx_kp_u_DSP_memory_error_external) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_16, __pyx_kp_u_Verify_memory_error) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_17, __pyx_kp_u_Externet_error) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_18, __pyx_kp_u_NAND_memory_error_Only_RTC6_Ethe) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_load_program_file, __pyx_t_2) < 0) __PYX_ERR(0, 38, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_2, __pyx_kp_u_The_board_is_not_running) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_3, __pyx_kp_u_RTC6DAT_dat_file_or_RTC6RBF_rbf) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_5, __pyx_kp_u_Not_enough_Windows_memory) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_6, __pyx_kp_u_Access_error_the_board_is_reserv) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_7, __pyx_kp_u_Version_error_RTC6_DLL_version_R) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_8, __pyx_kp_u_RTC6_board_driver_not_found) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_9, __pyx_kp_u_Loading_of_RTC6OUT_out_or_RTC6ET) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_11, __pyx_kp_u_Firmware_error_loading_of_RTC6RB) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_12, __pyx_kp_u_Error_opening_reading_file_RTC6D) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_14, __pyx_kp_u_DSP_memory_error_external) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_16, __pyx_kp_u_Verify_memory_error) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_17, __pyx_kp_u_Externet_error) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_18, __pyx_kp_u_NAND_memory_error_Only_RTC6_Ethe) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_load_program_file, __pyx_t_2) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "cython/rtc6_sdk.pyx":56
+  /* "cython/rtc6_sdk.pyx":58
  *         },
  *         "load_correction_file": {
  *             1: "File error (file corrupt or incomplete)",             # <<<<<<<<<<<<<<
  *             2: "Memory error (RTC6 DLL-internal, Windows system memory)",
  *             3: "File-open error (empty string submitted for Name parameter, file not found, etc)",
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_1, __pyx_kp_u_File_error_file_corrupt_or_incom) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_2, __pyx_kp_u_Memory_error_RTC6_DLL_internal_W) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_3, __pyx_kp_u_File_open_error_empty_string_sub) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_4, __pyx_kp_u_DSP_memory_error) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_5, __pyx_kp_u_PCI_download_error_RTC6_board_dr) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_8, __pyx_kp_u_RTC6_board_driver_not_found_get) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_10, __pyx_kp_u_Parameter_error_incorrect_No) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_11, __pyx_kp_u_Access_error_check_doc) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_12, __pyx_kp_u_Warning_3D_correction_table_or_D) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_13, __pyx_kp_u_Busy_error_no_download_board_is) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_14, __pyx_kp_u_PCI_upload_error_RTC6_board_driv) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_15, __pyx_kp_u_Verify_error_only_applicable_for) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_load_correction_file, __pyx_t_2) < 0) __PYX_ERR(0, 38, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_1, __pyx_kp_u_File_error_file_corrupt_or_incom) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_2, __pyx_kp_u_Memory_error_RTC6_DLL_internal_W) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_3, __pyx_kp_u_File_open_error_empty_string_sub) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_4, __pyx_kp_u_DSP_memory_error) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_5, __pyx_kp_u_PCI_download_error_RTC6_board_dr) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_8, __pyx_kp_u_RTC6_board_driver_not_found_get) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_10, __pyx_kp_u_Parameter_error_incorrect_No) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_11, __pyx_kp_u_Access_error_check_doc) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_12, __pyx_kp_u_Warning_3D_correction_table_or_D) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_13, __pyx_kp_u_Busy_error_no_download_board_is) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_14, __pyx_kp_u_PCI_upload_error_RTC6_board_driv) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_15, __pyx_kp_u_Verify_error_only_applicable_for) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_load_correction_file, __pyx_t_2) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "cython/rtc6_sdk.pyx":71
+  /* "cython/rtc6_sdk.pyx":73
  *         },
  *         "acc_error":{
  *             0: "No RTC6 PCIe Board found",             # <<<<<<<<<<<<<<
  *             1: "Access denied (e.g. resevered by another program)",
  *             2: "Command not forwarded (internal board driver error/PCI error)",
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(16); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 71, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(16); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_0, __pyx_kp_u_No_RTC6_PCIe_Board_found) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_1, __pyx_kp_u_Access_denied_e_g_resevered_by_a) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_2, __pyx_kp_u_Command_not_forwarded_internal_b) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_3, __pyx_kp_u_No_response_from_board_likely_no) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_4, __pyx_kp_u_Invalid_parameter) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_5, __pyx_kp_u_List_processing_is_not_active) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_6, __pyx_kp_u_List_command_rejected_invalid_in) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_7, __pyx_kp_u_List_command_was_converted_to_a) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_8, __pyx_kp_u_Version_error_dll_rbf_and_out_fi) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_9, __pyx_kp_u_Verify_error) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_10, __pyx_kp_u_Type_error_e_g_eth_command_sent) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_11, __pyx_kp_u_Out_of_memory) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_12, __pyx_kp_u_Download_error) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_13, __pyx_kp_u_General_Ethernet_error) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_15, __pyx_kp_u_Unsupported_Windows_version) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_2, __pyx_int_16, __pyx_kp_u_Error_reading_PCI_configuration) < 0) __PYX_ERR(0, 71, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_acc_error, __pyx_t_2) < 0) __PYX_ERR(0, 38, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_0, __pyx_kp_u_No_RTC6_PCIe_Board_found) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_1, __pyx_kp_u_Access_denied_e_g_resevered_by_a) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_2, __pyx_kp_u_Command_not_forwarded_internal_b) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_3, __pyx_kp_u_No_response_from_board_likely_no) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_4, __pyx_kp_u_Invalid_parameter) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_5, __pyx_kp_u_List_processing_is_not_active) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_6, __pyx_kp_u_List_command_rejected_invalid_in) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_7, __pyx_kp_u_List_command_was_converted_to_a) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_8, __pyx_kp_u_Version_error_dll_rbf_and_out_fi) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_9, __pyx_kp_u_Verify_error) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_10, __pyx_kp_u_Type_error_e_g_eth_command_sent) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_11, __pyx_kp_u_Out_of_memory) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_12, __pyx_kp_u_Download_error) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_13, __pyx_kp_u_General_Ethernet_error) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_15, __pyx_kp_u_Unsupported_Windows_version) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_int_16, __pyx_kp_u_Error_reading_PCI_configuration) < 0) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_acc_error, __pyx_t_2) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_ERR_CODES, __pyx_t_1) < 0) __PYX_ERR(0, 37, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_ERR_CODES, __pyx_t_1) < 0) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":90
+  /* "cython/rtc6_sdk.pyx":92
  *     }
  * 
  *     RTC6_NO_PCIE_CARD_FOUND = 0             # <<<<<<<<<<<<<<
  *     RTC6_ACCESS_DENIED = 1
  *     RTC6_SEND_ERROR = 2
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_NO_PCIE_CARD_FOUND, __pyx_int_0) < 0) __PYX_ERR(0, 90, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_NO_PCIE_CARD_FOUND, __pyx_int_0) < 0) __PYX_ERR(0, 92, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":91
+  /* "cython/rtc6_sdk.pyx":93
  * 
  *     RTC6_NO_PCIE_CARD_FOUND = 0
  *     RTC6_ACCESS_DENIED = 1             # <<<<<<<<<<<<<<
  *     RTC6_SEND_ERROR = 2
  *     RTC6_TIMEOUT = 3
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_ACCESS_DENIED, __pyx_int_1) < 0) __PYX_ERR(0, 91, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_ACCESS_DENIED, __pyx_int_1) < 0) __PYX_ERR(0, 93, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":92
+  /* "cython/rtc6_sdk.pyx":94
  *     RTC6_NO_PCIE_CARD_FOUND = 0
  *     RTC6_ACCESS_DENIED = 1
  *     RTC6_SEND_ERROR = 2             # <<<<<<<<<<<<<<
  *     RTC6_TIMEOUT = 3
  *     RTC6_PARAM_ERROR = 4
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_SEND_ERROR, __pyx_int_2) < 0) __PYX_ERR(0, 92, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_SEND_ERROR, __pyx_int_2) < 0) __PYX_ERR(0, 94, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":93
+  /* "cython/rtc6_sdk.pyx":95
  *     RTC6_ACCESS_DENIED = 1
  *     RTC6_SEND_ERROR = 2
  *     RTC6_TIMEOUT = 3             # <<<<<<<<<<<<<<
  *     RTC6_PARAM_ERROR = 4
  *     RTC6_BUSY = 5
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_TIMEOUT, __pyx_int_3) < 0) __PYX_ERR(0, 93, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_TIMEOUT, __pyx_int_3) < 0) __PYX_ERR(0, 95, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":94
+  /* "cython/rtc6_sdk.pyx":96
  *     RTC6_SEND_ERROR = 2
  *     RTC6_TIMEOUT = 3
  *     RTC6_PARAM_ERROR = 4             # <<<<<<<<<<<<<<
  *     RTC6_BUSY = 5
  *     RTC6_REJCTED = 6
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_PARAM_ERROR, __pyx_int_4) < 0) __PYX_ERR(0, 94, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_PARAM_ERROR, __pyx_int_4) < 0) __PYX_ERR(0, 96, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":95
+  /* "cython/rtc6_sdk.pyx":97
  *     RTC6_TIMEOUT = 3
  *     RTC6_PARAM_ERROR = 4
  *     RTC6_BUSY = 5             # <<<<<<<<<<<<<<
  *     RTC6_REJCTED = 6
  *     RTC6_IGNORED = 7
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_BUSY, __pyx_int_5) < 0) __PYX_ERR(0, 95, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_BUSY, __pyx_int_5) < 0) __PYX_ERR(0, 97, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":96
+  /* "cython/rtc6_sdk.pyx":98
  *     RTC6_PARAM_ERROR = 4
  *     RTC6_BUSY = 5
  *     RTC6_REJCTED = 6             # <<<<<<<<<<<<<<
  *     RTC6_IGNORED = 7
  *     RTC6_VERSION_MISMATCH = 8
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_REJCTED, __pyx_int_6) < 0) __PYX_ERR(0, 96, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_REJCTED, __pyx_int_6) < 0) __PYX_ERR(0, 98, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":97
+  /* "cython/rtc6_sdk.pyx":99
  *     RTC6_BUSY = 5
  *     RTC6_REJCTED = 6
  *     RTC6_IGNORED = 7             # <<<<<<<<<<<<<<
  *     RTC6_VERSION_MISMATCH = 8
  *     RTC6_VERIFY_ERROR = 9
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_IGNORED, __pyx_int_7) < 0) __PYX_ERR(0, 97, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_IGNORED, __pyx_int_7) < 0) __PYX_ERR(0, 99, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":98
+  /* "cython/rtc6_sdk.pyx":100
  *     RTC6_REJCTED = 6
  *     RTC6_IGNORED = 7
  *     RTC6_VERSION_MISMATCH = 8             # <<<<<<<<<<<<<<
  *     RTC6_VERIFY_ERROR = 9
  *     RTC6_TYPE_REJECTED = 10
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_VERSION_MISMATCH, __pyx_int_8) < 0) __PYX_ERR(0, 98, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_VERSION_MISMATCH, __pyx_int_8) < 0) __PYX_ERR(0, 100, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":99
+  /* "cython/rtc6_sdk.pyx":101
  *     RTC6_IGNORED = 7
  *     RTC6_VERSION_MISMATCH = 8
  *     RTC6_VERIFY_ERROR = 9             # <<<<<<<<<<<<<<
  *     RTC6_TYPE_REJECTED = 10
  *     RTC6_OUT_OF_MEMORY = 11
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_VERIFY_ERROR, __pyx_int_9) < 0) __PYX_ERR(0, 99, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_VERIFY_ERROR, __pyx_int_9) < 0) __PYX_ERR(0, 101, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":100
+  /* "cython/rtc6_sdk.pyx":102
  *     RTC6_VERSION_MISMATCH = 8
  *     RTC6_VERIFY_ERROR = 9
  *     RTC6_TYPE_REJECTED = 10             # <<<<<<<<<<<<<<
  *     RTC6_OUT_OF_MEMORY = 11
  *     RTC6_FLASH_ERROR = 12
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_TYPE_REJECTED, __pyx_int_10) < 0) __PYX_ERR(0, 100, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_TYPE_REJECTED, __pyx_int_10) < 0) __PYX_ERR(0, 102, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":101
+  /* "cython/rtc6_sdk.pyx":103
  *     RTC6_VERIFY_ERROR = 9
  *     RTC6_TYPE_REJECTED = 10
  *     RTC6_OUT_OF_MEMORY = 11             # <<<<<<<<<<<<<<
  *     RTC6_FLASH_ERROR = 12
  *     RTC6_ETH_ERROR = 13
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_OUT_OF_MEMORY, __pyx_int_11) < 0) __PYX_ERR(0, 101, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_OUT_OF_MEMORY, __pyx_int_11) < 0) __PYX_ERR(0, 103, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":102
+  /* "cython/rtc6_sdk.pyx":104
  *     RTC6_TYPE_REJECTED = 10
  *     RTC6_OUT_OF_MEMORY = 11
  *     RTC6_FLASH_ERROR = 12             # <<<<<<<<<<<<<<
  *     RTC6_ETH_ERROR = 13
  *     RTC6_WIN_VER_ERROR = 15
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_FLASH_ERROR, __pyx_int_12) < 0) __PYX_ERR(0, 102, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_FLASH_ERROR, __pyx_int_12) < 0) __PYX_ERR(0, 104, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":103
+  /* "cython/rtc6_sdk.pyx":105
  *     RTC6_OUT_OF_MEMORY = 11
  *     RTC6_FLASH_ERROR = 12
  *     RTC6_ETH_ERROR = 13             # <<<<<<<<<<<<<<
  *     RTC6_WIN_VER_ERROR = 15
  *     RTC6_CONFIG_ERROR = 16
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_ETH_ERROR, __pyx_int_13) < 0) __PYX_ERR(0, 103, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_ETH_ERROR, __pyx_int_13) < 0) __PYX_ERR(0, 105, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":104
+  /* "cython/rtc6_sdk.pyx":106
  *     RTC6_FLASH_ERROR = 12
  *     RTC6_ETH_ERROR = 13
  *     RTC6_WIN_VER_ERROR = 15             # <<<<<<<<<<<<<<
  *     RTC6_CONFIG_ERROR = 16
  * 
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_WIN_VER_ERROR, __pyx_int_15) < 0) __PYX_ERR(0, 104, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_WIN_VER_ERROR, __pyx_int_15) < 0) __PYX_ERR(0, 106, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":105
+  /* "cython/rtc6_sdk.pyx":107
  *     RTC6_ETH_ERROR = 13
  *     RTC6_WIN_VER_ERROR = 15
  *     RTC6_CONFIG_ERROR = 16             # <<<<<<<<<<<<<<
  * 
- *     def __cinit__(self, cfg_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")):
+ *     cdef int  cardno
  */
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_RTC6_CONFIG_ERROR, __pyx_int_16) < 0) __PYX_ERR(0, 105, __pyx_L1_error)
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_RTC6_CONFIG_ERROR, __pyx_int_16) < 0) __PYX_ERR(0, 107, __pyx_L1_error)
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":107
- *     RTC6_CONFIG_ERROR = 16
- * 
- *     def __cinit__(self, cfg_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")):             # <<<<<<<<<<<<<<
- *         """
- *         TODO: device initialization.
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_os); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 107, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_path); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_join); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 107, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_os); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_path); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 107, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_dirname); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 107, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_path); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 107, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_abspath); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 107, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_file); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 107, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 107, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 107, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 107, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_GIVEREF(__pyx_t_5);
-  PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5);
-  __Pyx_INCREF(__pyx_n_u_data);
-  __Pyx_GIVEREF(__pyx_n_u_data);
-  PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_n_u_data);
-  __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_6, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 107, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_k_ = __pyx_t_5;
-  __Pyx_GIVEREF(__pyx_t_5);
-  __pyx_t_5 = 0;
-
-  /* "cython/rtc6_sdk.pyx":218
+  /* "cython/rtc6_sdk.pyx":239
  * 
  *     @staticmethod
  *     def has_error(error_code:int, bit_index: int):             # <<<<<<<<<<<<<<
  *         return (error_code & (1<<bit_index)) != 0
  * 
  */
-  __pyx_t_5 = PyCFunction_NewEx(&__pyx_mdef_9pyscanlab_8rtc6_sdk_7RTC6Man_7has_error, NULL, __pyx_n_s_pyscanlab_rtc6_sdk); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 218, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_has_error, __pyx_t_5) < 0) __PYX_ERR(0, 218, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9pyscanlab_8rtc6_sdk_10RTC6Helper_9has_error, NULL, __pyx_n_s_pyscanlab_rtc6_sdk); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 239, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_has_error, __pyx_t_1) < 0) __PYX_ERR(0, 239, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
-  /* "cython/rtc6_sdk.pyx":217
+  /* "cython/rtc6_sdk.pyx":238
  *             raise RTC6DevError(err)
  * 
  *     @staticmethod             # <<<<<<<<<<<<<<
  *     def has_error(error_code:int, bit_index: int):
  *         return (error_code & (1<<bit_index)) != 0
  */
-  __Pyx_GetNameInClass(__pyx_t_5, (PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man, __pyx_n_s_has_error); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 218, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_builtin_staticmethod, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 217, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man->tp_dict, __pyx_n_s_has_error, __pyx_t_6) < 0) __PYX_ERR(0, 218, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Man);
+  __Pyx_GetNameInClass(__pyx_t_1, (PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper, __pyx_n_s_has_error); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 239, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_staticmethod, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper->tp_dict, __pyx_n_s_has_error, __pyx_t_2) < 0) __PYX_ERR(0, 239, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  PyType_Modified(__pyx_ptype_9pyscanlab_8rtc6_sdk_RTC6Helper);
 
   /* "cython/rtc6_sdk.pyx":1
- * #distutils: language = c++             # <<<<<<<<<<<<<<
- * cimport rtc6_sdk as rtc6
- * from cpython.mem cimport PyMem_Malloc, PyMem_Free
+ * # vim:  set syntax=python foldmethod=indent:             # <<<<<<<<<<<<<<
+ * #distutils: language = c++
+ * from libcpp cimport bool
  */
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_6) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /*--- Wrapped vars code ---*/
 
@@ -6891,7 +7686,6 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_6);
   if (__pyx_m) {
     if (__pyx_d) {
       __Pyx_AddTraceback("init pyscanlab.rtc6_sdk", __pyx_clineno, __pyx_lineno, __pyx_filename);
@@ -7382,6 +8176,68 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObjec
 }
 #endif
 
+/* JoinPyUnicode */
+static PyObject* __Pyx_PyUnicode_Join(PyObject* value_tuple, Py_ssize_t value_count, Py_ssize_t result_ulength,
+                                      CYTHON_UNUSED Py_UCS4 max_char) {
+#if CYTHON_USE_UNICODE_INTERNALS && CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    PyObject *result_uval;
+    int result_ukind;
+    Py_ssize_t i, char_pos;
+    void *result_udata;
+#if CYTHON_PEP393_ENABLED
+    result_uval = PyUnicode_New(result_ulength, max_char);
+    if (unlikely(!result_uval)) return NULL;
+    result_ukind = (max_char <= 255) ? PyUnicode_1BYTE_KIND : (max_char <= 65535) ? PyUnicode_2BYTE_KIND : PyUnicode_4BYTE_KIND;
+    result_udata = PyUnicode_DATA(result_uval);
+#else
+    result_uval = PyUnicode_FromUnicode(NULL, result_ulength);
+    if (unlikely(!result_uval)) return NULL;
+    result_ukind = sizeof(Py_UNICODE);
+    result_udata = PyUnicode_AS_UNICODE(result_uval);
+#endif
+    char_pos = 0;
+    for (i=0; i < value_count; i++) {
+        int ukind;
+        Py_ssize_t ulength;
+        void *udata;
+        PyObject *uval = PyTuple_GET_ITEM(value_tuple, i);
+        if (unlikely(__Pyx_PyUnicode_READY(uval)))
+            goto bad;
+        ulength = __Pyx_PyUnicode_GET_LENGTH(uval);
+        if (unlikely(!ulength))
+            continue;
+        if (unlikely(char_pos + ulength < 0))
+            goto overflow;
+        ukind = __Pyx_PyUnicode_KIND(uval);
+        udata = __Pyx_PyUnicode_DATA(uval);
+        if (!CYTHON_PEP393_ENABLED || ukind == result_ukind) {
+            memcpy((char *)result_udata + char_pos * result_ukind, udata, (size_t) (ulength * result_ukind));
+        } else {
+            #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030300F0 || defined(_PyUnicode_FastCopyCharacters)
+            _PyUnicode_FastCopyCharacters(result_uval, char_pos, uval, 0, ulength);
+            #else
+            Py_ssize_t j;
+            for (j=0; j < ulength; j++) {
+                Py_UCS4 uchar = __Pyx_PyUnicode_READ(ukind, udata, j);
+                __Pyx_PyUnicode_WRITE(result_ukind, result_udata, char_pos+j, uchar);
+            }
+            #endif
+        }
+        char_pos += ulength;
+    }
+    return result_uval;
+overflow:
+    PyErr_SetString(PyExc_OverflowError, "join() result is too long for a Python string");
+bad:
+    Py_DECREF(result_uval);
+    return NULL;
+#else
+    result_ulength++;
+    value_count++;
+    return PyUnicode_Join(__pyx_empty_unicode, value_tuple);
+#endif
+}
+
 /* PyObjectCall2Args */
 static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2) {
     PyObject *args, *result = NULL;
@@ -7410,28 +8266,6 @@ static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyOb
 done:
     return result;
 }
-
-/* PyObjectCallNoArg */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func) {
-#if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(func)) {
-        return __Pyx_PyFunction_FastCall(func, NULL, 0);
-    }
-#endif
-#ifdef __Pyx_CyFunction_USED
-    if (likely(PyCFunction_Check(func) || __Pyx_CyFunction_Check(func)))
-#else
-    if (likely(PyCFunction_Check(func)))
-#endif
-    {
-        if (likely(PyCFunction_GET_FLAGS(func) & METH_NOARGS)) {
-            return __Pyx_PyObject_CallMethO(func, NULL);
-        }
-    }
-    return __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL);
-}
-#endif
 
 /* PyErrFetchRestore */
 #if CYTHON_FAST_THREAD_STATE
@@ -7616,6 +8450,28 @@ bad:
 }
 #endif
 
+/* PyObjectCallNoArg */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func) {
+#if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(func)) {
+        return __Pyx_PyFunction_FastCall(func, NULL, 0);
+    }
+#endif
+#ifdef __Pyx_CyFunction_USED
+    if (likely(PyCFunction_Check(func) || __Pyx_CyFunction_Check(func)))
+#else
+    if (likely(PyCFunction_Check(func)))
+#endif
+    {
+        if (likely(PyCFunction_GET_FLAGS(func) & METH_NOARGS)) {
+            return __Pyx_PyObject_CallMethO(func, NULL);
+        }
+    }
+    return __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL);
+}
+#endif
+
 /* DictGetItem */
 #if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY
 static PyObject *__Pyx_PyDict_GetItem(PyObject *d, PyObject* key) {
@@ -7725,68 +8581,6 @@ static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i, 
     }
 #endif
     return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
-}
-
-/* JoinPyUnicode */
-static PyObject* __Pyx_PyUnicode_Join(PyObject* value_tuple, Py_ssize_t value_count, Py_ssize_t result_ulength,
-                                      CYTHON_UNUSED Py_UCS4 max_char) {
-#if CYTHON_USE_UNICODE_INTERNALS && CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    PyObject *result_uval;
-    int result_ukind;
-    Py_ssize_t i, char_pos;
-    void *result_udata;
-#if CYTHON_PEP393_ENABLED
-    result_uval = PyUnicode_New(result_ulength, max_char);
-    if (unlikely(!result_uval)) return NULL;
-    result_ukind = (max_char <= 255) ? PyUnicode_1BYTE_KIND : (max_char <= 65535) ? PyUnicode_2BYTE_KIND : PyUnicode_4BYTE_KIND;
-    result_udata = PyUnicode_DATA(result_uval);
-#else
-    result_uval = PyUnicode_FromUnicode(NULL, result_ulength);
-    if (unlikely(!result_uval)) return NULL;
-    result_ukind = sizeof(Py_UNICODE);
-    result_udata = PyUnicode_AS_UNICODE(result_uval);
-#endif
-    char_pos = 0;
-    for (i=0; i < value_count; i++) {
-        int ukind;
-        Py_ssize_t ulength;
-        void *udata;
-        PyObject *uval = PyTuple_GET_ITEM(value_tuple, i);
-        if (unlikely(__Pyx_PyUnicode_READY(uval)))
-            goto bad;
-        ulength = __Pyx_PyUnicode_GET_LENGTH(uval);
-        if (unlikely(!ulength))
-            continue;
-        if (unlikely(char_pos + ulength < 0))
-            goto overflow;
-        ukind = __Pyx_PyUnicode_KIND(uval);
-        udata = __Pyx_PyUnicode_DATA(uval);
-        if (!CYTHON_PEP393_ENABLED || ukind == result_ukind) {
-            memcpy((char *)result_udata + char_pos * result_ukind, udata, (size_t) (ulength * result_ukind));
-        } else {
-            #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030300F0 || defined(_PyUnicode_FastCopyCharacters)
-            _PyUnicode_FastCopyCharacters(result_uval, char_pos, uval, 0, ulength);
-            #else
-            Py_ssize_t j;
-            for (j=0; j < ulength; j++) {
-                Py_UCS4 uchar = __Pyx_PyUnicode_READ(ukind, udata, j);
-                __Pyx_PyUnicode_WRITE(result_ukind, result_udata, char_pos+j, uchar);
-            }
-            #endif
-        }
-        char_pos += ulength;
-    }
-    return result_uval;
-overflow:
-    PyErr_SetString(PyExc_OverflowError, "join() result is too long for a Python string");
-bad:
-    Py_DECREF(result_uval);
-    return NULL;
-#else
-    result_ulength++;
-    value_count++;
-    return PyUnicode_Join(__pyx_empty_unicode, value_tuple);
-#endif
 }
 
 /* PyIntCompare */
@@ -8697,6 +9491,202 @@ bad:
         return (target_type) value;\
     }
 
+/* CIntFromPy */
+static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *x) {
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+    const int neg_one = (int) -1, const_zero = (int) 0;
+#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
+#pragma GCC diagnostic pop
+#endif
+    const int is_unsigned = neg_one > const_zero;
+#if PY_MAJOR_VERSION < 3
+    if (likely(PyInt_Check(x))) {
+        if (sizeof(int) < sizeof(long)) {
+            __PYX_VERIFY_RETURN_INT(int, long, PyInt_AS_LONG(x))
+        } else {
+            long val = PyInt_AS_LONG(x);
+            if (is_unsigned && unlikely(val < 0)) {
+                goto raise_neg_overflow;
+            }
+            return (int) val;
+        }
+    } else
+#endif
+    if (likely(PyLong_Check(x))) {
+        if (is_unsigned) {
+#if CYTHON_USE_PYLONG_INTERNALS
+            const digit* digits = ((PyLongObject*)x)->ob_digit;
+            switch (Py_SIZE(x)) {
+                case  0: return (int) 0;
+                case  1: __PYX_VERIFY_RETURN_INT(int, digit, digits[0])
+                case 2:
+                    if (8 * sizeof(int) > 1 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(int) >= 2 * PyLong_SHIFT) {
+                            return (int) (((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
+                        }
+                    }
+                    break;
+                case 3:
+                    if (8 * sizeof(int) > 2 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(int) >= 3 * PyLong_SHIFT) {
+                            return (int) (((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
+                        }
+                    }
+                    break;
+                case 4:
+                    if (8 * sizeof(int) > 3 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(int) >= 4 * PyLong_SHIFT) {
+                            return (int) (((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
+                        }
+                    }
+                    break;
+            }
+#endif
+#if CYTHON_COMPILING_IN_CPYTHON
+            if (unlikely(Py_SIZE(x) < 0)) {
+                goto raise_neg_overflow;
+            }
+#else
+            {
+                int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
+                if (unlikely(result < 0))
+                    return (int) -1;
+                if (unlikely(result == 1))
+                    goto raise_neg_overflow;
+            }
+#endif
+            if (sizeof(int) <= sizeof(unsigned long)) {
+                __PYX_VERIFY_RETURN_INT_EXC(int, unsigned long, PyLong_AsUnsignedLong(x))
+#ifdef HAVE_LONG_LONG
+            } else if (sizeof(int) <= sizeof(unsigned PY_LONG_LONG)) {
+                __PYX_VERIFY_RETURN_INT_EXC(int, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
+#endif
+            }
+        } else {
+#if CYTHON_USE_PYLONG_INTERNALS
+            const digit* digits = ((PyLongObject*)x)->ob_digit;
+            switch (Py_SIZE(x)) {
+                case  0: return (int) 0;
+                case -1: __PYX_VERIFY_RETURN_INT(int, sdigit, (sdigit) (-(sdigit)digits[0]))
+                case  1: __PYX_VERIFY_RETURN_INT(int,  digit, +digits[0])
+                case -2:
+                    if (8 * sizeof(int) - 1 > 1 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(int) - 1 > 2 * PyLong_SHIFT) {
+                            return (int) (((int)-1)*(((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+                case 2:
+                    if (8 * sizeof(int) > 1 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(int) - 1 > 2 * PyLong_SHIFT) {
+                            return (int) ((((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+                case -3:
+                    if (8 * sizeof(int) - 1 > 2 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(int) - 1 > 3 * PyLong_SHIFT) {
+                            return (int) (((int)-1)*(((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+                case 3:
+                    if (8 * sizeof(int) > 2 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(int) - 1 > 3 * PyLong_SHIFT) {
+                            return (int) ((((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+                case -4:
+                    if (8 * sizeof(int) - 1 > 3 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(int) - 1 > 4 * PyLong_SHIFT) {
+                            return (int) (((int)-1)*(((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+                case 4:
+                    if (8 * sizeof(int) > 3 * PyLong_SHIFT) {
+                        if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
+                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
+                        } else if (8 * sizeof(int) - 1 > 4 * PyLong_SHIFT) {
+                            return (int) ((((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
+                        }
+                    }
+                    break;
+            }
+#endif
+            if (sizeof(int) <= sizeof(long)) {
+                __PYX_VERIFY_RETURN_INT_EXC(int, long, PyLong_AsLong(x))
+#ifdef HAVE_LONG_LONG
+            } else if (sizeof(int) <= sizeof(PY_LONG_LONG)) {
+                __PYX_VERIFY_RETURN_INT_EXC(int, PY_LONG_LONG, PyLong_AsLongLong(x))
+#endif
+            }
+        }
+        {
+#if CYTHON_COMPILING_IN_PYPY && !defined(_PyLong_AsByteArray)
+            PyErr_SetString(PyExc_RuntimeError,
+                            "_PyLong_AsByteArray() not available in PyPy, cannot convert large numbers");
+#else
+            int val;
+            PyObject *v = __Pyx_PyNumber_IntOrLong(x);
+ #if PY_MAJOR_VERSION < 3
+            if (likely(v) && !PyLong_Check(v)) {
+                PyObject *tmp = v;
+                v = PyNumber_Long(tmp);
+                Py_DECREF(tmp);
+            }
+ #endif
+            if (likely(v)) {
+                int one = 1; int is_little = (int)*(unsigned char *)&one;
+                unsigned char *bytes = (unsigned char *)&val;
+                int ret = _PyLong_AsByteArray((PyLongObject *)v,
+                                              bytes, sizeof(val),
+                                              is_little, !is_unsigned);
+                Py_DECREF(v);
+                if (likely(!ret))
+                    return val;
+            }
+#endif
+            return (int) -1;
+        }
+    } else {
+        int val;
+        PyObject *tmp = __Pyx_PyNumber_IntOrLong(x);
+        if (!tmp) return (int) -1;
+        val = __Pyx_PyInt_As_int(tmp);
+        Py_DECREF(tmp);
+        return val;
+    }
+raise_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "value too large to convert to int");
+    return (int) -1;
+raise_neg_overflow:
+    PyErr_SetString(PyExc_OverflowError,
+        "can't convert negative value to int");
+    return (int) -1;
+}
+
 /* CIntToPy */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_uint32_t(uint32_t value) {
 #ifdef __Pyx_HAS_GCC_DIAGNOSTIC
@@ -9163,202 +10153,6 @@ raise_neg_overflow:
     PyErr_SetString(PyExc_OverflowError,
         "can't convert negative value to long");
     return (long) -1;
-}
-
-/* CIntFromPy */
-static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *x) {
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-    const int neg_one = (int) -1, const_zero = (int) 0;
-#ifdef __Pyx_HAS_GCC_DIAGNOSTIC
-#pragma GCC diagnostic pop
-#endif
-    const int is_unsigned = neg_one > const_zero;
-#if PY_MAJOR_VERSION < 3
-    if (likely(PyInt_Check(x))) {
-        if (sizeof(int) < sizeof(long)) {
-            __PYX_VERIFY_RETURN_INT(int, long, PyInt_AS_LONG(x))
-        } else {
-            long val = PyInt_AS_LONG(x);
-            if (is_unsigned && unlikely(val < 0)) {
-                goto raise_neg_overflow;
-            }
-            return (int) val;
-        }
-    } else
-#endif
-    if (likely(PyLong_Check(x))) {
-        if (is_unsigned) {
-#if CYTHON_USE_PYLONG_INTERNALS
-            const digit* digits = ((PyLongObject*)x)->ob_digit;
-            switch (Py_SIZE(x)) {
-                case  0: return (int) 0;
-                case  1: __PYX_VERIFY_RETURN_INT(int, digit, digits[0])
-                case 2:
-                    if (8 * sizeof(int) > 1 * PyLong_SHIFT) {
-                        if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if (8 * sizeof(int) >= 2 * PyLong_SHIFT) {
-                            return (int) (((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
-                        }
-                    }
-                    break;
-                case 3:
-                    if (8 * sizeof(int) > 2 * PyLong_SHIFT) {
-                        if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if (8 * sizeof(int) >= 3 * PyLong_SHIFT) {
-                            return (int) (((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
-                        }
-                    }
-                    break;
-                case 4:
-                    if (8 * sizeof(int) > 3 * PyLong_SHIFT) {
-                        if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if (8 * sizeof(int) >= 4 * PyLong_SHIFT) {
-                            return (int) (((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0]));
-                        }
-                    }
-                    break;
-            }
-#endif
-#if CYTHON_COMPILING_IN_CPYTHON
-            if (unlikely(Py_SIZE(x) < 0)) {
-                goto raise_neg_overflow;
-            }
-#else
-            {
-                int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
-                if (unlikely(result < 0))
-                    return (int) -1;
-                if (unlikely(result == 1))
-                    goto raise_neg_overflow;
-            }
-#endif
-            if (sizeof(int) <= sizeof(unsigned long)) {
-                __PYX_VERIFY_RETURN_INT_EXC(int, unsigned long, PyLong_AsUnsignedLong(x))
-#ifdef HAVE_LONG_LONG
-            } else if (sizeof(int) <= sizeof(unsigned PY_LONG_LONG)) {
-                __PYX_VERIFY_RETURN_INT_EXC(int, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
-#endif
-            }
-        } else {
-#if CYTHON_USE_PYLONG_INTERNALS
-            const digit* digits = ((PyLongObject*)x)->ob_digit;
-            switch (Py_SIZE(x)) {
-                case  0: return (int) 0;
-                case -1: __PYX_VERIFY_RETURN_INT(int, sdigit, (sdigit) (-(sdigit)digits[0]))
-                case  1: __PYX_VERIFY_RETURN_INT(int,  digit, +digits[0])
-                case -2:
-                    if (8 * sizeof(int) - 1 > 1 * PyLong_SHIFT) {
-                        if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if (8 * sizeof(int) - 1 > 2 * PyLong_SHIFT) {
-                            return (int) (((int)-1)*(((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-                case 2:
-                    if (8 * sizeof(int) > 1 * PyLong_SHIFT) {
-                        if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if (8 * sizeof(int) - 1 > 2 * PyLong_SHIFT) {
-                            return (int) ((((((int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-                case -3:
-                    if (8 * sizeof(int) - 1 > 2 * PyLong_SHIFT) {
-                        if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if (8 * sizeof(int) - 1 > 3 * PyLong_SHIFT) {
-                            return (int) (((int)-1)*(((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-                case 3:
-                    if (8 * sizeof(int) > 2 * PyLong_SHIFT) {
-                        if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if (8 * sizeof(int) - 1 > 3 * PyLong_SHIFT) {
-                            return (int) ((((((((int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-                case -4:
-                    if (8 * sizeof(int) - 1 > 3 * PyLong_SHIFT) {
-                        if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(int, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if (8 * sizeof(int) - 1 > 4 * PyLong_SHIFT) {
-                            return (int) (((int)-1)*(((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-                case 4:
-                    if (8 * sizeof(int) > 3 * PyLong_SHIFT) {
-                        if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(int, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | (unsigned long)digits[2]) << PyLong_SHIFT) | (unsigned long)digits[1]) << PyLong_SHIFT) | (unsigned long)digits[0])))
-                        } else if (8 * sizeof(int) - 1 > 4 * PyLong_SHIFT) {
-                            return (int) ((((((((((int)digits[3]) << PyLong_SHIFT) | (int)digits[2]) << PyLong_SHIFT) | (int)digits[1]) << PyLong_SHIFT) | (int)digits[0])));
-                        }
-                    }
-                    break;
-            }
-#endif
-            if (sizeof(int) <= sizeof(long)) {
-                __PYX_VERIFY_RETURN_INT_EXC(int, long, PyLong_AsLong(x))
-#ifdef HAVE_LONG_LONG
-            } else if (sizeof(int) <= sizeof(PY_LONG_LONG)) {
-                __PYX_VERIFY_RETURN_INT_EXC(int, PY_LONG_LONG, PyLong_AsLongLong(x))
-#endif
-            }
-        }
-        {
-#if CYTHON_COMPILING_IN_PYPY && !defined(_PyLong_AsByteArray)
-            PyErr_SetString(PyExc_RuntimeError,
-                            "_PyLong_AsByteArray() not available in PyPy, cannot convert large numbers");
-#else
-            int val;
-            PyObject *v = __Pyx_PyNumber_IntOrLong(x);
- #if PY_MAJOR_VERSION < 3
-            if (likely(v) && !PyLong_Check(v)) {
-                PyObject *tmp = v;
-                v = PyNumber_Long(tmp);
-                Py_DECREF(tmp);
-            }
- #endif
-            if (likely(v)) {
-                int one = 1; int is_little = (int)*(unsigned char *)&one;
-                unsigned char *bytes = (unsigned char *)&val;
-                int ret = _PyLong_AsByteArray((PyLongObject *)v,
-                                              bytes, sizeof(val),
-                                              is_little, !is_unsigned);
-                Py_DECREF(v);
-                if (likely(!ret))
-                    return val;
-            }
-#endif
-            return (int) -1;
-        }
-    } else {
-        int val;
-        PyObject *tmp = __Pyx_PyNumber_IntOrLong(x);
-        if (!tmp) return (int) -1;
-        val = __Pyx_PyInt_As_int(tmp);
-        Py_DECREF(tmp);
-        return val;
-    }
-raise_overflow:
-    PyErr_SetString(PyExc_OverflowError,
-        "value too large to convert to int");
-    return (int) -1;
-raise_neg_overflow:
-    PyErr_SetString(PyExc_OverflowError,
-        "can't convert negative value to int");
-    return (int) -1;
 }
 
 /* FastTypeChecks */
