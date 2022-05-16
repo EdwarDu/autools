@@ -7,7 +7,7 @@ from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
 import numpy as np
 import logging
 import os
-from typing import Union
+from typing import Union, Tuple
 
 #[FIXME]: For testing now, use split log, this is not good for packaging
 _SPLIT_LOG = True
@@ -239,13 +239,14 @@ cdef class RTC6Helper:
     def has_error(error_code:int, bit_index: int):
         return (error_code & (1<<bit_index)) != 0
     
-    def goto_xy(self, x: int, y: int):
+    def goto_xy(self, x: int, y: int) -> Tuple[int]:
         x1 = min(max(-524288, x), 524287)
         y1 = min(max(-524288, y), 524287)
         if x != x1 or y != y1:
             rtc6_logger.warning(f"x or y is out of range [-524288, 524287], clipped", extra={"component": "rtc6"})
         rtc6_logger.debug(f"Going to ({x1},{y1})", extra={"component": "rtc6"})    
         _goto_xy(self.cardno, x1, y1)
+        return x1, y1
 
     def get_error(self):
         return _get_error(self.cardno)

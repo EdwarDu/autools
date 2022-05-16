@@ -212,7 +212,7 @@ cdef class Andor3Man:
         if ret != andor3.AT_SUCCESS:
             andor3_logger.error(f"Failed to check {what} for {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             raise Exception(f"Failed to check {what} for {feature}, {error_code_to_str(ret)}")
-        andor3_logger.debug(f"{feature} is {'not' if b!=andor3.AT_TRUE else ''} {what}", extra={"component": "Andor3"})
+        andor3_logger.debug(f"{feature} is {'not ' if b!=andor3.AT_TRUE else ''}{what}", extra={"component": "Andor3"})
         return b == andor3.AT_TRUE
 
     def is_feature_implemented(self, feature: str):
@@ -314,7 +314,7 @@ cdef class Andor3Man:
         handle = 1 if self.is_sys_feature(feature) else self._c_dev_h
         ret = andor3.AT_GetEnumCount(handle, feature, &i_count)
         # FIXME: This should not happen, but it is happening for Zyla camera (in Windows at least)
-        if ret != andor3.AT_ERR_NOTIMPLEMENTED:
+        if ret == andor3.AT_ERR_NOTIMPLEMENTED:
             andor3_logger.error(f"Failed to get(e) count for {feature}, {error_code_to_str(ret)}", extra={"component": "Andor3"})
             self._feature_map[feature]['b_implemented'] = False
             return 0
@@ -524,7 +524,8 @@ cdef class Andor3Man:
             andor3_logger.warning(f"Buffer size {len(buffer)} is less than expected size {stride*height}, padding 0", extra={"component": "Andor3"})
         elif len(buffer) > stride * height:
             buffer_fixed = buffer[:stride * height]
-            andor3_logger.warning(f"Buffer size {len(buffer)} is larger than expected size {stride*height}, truncating", extra={"component": "Andor3"})
+            # as we are using circular buffers with Max size, don't care about this one
+            #andor3_logger.warning(f"Buffer size {len(buffer)} is larger than expected size {stride*height}, truncating", extra={"component": "Andor3"})
         else:
             buffer_fixed = buffer
 

@@ -2,9 +2,6 @@
 */
 !.gitignore
 !README.md
-!andor_sdk3.pxd
-!andor_sdk3.pyx
-!atcore_fake_dev.cpp
 !run.py
 !setup.py
 !cython/

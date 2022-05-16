@@ -22,7 +22,7 @@ import logging
 
 setup_main_logger = logging.getLogger("autools_setup_main")
 
-setup_main_logger.setLevel(logging.INFO)
+setup_main_logger.setLevel(logging.DEBUG)
 setup_main_logger_fh = logging.FileHandler("autools_setup_main.log")
 setup_main_logger_formatter = logging.Formatter('%(asctime)s [%(component)s] - %(levelname)s - %(message)s')
 setup_main_logger_fh.setFormatter(setup_main_logger_formatter)

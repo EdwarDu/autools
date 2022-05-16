@@ -184,12 +184,14 @@ class AndorCameraMan(CameraMan):
         super().__init__(cam_type="andor")
         self._dev_id = dev_id
         self._a3man = Andor3Man()
-        self._buffer_id = None
+        self._buffer_ids = []
         self._frame_width = 0
         self._frame_height = 0
         self._frame_stride = 0
         self._dev_h = None
         self._pixel_encoding = None
+
+        self._b_circular_buf_acquiring = False
 
         self.features = {}
 
@@ -200,6 +202,50 @@ class AndorCameraMan(CameraMan):
 
         self.camera_prop_changed.connect(self._update_ui_values)
 
+    def _create_circular_buffers(self, n_buffers: int = 10):
+        has_binning = self._a3man.is_feature_implemented("AOIBinning")
+        if has_binning:
+            previous_index = self._a3man.get_e_feature_index("AOIBinning")
+            self._a3man.set_e_feature("AOIBinning", "1x1")
+
+        # create max_image_size buffer, so we do not need to re-allocate
+        max_image_size = 4 * (self._a3man.get_i_feature_max("AOIWidth") + 4) * self._a3man.get_i_feature_max("AOIHeight")
+        
+        if has_binning:
+            self._a3man.set_e_feature("AOIBinning", previous_index)
+        
+        for i in range(0, n_buffers):
+            self._buffer_ids.append(self._a3man.create_buffer(max_image_size))
+
+    def _start_circular_buffers(self,):
+        if len(self._buffer_ids) == 0:
+            self._create_circular_buffers()
+
+        if self._a3man.is_feature_writable('AcquisitionStop'):
+            self._a3man.send_command("AcquisitionStop")
+        self._a3man.flush()
+        self._b_circular_buf_acquiring = False
+
+        self._a3man.set_e_feature("CycleMode", "Continuous")
+        for buf_id in self._buffer_ids:
+            self._a3man.queue_buffer(buf_id)
+        if self._a3man.is_feature_writable('AcquisitionStart'):
+            self._a3man.send_command("AcquisitionStart") 
+        self._b_circular_buf_acquiring = True
+
+    def _stop_circular_buffers(self,):
+        if self._a3man.is_feature_writable('AcquisitionStop'):
+            self._a3man.send_command("AcquisitionStop")
+        self._a3man.flush()
+        self._b_circular_buf_acquiring = False
+
+    def __del__(self, ):
+        # free all the buffers
+        if len(self._buffer_ids) != 0:
+            for id in self._buffer_ids:
+                self._a3man.free_buffer(id)
+            self._buffer_ids = []
+
     def get_dev_id(self):
         return self._dev_id
 
@@ -207,6 +253,11 @@ class AndorCameraMan(CameraMan):
         self._a3man.open_dev(self._dev_id)
         self._dev_h = self._a3man.get_dev_handle()
         self._set_features(AndorCameraMan.ANDOR3_FEATURES, True)
+        self._frame_height = self._a3man.get_i_feature("AOIHeight")
+        self._frame_width = self._a3man.get_i_feature("AOIWidth")
+        self._frame_stride = self._a3man.get_i_feature("AOIStride")
+        self._pixel_encoding = self._a3man.get_e_feature_str("PixelEncoding")
+        self._start_circular_buffers()
         self._a3man.register_feature_cb("AOIWidth", lambda feature_name: self._frame_width_changed())
         self._a3man.register_feature_cb("AOIHeight", lambda feature_name: self._frame_height_changed())
         self._a3man.register_feature_cb("AOIStride", lambda feature_name: self._frame_stride_changed())
@@ -238,38 +289,49 @@ class AndorCameraMan(CameraMan):
         return self._frame_width, self._frame_height, 1
 
     def _frame_height_changed(self):
-        self._frame_height = self._a3man.get_i_feature("AOIHeight")
+        frame_height = self._a3man.get_i_feature("AOIHeight")
+        if frame_height != self._frame_height:
+            self._frame_height = frame_height
+            self._start_circular_buffers()  # causing circular buffer stop, flush and start again
+            # WARNING: do not change anything affecting AOIHeight, AOIWidth, AOIStride, and PixelEncoding
+            #  Probably is okay, but may have glitch in the image acquisition
 
     def _frame_width_changed(self):
-        self._frame_width = self._a3man.get_i_feature("AOIWidth")
+        frame_width = self._a3man.get_i_feature("AOIWidth")
+        if frame_width != self._frame_width:
+            self._frame_width = frame_width
+            self._start_circular_buffers()
 
     def _frame_stride_changed(self):
-        self._frame_stride = self._a3man.get_i_feature("AOIStride")
+        frame_stride = self._a3man.get_i_feature("AOIStride")
+        if frame_stride != self._frame_stride:
+            self._frame_stride = frame_stride
+            self._start_circular_buffers()
 
     def _pixel_encoding_changed(self):
-        self._pixel_encoding = self._a3man.get_e_feature_str("PixelEncoding")
+        pixel_encoding = self._a3man.get_e_feature_str("PixelEncoding")
+        if pixel_encoding != self._pixel_encoding:
+            self._pixel_encoding = pixel_encoding
+            self._start_circular_buffers()
 
+    # TODO: speed up this with double buffer?
     def grab_frame(self, n_channel_index: int):
         # n_channel_index is ignored as currently only mono cam is supported
-        cur_buffer_size = self._a3man.get_buffer_size(self._buffer_id)
-        if cur_buffer_size != self._frame_height * self._frame_stride:
-            self._a3man.free_buffer(self._buffer_id)
-            self._buffer_id = self._a3man.create_buffer(self._frame_height * self._frame_stride)
-
-        self._a3man.queue_buffer(self._buffer_id)
-        self._a3man.send_command("AcquisitionStart")
-        buffer_id, buffer_rd_size = self._a3man.wait_buffer(30000)  # wait for 30s
-        raw_bytes = self._a3man.get_data_from_buffer(buffer_id, buffer_rd_size)
-        self._a3man.send_command("AcquisitionStop")
-        self._a3man.flush()
-        np_arr = Andor3Man.convert_bytes_to_numpy_array(
-            raw_bytes,
-            self._pixel_encoding,
-            self._frame_stride,
-            self._frame_width,
-            self._frame_height
-        )
-        return np_arr
+        if not self._b_circular_buf_acquiring: self._start_circular_buffers()
+        try:
+            buffer_id, buffer_rd_size = self._a3man.wait_buffer(30000)  # wait for 30s
+            raw_bytes = self._a3man.get_data_from_buffer(buffer_id, buffer_rd_size)
+            self._a3man.queue_buffer(buffer_id)
+            np_arr = Andor3Man.convert_bytes_to_numpy_array(
+                raw_bytes,
+                self._pixel_encoding,
+                self._frame_stride,
+                self._frame_width,
+                self._frame_height
+            )
+            return np_arr
+        except:
+            return None
 
     def _set_features(self, features: dict, b_update: bool = False):
         self.features = features
@@ -289,13 +351,18 @@ class AndorCameraMan(CameraMan):
                         else self._a3man.get_f_feature_min(feature)
                     self.features[feature]['max'] = self._a3man.get_i_feature_max(feature) if feature_type == 'i' \
                         else self._a3man.get_f_feature_max(feature)
+                elif feature_type == 'c':
+                    self.features[feature]['b_readable'] = self._a3man.is_feature_readable(feature)
+                    if not self.features[feature]['b_readable']:
+                        continue
+                    self.features[feature]['b_writable'] = self._a3man.is_feature_writable(feature)
                 elif feature_type == 's':
                     self.features[feature]['b_readable'] = self._a3man.is_feature_readable(feature)
                     if not self.features[feature]['b_readable']:
                         continue
 
                     self.features[feature]['b_writable'] = self._a3man.is_feature_writable(feature)
-                elif feature_type == 'b':    
+                elif feature_type == 'b':
                     self.features[feature]['b_readable'] = self._a3man.is_feature_readable(feature)
                     if not self.features[feature]['b_readable']:
                         continue
