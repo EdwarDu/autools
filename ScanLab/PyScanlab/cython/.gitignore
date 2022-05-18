@@ -1,0 +1,8 @@
+*
+*/
+!.gitignore
+!rtc6_fake_dev.cpp
+!rtc6_sdk.pxd
+!rtc6_sdk.pyx
+!rtc6_wrapper.cpp
+

@@ -1,20 +1,21 @@
-#include "RTC6impl.hpp"
-inline UINT _init_rtc6_dll (int __attribute__((unused)) cardno ) {
+#include <RTC6impl.hpp>
+#define UNUSED(x) /*Empty*/
+inline UINT _init_rtc6_dll (int UNUSED(cardno) ) {
  return init_rtc6_dll ();
 }
-inline void _free_rtc6_dll (int __attribute__((unused)) cardno ) {
+inline void _free_rtc6_dll (int UNUSED(cardno) ) {
  return free_rtc6_dll ();
 }
-inline void _set_rtc4_mode (int __attribute__((unused)) cardno ) {
+inline void _set_rtc4_mode (int UNUSED(cardno) ) {
  return set_rtc4_mode ();
 }
-inline void _set_rtc5_mode (int __attribute__((unused)) cardno ) {
+inline void _set_rtc5_mode (int UNUSED(cardno) ) {
  return set_rtc5_mode ();
 }
-inline void _set_rtc6_mode (int __attribute__((unused)) cardno ) {
+inline void _set_rtc6_mode (int UNUSED(cardno) ) {
  return set_rtc6_mode ();
 }
-inline UINT _get_rtc_mode (int __attribute__((unused)) cardno ) {
+inline UINT _get_rtc_mode (int UNUSED(cardno) ) {
  return get_rtc_mode ();
 }
 inline UINT _get_error (int cardno ) {
@@ -33,55 +34,55 @@ inline UINT _set_verify (int cardno ,const UINT Verify) {
   if (cardno == -1) { return set_verify(Verify);}
   else { return n_set_verify (static_cast<UINT>(cardno),Verify);}
 }
-inline UINT _verify_checksum (int __attribute__((unused)) cardno ,const char* Name) {
+inline UINT _verify_checksum (int UNUSED(cardno) ,const char* Name) {
  return verify_checksum (Name);
 }
-inline UINT _eth_count_cards (int __attribute__((unused)) cardno ) {
+inline UINT _eth_count_cards (int UNUSED(cardno) ) {
  return eth_count_cards ();
 }
-inline UINT _eth_found_cards (int __attribute__((unused)) cardno ) {
+inline UINT _eth_found_cards (int UNUSED(cardno) ) {
  return eth_found_cards ();
 }
-inline UINT _eth_max_card (int __attribute__((unused)) cardno ) {
+inline UINT _eth_max_card (int UNUSED(cardno) ) {
  return eth_max_card ();
 }
-inline long _eth_remove_card (int __attribute__((unused)) cardno ,const UINT CardNo) {
+inline long _eth_remove_card (int UNUSED(cardno) ,const UINT CardNo) {
  return eth_remove_card (CardNo);
 }
-inline void _eth_get_card_info (int __attribute__((unused)) cardno ,const UINT CardNo, const ULONG_PTR Ptr) {
+inline void _eth_get_card_info (int UNUSED(cardno) ,const UINT CardNo, const ULONG_PTR Ptr) {
  return eth_get_card_info (CardNo,Ptr);
 }
-inline void _eth_get_card_info_search (int __attribute__((unused)) cardno ,const UINT SearchNo, const ULONG_PTR Ptr) {
+inline void _eth_get_card_info_search (int UNUSED(cardno) ,const UINT SearchNo, const ULONG_PTR Ptr) {
  return eth_get_card_info_search (SearchNo,Ptr);
 }
-inline void _eth_set_search_cards_timeout (int __attribute__((unused)) cardno ,const UINT TimeOut) {
+inline void _eth_set_search_cards_timeout (int UNUSED(cardno) ,const UINT TimeOut) {
  return eth_set_search_cards_timeout (TimeOut);
 }
-inline UINT _eth_search_cards (int __attribute__((unused)) cardno ,const UINT Ip, const UINT NetMask) {
+inline UINT _eth_search_cards (int UNUSED(cardno) ,const UINT Ip, const UINT NetMask) {
  return eth_search_cards (Ip,NetMask);
 }
-inline UINT _eth_search_cards_range (int __attribute__((unused)) cardno ,const UINT StartIp, const UINT EndIp) {
+inline UINT _eth_search_cards_range (int UNUSED(cardno) ,const UINT StartIp, const UINT EndIp) {
  return eth_search_cards_range (StartIp,EndIp);
 }
-inline long _eth_assign_card_ip (int __attribute__((unused)) cardno ,const UINT Ip, const UINT CardNo) {
+inline long _eth_assign_card_ip (int UNUSED(cardno) ,const UINT Ip, const UINT CardNo) {
  return eth_assign_card_ip (Ip,CardNo);
 }
-inline long _eth_assign_card (int __attribute__((unused)) cardno ,const UINT SearchNo, const UINT CardNo) {
+inline long _eth_assign_card (int UNUSED(cardno) ,const UINT SearchNo, const UINT CardNo) {
  return eth_assign_card (SearchNo,CardNo);
 }
-inline UINT _eth_convert_string_to_ip (int __attribute__((unused)) cardno ,const char* IpString) {
+inline UINT _eth_convert_string_to_ip (int UNUSED(cardno) ,const char* IpString) {
  return eth_convert_string_to_ip (IpString);
 }
-inline void _eth_convert_ip_to_string (int __attribute__((unused)) cardno ,const UINT Ip, const ULONG_PTR IpString) {
+inline void _eth_convert_ip_to_string (int UNUSED(cardno) ,const UINT Ip, const ULONG_PTR IpString) {
  return eth_convert_ip_to_string (Ip,IpString);
 }
-inline UINT _eth_get_ip (int __attribute__((unused)) cardno ,const UINT CardNo) {
+inline UINT _eth_get_ip (int UNUSED(cardno) ,const UINT CardNo) {
  return eth_get_ip (CardNo);
 }
-inline UINT _eth_get_ip_search (int __attribute__((unused)) cardno ,const UINT SearchNo) {
+inline UINT _eth_get_ip_search (int UNUSED(cardno) ,const UINT SearchNo) {
  return eth_get_ip_search (SearchNo);
 }
-inline UINT _eth_get_serial_search (int __attribute__((unused)) cardno ,const UINT SearchNo) {
+inline UINT _eth_get_serial_search (int UNUSED(cardno) ,const UINT SearchNo) {
  return eth_get_serial_search (SearchNo);
 }
 inline UINT _eth_get_last_error (int cardno ) {
@@ -148,32 +149,32 @@ inline UINT _write_image_eth (int cardno ,const char* Name) {
   if (cardno == -1) { return write_image_eth(Name);}
   else { return n_write_image_eth (static_cast<UINT>(cardno),Name);}
 }
-inline UINT _read_abc_from_file (int __attribute__((unused)) cardno ,const char* Name, double& A, double& B, double& C) {
+inline UINT _read_abc_from_file (int UNUSED(cardno) ,const char* Name, double& A, double& B, double& C) {
  return read_abc_from_file (Name,A,B,C);
 }
-inline UINT _write_abc_to_file (int __attribute__((unused)) cardno ,const char* Name, const double A, const double B, const double C) {
+inline UINT _write_abc_to_file (int UNUSED(cardno) ,const char* Name, const double A, const double B, const double C) {
  return write_abc_to_file (Name,A,B,C);
 }
 inline UINT _create_dat_file (int cardno ,const long Flag) {
   if (cardno == -1) { return create_dat_file(Flag);}
   else { return n_create_dat_file (static_cast<UINT>(cardno),Flag);}
 }
-inline UINT _transform (int __attribute__((unused)) cardno ,long& Sig1, long& Sig2, const ULONG_PTR Ptr, const UINT Code) {
+inline UINT _transform (int UNUSED(cardno) ,long& Sig1, long& Sig2, const ULONG_PTR Ptr, const UINT Code) {
  return transform (Sig1,Sig2,Ptr,Code);
 }
-inline UINT _rtc6_count_cards (int __attribute__((unused)) cardno ) {
+inline UINT _rtc6_count_cards (int UNUSED(cardno) ) {
  return rtc6_count_cards ();
 }
-inline UINT _acquire_rtc (int __attribute__((unused)) cardno ,const UINT CardNo) {
+inline UINT _acquire_rtc (int UNUSED(cardno) ,const UINT CardNo) {
  return acquire_rtc (CardNo);
 }
-inline UINT _release_rtc (int __attribute__((unused)) cardno ,const UINT CardNo) {
+inline UINT _release_rtc (int UNUSED(cardno) ,const UINT CardNo) {
  return release_rtc (CardNo);
 }
-inline UINT _select_rtc (int __attribute__((unused)) cardno ,const UINT CardNo) {
+inline UINT _select_rtc (int UNUSED(cardno) ,const UINT CardNo) {
  return select_rtc (CardNo);
 }
-inline UINT _get_dll_version (int __attribute__((unused)) cardno ) {
+inline UINT _get_dll_version (int UNUSED(cardno) ) {
  return get_dll_version ();
 }
 inline UINT _get_card_type (int cardno ) {

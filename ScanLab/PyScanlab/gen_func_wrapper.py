@@ -12,7 +12,10 @@ if os.path.exists(sys.argv[2]):
     exit(1)
 
 with open(sys.argv[1], 'r') as f_header, open(sys.argv[2], 'w') as f_wrapper, open(sys.argv[2]+".pxd", 'w') as f_pxd:
-    print(f'#include "{sys.argv[1]}"', file=f_wrapper)
+    print(f'#include <{os.path.basename(sys.argv[1])}>', file=f_wrapper)
+
+    print("""#define UNUSED(x) /*Empty*/""", file=f_wrapper)
+
     func_map = {}
 
     for line in f_header:
@@ -53,7 +56,7 @@ with open(sys.argv[1], 'r') as f_header, open(sys.argv[2], 'w') as f_wrapper, op
             print(f"}}", file=f_wrapper)
         else:
             print(f"inline {ret_type} _{func_name} "
-                  f"(int __attribute__((unused)) cardno {','+arg_list if arg_list != '' and arg_list != 'void' else ''}) {{", file=f_wrapper)
+                  f"(int UNUSED(cardno) {','+arg_list if arg_list != '' and arg_list != 'void' else ''}) {{", file=f_wrapper)
             print(f" return {func_name} (", end= '', file=f_wrapper)
             if arg_list != "" and arg_list != "void":
                 i = 0

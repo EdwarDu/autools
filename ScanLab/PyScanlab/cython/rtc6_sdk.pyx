@@ -108,7 +108,7 @@ cdef class RTC6Helper:
 
     cdef int  cardno
     cdef bool do_init
-    cdef UINT board_count
+    cdef int board_count
 
     def __cinit__(self, do_init: bool, cardno: int = -1):
         """

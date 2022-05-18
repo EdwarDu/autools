@@ -29,9 +29,11 @@ if python3_path is None:
     python3_path = ans
 
 os.system(f"{python3_path} setup.py build")
-os.system(f"{python3_path} -m pip install .")
 
-ans = input("If there is no error message, want to launch run.py to test the package? [y/N]")
-
+ans = input("If there is no error message, install ? [y/N]")
 if ans.lower().startswith("y"):
-    os.system(f"{python3_path} run.py")
+    os.system(f"{python3_path} -m pip install .")
+
+    ans = input("If there is no error message, want to launch run.py to test the package? [y/N]")
+    if ans.lower().startswith("y"):
+        os.system(f"{python3_path} run.py")
