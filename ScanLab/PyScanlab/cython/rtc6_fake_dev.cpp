@@ -412,7 +412,7 @@ RTC6_API UINT __stdcall transform(long& Sig1, long& Sig2, const ULONG_PTR Ptr, c
 RTC6_API UINT __stdcall rtc6_count_cards(void){
   // auto-gen dummy impl of function
   cout << __FUNCTION__ << " called " << endl;
-  return 0;
+  return 1;
 }
 
 RTC6_API UINT __stdcall acquire_rtc(const UINT CardNo){

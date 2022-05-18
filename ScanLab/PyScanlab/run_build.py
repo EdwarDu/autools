@@ -36,4 +36,5 @@ if ans.lower().startswith("y"):
 
     ans = input("If there is no error message, want to launch run.py to test the package? [y/N]")
     if ans.lower().startswith("y"):
-        os.system(f"{python3_path} run.py")
+        os.chdir(os.path.join(os.popen("git rev-parse --show-toplevel").read().strip(), ".."))
+        os.system(f"{python3_path} -m autools.ScanLab.RTC6Man")

@@ -107,32 +107,47 @@ cdef class RTC6Helper:
     RTC6_CONFIG_ERROR = 16
 
     cdef int  cardno
-    cdef bool do_init
-    cdef int board_count
+    cdef bool dll_init_okay
+    cdef int  board_count
 
     def __cinit__(self, do_init: bool, cardno: int = -1):
         """
         TODO: device initialization.
         """
-        self.do_init = do_init
         self.cardno = cardno
-        if self.do_init:
-            err = _init_rtc6_dll(self.cardno)
-            if err == 0:
-                rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})
-            else:
-                rtc6_logger.info(f"RTC6 DLL Init Failed: {hex(err)}", extra={"component": "rtc6"})
-
+        if do_init:
+            self.init_dll()
             _set_rtc6_mode(self.cardno)
 
-        self.board_count = _rtc6_count_cards(self.cardno)
         if self.cardno > 0:
             if self.cardno > self.board_count:
                 rtc6_logger.error(f"{cardno} is larger than number of RTC6 board count {self.board_count}")
                 raise ValueError(f"{cardno} is larger than number of RTC6 board count {self.board_count}")
 
+    def init_dll(self,):
+        err = _init_rtc6_dll(self.cardno)
+        if err == 0:
+            rtc6_logger.info("RTC6 DLL Init OKAY", extra={"component": "rtc6"})
+            self.dll_init_okay = True
+        else:
+            rtc6_logger.info(f"RTC6 DLL Init Failed: {hex(err)}", extra={"component": "rtc6"})
+            raise RTC6DevError(err)
+
+        self.board_count = _rtc6_count_cards(-1)
+        if self.board_count == 0:
+            rtc6_logger.error(f"{self.board_count} RTC6 boards were found")
+            raise RTC6DevError(f"No RTC6 board detected")
+
+    def free_dll(self,):
+        if self.dll_init_okay:
+            _free_rtc6_dll(-1)
+            self.dll_init_okay = False
+
+    def count_boards(self,):
+        return self.board_count
+
     def load_program_file(self, cfg_path: Union[str, None] = None):
-        if cfg_path is None:
+        if cfg_path is None or len(cfg_path) == 0:
             cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
         rtc6_logger.info(f"Board reset with config dir: {cfg_path}", extra={"component": "rtc6"})
         if not os.path.exists(cfg_path) or \
@@ -194,7 +209,7 @@ cdef class RTC6Helper:
         _config_list(self.cardno, mem1, mem2)
         
     def load_correction_file(self, cor_file: Union[None, str], table_no: int, dim: int):
-        if cor_file is None:
+        if cor_file is None or len(cor_file) == 0:
             cor_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "Cor_1to1.ct5")
         
         if not os.path.exists(cor_file):
@@ -235,6 +250,9 @@ cdef class RTC6Helper:
             rtc6_logger.error(f"Load correction file Failed: unknown error code {err}", extra={"component": "rtc6"})
             raise RTC6DevError(err)
 
+    def reset_error(self, bit_mask: int = 0xFFFFFFFF):
+        _reset_error(self.cardno, <uint32_t> bit_mask)
+
     @staticmethod
     def has_error(error_code:int, bit_index: int):
         return (error_code & (1<<bit_index)) != 0
@@ -267,5 +285,6 @@ cdef class RTC6Helper:
         """
         TODO: device finalise/close procedure
         """
-        if self.do_init:
+        if self.dll_init_okay:
             _free_rtc6_dll(self.cardno)
+

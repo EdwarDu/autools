@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import os
-import ctypes
 
 import time
 from .CameraMan import CameraMan
