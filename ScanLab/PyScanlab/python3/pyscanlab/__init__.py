@@ -1,9 +1,5 @@
 __all__ = ['RTC6Helper', "rtc6_sdk"]
 
-# allow raw function call to rtc6 (too many functions to handle in the python3 with wrapper for now)
-from pyscanlab import rtc6_sdk
-from pyscanlab.rtc6_sdk import RTC6Helper
-
 import os
 import re
 
@@ -23,3 +19,7 @@ if _dll_path not in _lst_path:
     os.environ[env_var_name] = os.environ.get(env_var_name) + os.pathsep + _dll_path
 
 __CFG_PATH__ = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+
+# allow raw function call to rtc6 (too many functions to handle in the python3 with wrapper for now)
+from pyscanlab import rtc6_sdk
+from pyscanlab.rtc6_sdk import RTC6Helper
