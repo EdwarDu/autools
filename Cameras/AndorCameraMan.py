@@ -221,7 +221,10 @@ class AndorCameraMan(CameraMan):
             self._create_circular_buffers()
 
         if self._a3man.is_feature_writable('AcquisitionStop'):
-            self._a3man.send_command("AcquisitionStop")
+            try:
+                self._a3man.send_command("AcquisitionStop")
+            except:
+                pass
         self._a3man.flush()
         self._b_circular_buf_acquiring = False
 
@@ -229,12 +232,18 @@ class AndorCameraMan(CameraMan):
         for buf_id in self._buffer_ids:
             self._a3man.queue_buffer(buf_id)
         if self._a3man.is_feature_writable('AcquisitionStart'):
-            self._a3man.send_command("AcquisitionStart") 
+            try:
+                self._a3man.send_command("AcquisitionStart") 
+            except:
+                pass
         self._b_circular_buf_acquiring = True
 
     def _stop_circular_buffers(self,):
         if self._a3man.is_feature_writable('AcquisitionStop'):
-            self._a3man.send_command("AcquisitionStop")
+            try:
+                self._a3man.send_command("AcquisitionStop")
+            except:
+                pass
         self._a3man.flush()
         self._b_circular_buf_acquiring = False
 
@@ -273,11 +282,7 @@ class AndorCameraMan(CameraMan):
                     self._a3man.clear_feature_cb(feature)
 
         if len(self._buffer_ids) > 0:
-            try:
-                self._a3man.send_command("AcquisitionStop")
-                self._a3man.flush()
-            except:
-                pass
+            self._stop_circular_buffers()
             for i in self._buffer_ids:
                 self._a3man.free_buffer(i)
             self._buffer_ids = []
