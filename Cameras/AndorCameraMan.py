@@ -239,11 +239,8 @@ class AndorCameraMan(CameraMan):
         self._b_circular_buf_acquiring = False
 
     def __del__(self, ):
-        # free all the buffers
-        if len(self._buffer_ids) != 0:
-            for id in self._buffer_ids:
-                self._a3man.free_buffer(id)
-            self._buffer_ids = []
+        if self.is_open():
+            self.close()
 
     def get_dev_id(self):
         return self._dev_id
@@ -275,9 +272,15 @@ class AndorCameraMan(CameraMan):
                         ('system' not in self.features[feature].keys() or not self.features[feature]['system']):
                     self._a3man.clear_feature_cb(feature)
 
-        # Only single buffer is supported, in case NOT, this needs to be modified also
-        if self._buffer_id is not None:
-            self._a3man.free_buffer(self._buffer_id)
+        if len(self._buffer_ids) > 0:
+            try:
+                self._a3man.send_command("AcquisitionStop")
+                self._a3man.flush()
+            except:
+                pass
+            for i in self._buffer_ids:
+                self._a3man.free_buffer(i)
+            self._buffer_ids = []
         self._a3man.close()
 
     def get_frame_size(self):
