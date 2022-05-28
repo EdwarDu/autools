@@ -213,7 +213,7 @@ class AFG31000Man(QObject):
         return self.send_cmd(f"SOURCE{ch}:PHASE:INITIATE", False)
 
     # TODO: no PM commands
-    def pulse_dutye_cycle(self, ch: Union[int, str] = "", b_query: bool = True, value: Union[str, None] = None):
+    def pulse_duty_cycle(self, ch: Union[int, str] = "", b_query: bool = True, value: Union[str, None] = None):
         return self.send_cmd(f"SOURCE{ch}:PULSE:DCYCLE", b_query, value)
 
     def pulse_lead_delay(self, ch: Union[int, str] = "", b_query: bool = True, value: Union[str, None] = None):
