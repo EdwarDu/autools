@@ -1,2 +1,7 @@
 build/
 pyscanlab.egg-info/
+
+!python3/pyscanlab/*
+!python3/pyscanlab/lib/
+!python3/pyscanlab/data/
+

@@ -130,6 +130,7 @@ class SR830Man(QObject):
                 self.com_end = '\n'
                 self.output_interface(False, SR830Man.OUTPUT_INTERFACE_GPIB)
                 self.gpib_override_remote_state(False, SR830Man.GPIB_OVERRIDE_REMOTE_STATE_ON)
+                self.opened.emit()
         else:
             raise ValueError(f"Unknown type of mode {self.com_mode}")
 

@@ -58,7 +58,7 @@
         <property name="horizontalSpacing">
          <number>10</number>
         </property>
-        <item row="1" column="1" colspan="2">
+        <item row="0" column="1" colspan="2">
          <widget class="QComboBox" name="comboBox_CONN">
           <property name="enabled">
            <bool>true</bool>
@@ -71,23 +71,7 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_COM_Status">
-          <property name="styleSheet">
-           <string notr="true">background : red</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-          <property name="margin">
-           <number>0</number>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2">
+        <item row="1" column="2">
          <widget class="QPushButton" name="pushButton_COM_Open">
           <property name="maximumSize">
            <size>
@@ -106,42 +90,23 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1" colspan="2">
-         <widget class="QComboBox" name="comboBox_COM_Parity">
-          <property name="currentText">
-           <string>ODD</string>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_COM_Status">
+          <property name="styleSheet">
+           <string notr="true">background : red</string>
           </property>
-          <property name="currentIndex">
-           <number>1</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>None</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>ODD</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>EVEN</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_7">
           <property name="text">
-           <string>Parity:</string>
+           <string/>
           </property>
           <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="margin">
+           <number>0</number>
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
+        <item row="1" column="1">
          <widget class="QPushButton" name="pushButton_COM_Refresh">
           <property name="minimumSize">
            <size>
@@ -163,100 +128,13 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="0" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
            <string>CONN:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>BaudRate:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1" colspan="2">
-         <widget class="QComboBox" name="comboBox_COM_BaudRate">
-          <property name="editable">
-           <bool>false</bool>
-          </property>
-          <property name="currentText">
-           <string>19200</string>
-          </property>
-          <property name="currentIndex">
-           <number>1</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>9600</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>19200</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>38400</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>57600</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>115200</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>Interface:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QRadioButton" name="radioButton_Interf_GPIB">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>&amp;GPIB</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QRadioButton" name="radioButton_Interf_RS232">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>RS&amp;232</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -302,7 +180,7 @@
        <number>8</number>
       </property>
       <item>
-       <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,0,0,0,0">
+       <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,0,0,0">
         <property name="leftMargin">
          <number>6</number>
         </property>
@@ -312,323 +190,17 @@
         <property name="horizontalSpacing">
          <number>10</number>
         </property>
-        <item row="0" column="0" colspan="2">
-         <widget class="QLabel" name="label_2">
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="label_14">
           <property name="text">
-           <string>Time Const.:</string>
+           <string>Harmonic:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
-        <item row="5" column="0" colspan="2">
-         <widget class="QLabel" name="label_16">
-          <property name="text">
-           <string>Frequency:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="0" colspan="2">
-         <widget class="QLabel" name="label_11">
-          <property name="text">
-           <string>Y:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="12" column="3" colspan="2">
-         <widget class="QPushButton" name="pushButton_GetAll">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Get X, Y, R, Theta, F</string>
-          </property>
-          <property name="text">
-           <string>GetAll</string>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="4">
-         <widget class="QPushButton" name="pushButton_GetY">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string/>
-          </property>
-          <property name="text">
-           <string>Get</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2" colspan="3">
-         <widget class="QComboBox" name="comboBox_TimeConstant">
-          <property name="currentIndex">
-           <number>10</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>10 us</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>30 us</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>100 us</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>300 us</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>1 ms</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>3 ms</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>10 ms</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>30 ms</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>100 ms</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>300 ms</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>1 s</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>3 s</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>10 s</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>30 s</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>100 s</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>300 s</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>1 ks</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>3 ks</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>10 ks</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>30 ks</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="7" column="0" colspan="5">
-         <widget class="Line" name="line">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="3" colspan="2">
-         <widget class="QPushButton" name="pushButton_SetHarmonic">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string/>
-          </property>
-          <property name="text">
-           <string>Set</string>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="4">
-         <widget class="QPushButton" name="pushButton_GetTheta">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string/>
-          </property>
-          <property name="text">
-           <string>Get</string>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="2" colspan="2">
-         <widget class="QLineEdit" name="lineEdit_Theta">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>AFG31000 Phase (float)</string>
-          </property>
-          <property name="inputMethodHints">
-           <set>Qt::ImhFormattedNumbersOnly</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2" colspan="3">
-         <widget class="QComboBox" name="comboBox_FilterSlope">
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>6 dB/oct</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>12 dB/oct</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>18 dB/oct</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>24 dB/oct</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="4" column="2">
-         <widget class="QRadioButton" name="radioButton_ref_src_external">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>E&amp;xternal</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="3" alignment="Qt::AlignHCenter">
-         <widget class="QPushButton" name="pushButton_SetPhase">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string/>
-          </property>
-          <property name="text">
-           <string>Set</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="2">
+        <item row="0" column="2">
          <widget class="QLineEdit" name="lineEdit_Frequency">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -650,212 +222,7 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0" colspan="2" alignment="Qt::AlignRight">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Sensitivity:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2" colspan="3">
-         <widget class="QComboBox" name="comboBox_Sensitivity">
-          <property name="currentIndex">
-           <number>10</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>2 nV/fA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>5 nV/fA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>2 nV/fA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>5 nV/fA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>10 nV/fA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>20 nV/fA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>50 nV/fA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>100 nV/fA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>200 nV/fA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>500 nV/fA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>1 uV/pA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>2 uV/pA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>5 uV/pA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>10 uV/pA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>20 uV/pA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>50 uV/pA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>100 uV/pA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>200 uV/pA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>500 uV/pA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>1 mV/nA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>2 mV/nA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>5 mV/nA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>10 mV/nA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>20 mV/nA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>50 mV/nA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>100 mV/nA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>200 mV/nA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>500 mV/nA</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>1 V/uA</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="2" alignment="Qt::AlignRight">
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>Phase:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0" colspan="2">
-         <widget class="QLabel" name="label_14">
-          <property name="text">
-           <string>Harmonic:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0" colspan="2" alignment="Qt::AlignRight">
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>Ref Source:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="3">
-         <widget class="QPushButton" name="pushButton_GetFrequency">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string/>
-          </property>
-          <property name="text">
-           <string>Get</string>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="0" colspan="2">
+        <item row="3" column="0" colspan="2">
          <widget class="QLabel" name="label_10">
           <property name="text">
            <string>X:</string>
@@ -865,235 +232,20 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="4" alignment="Qt::AlignHCenter">
-         <widget class="QPushButton" name="pushButton_Autophase">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string/>
-          </property>
+        <item row="0" column="0" colspan="2">
+         <widget class="QLabel" name="label_16">
           <property name="text">
-           <string>Auto</string>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="4">
-         <widget class="QPushButton" name="pushButton_GetR">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string/>
-          </property>
-          <property name="text">
-           <string>Get</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="QLineEdit" name="lineEdit_phase">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>AFG31000 Phase (float)</string>
-          </property>
-          <property name="inputMethodHints">
-           <set>Qt::ImhFormattedNumbersOnly</set>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="0" colspan="2">
-         <widget class="QLabel" name="label_12">
-          <property name="text">
-           <string>Theta:</string>
+           <string>Frequency:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
-        <item row="4" column="3" colspan="2">
-         <widget class="QRadioButton" name="radioButton_ref_src_internal">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>I&amp;nternal</string>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="2" colspan="2">
-         <widget class="QLineEdit" name="lineEdit_R">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>AFG31000 Phase (float)</string>
-          </property>
-          <property name="inputMethodHints">
-           <set>Qt::ImhFormattedNumbersOnly</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QLabel" name="label_15">
-          <property name="text">
-           <string>Filter Slope:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="4">
-         <widget class="QPushButton" name="pushButton_GetX">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string/>
-          </property>
-          <property name="text">
-           <string>Get</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="2">
-         <widget class="QSpinBox" name="spinBox_Harmonic">
-          <property name="keyboardTracking">
-           <bool>false</bool>
-          </property>
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>19999</number>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="0" colspan="2">
-         <widget class="QLabel" name="label_13">
-          <property name="text">
-           <string>R:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="2" colspan="2">
-         <widget class="QLineEdit" name="lineEdit_X">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>AFG31000 Phase (float)</string>
-          </property>
-          <property name="inputMethodHints">
-           <set>Qt::ImhFormattedNumbersOnly</set>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="2" colspan="2">
-         <widget class="QLineEdit" name="lineEdit_Y">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>AFG31000 Phase (float)</string>
-          </property>
-          <property name="inputMethodHints">
-           <set>Qt::ImhFormattedNumbersOnly</set>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="4">
-         <widget class="QPushButton" name="pushButton_SetFrequency">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string/>
-          </property>
-          <property name="text">
-           <string>Set</string>
+        <item row="2" column="0" colspan="4">
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
@@ -1118,35 +270,10 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>radioButton_Interf_GPIB</tabstop>
-  <tabstop>radioButton_Interf_RS232</tabstop>
   <tabstop>comboBox_CONN</tabstop>
-  <tabstop>comboBox_COM_BaudRate</tabstop>
-  <tabstop>comboBox_COM_Parity</tabstop>
   <tabstop>pushButton_COM_Refresh</tabstop>
   <tabstop>pushButton_COM_Open</tabstop>
-  <tabstop>comboBox_TimeConstant</tabstop>
-  <tabstop>comboBox_Sensitivity</tabstop>
-  <tabstop>comboBox_FilterSlope</tabstop>
-  <tabstop>lineEdit_phase</tabstop>
-  <tabstop>pushButton_SetPhase</tabstop>
-  <tabstop>pushButton_Autophase</tabstop>
-  <tabstop>radioButton_ref_src_external</tabstop>
-  <tabstop>radioButton_ref_src_internal</tabstop>
   <tabstop>lineEdit_Frequency</tabstop>
-  <tabstop>pushButton_GetFrequency</tabstop>
-  <tabstop>pushButton_SetFrequency</tabstop>
-  <tabstop>spinBox_Harmonic</tabstop>
-  <tabstop>pushButton_SetHarmonic</tabstop>
-  <tabstop>lineEdit_X</tabstop>
-  <tabstop>pushButton_GetX</tabstop>
-  <tabstop>lineEdit_Y</tabstop>
-  <tabstop>pushButton_GetY</tabstop>
-  <tabstop>lineEdit_R</tabstop>
-  <tabstop>pushButton_GetR</tabstop>
-  <tabstop>lineEdit_Theta</tabstop>
-  <tabstop>pushButton_GetTheta</tabstop>
-  <tabstop>pushButton_GetAll</tabstop>
  </tabstops>
  <resources/>
  <connections/>

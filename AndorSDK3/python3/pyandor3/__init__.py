@@ -1,7 +1,5 @@
 __all__ = ['Andor3Man', ]
 
-from pyandor3.andor_sdk3 import Andor3Man
-
 import os 
 import re
 
@@ -20,3 +18,4 @@ _dll_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), sub_path)
 if _dll_path not in _lst_path:
     os.environ[env_var_name] = os.environ.get(env_var_name) + os.pathsep + _dll_path
 
+from pyandor3.andor_sdk3 import Andor3Man
