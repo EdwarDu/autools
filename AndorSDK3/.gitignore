@@ -4,6 +4,7 @@
 !README.md
 !run.py
 !setup.py
+!run*.py
 !cython/
 !cython/**
 !python3/
