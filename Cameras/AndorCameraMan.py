@@ -209,10 +209,10 @@ class AndorCameraMan(CameraMan):
 
         # create max_image_size buffer, so we do not need to re-allocate
         max_image_size = 4 * (self._a3man.get_i_feature_max("AOIWidth") + 4) * self._a3man.get_i_feature_max("AOIHeight")
-        
+
         if has_binning:
             self._a3man.set_e_feature("AOIBinning", previous_index)
-        
+
         for i in range(0, n_buffers):
             self._buffer_ids.append(self._a3man.create_buffer(max_image_size))
 
@@ -220,30 +220,21 @@ class AndorCameraMan(CameraMan):
         if len(self._buffer_ids) == 0:
             self._create_circular_buffers()
 
-        if self._a3man.is_feature_writable('AcquisitionStop'):
-            try:
-                self._a3man.send_command("AcquisitionStop")
-            except:
-                pass
+        try: self._a3man.send_command("AcquisitionStop")
+        except: pass
         self._a3man.flush()
         self._b_circular_buf_acquiring = False
 
         self._a3man.set_e_feature("CycleMode", "Continuous")
         for buf_id in self._buffer_ids:
             self._a3man.queue_buffer(buf_id)
-        if self._a3man.is_feature_writable('AcquisitionStart'):
-            try:
-                self._a3man.send_command("AcquisitionStart") 
-            except:
-                pass
+        try: self._a3man.send_command("AcquisitionStart") 
+        except: pass
         self._b_circular_buf_acquiring = True
 
     def _stop_circular_buffers(self,):
-        if self._a3man.is_feature_writable('AcquisitionStop'):
-            try:
-                self._a3man.send_command("AcquisitionStop")
-            except:
-                pass
+        try: self._a3man.send_command("AcquisitionStop")
+        except: pass
         self._a3man.flush()
         self._b_circular_buf_acquiring = False
 
@@ -321,7 +312,6 @@ class AndorCameraMan(CameraMan):
             self._pixel_encoding = pixel_encoding
             self._start_circular_buffers()
 
-    # TODO: speed up this with double buffer?
     def grab_frame(self, n_channel_index: int):
         # n_channel_index is ignored as currently only mono cam is supported
         if not self._b_circular_buf_acquiring: self._start_circular_buffers()
