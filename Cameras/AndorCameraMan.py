@@ -191,6 +191,7 @@ class AndorCameraMan(CameraMan):
         self._pixel_encoding = None
 
         self._b_circular_buf_acquiring = False
+        self._b_circular_buf_invalidated = True
 
         self.features = {}
 
@@ -231,6 +232,7 @@ class AndorCameraMan(CameraMan):
         try: self._a3man.send_command("AcquisitionStart") 
         except: pass
         self._b_circular_buf_acquiring = True
+        self._b_circular_buf_invalidated = False
 
     def _stop_circular_buffers(self,):
         try: self._a3man.send_command("AcquisitionStop")
@@ -253,7 +255,8 @@ class AndorCameraMan(CameraMan):
         self._frame_width = self._a3man.get_i_feature("AOIWidth")
         self._frame_stride = self._a3man.get_i_feature("AOIStride")
         self._pixel_encoding = self._a3man.get_e_feature_str("PixelEncoding")
-        self._start_circular_buffers()
+        #self._start_circular_buffers()
+        self._b_circular_buf_invalidated = True
         self._a3man.register_feature_cb("AOIWidth", lambda feature_name: self._frame_width_changed())
         self._a3man.register_feature_cb("AOIHeight", lambda feature_name: self._frame_height_changed())
         self._a3man.register_feature_cb("AOIStride", lambda feature_name: self._frame_stride_changed())
@@ -290,7 +293,7 @@ class AndorCameraMan(CameraMan):
         frame_height = self._a3man.get_i_feature("AOIHeight")
         if frame_height != self._frame_height:
             self._frame_height = frame_height
-            self._start_circular_buffers()  # causing circular buffer stop, flush and start again
+            self._b_circular_buf_invalidated = True
             # WARNING: do not change anything affecting AOIHeight, AOIWidth, AOIStride, and PixelEncoding
             #  Probably is okay, but may have glitch in the image acquisition
 
@@ -298,23 +301,24 @@ class AndorCameraMan(CameraMan):
         frame_width = self._a3man.get_i_feature("AOIWidth")
         if frame_width != self._frame_width:
             self._frame_width = frame_width
-            self._start_circular_buffers()
+            self._b_circular_buf_invalidated = True
 
     def _frame_stride_changed(self):
         frame_stride = self._a3man.get_i_feature("AOIStride")
         if frame_stride != self._frame_stride:
             self._frame_stride = frame_stride
-            self._start_circular_buffers()
+            self._b_circular_buf_invalidated = True
 
     def _pixel_encoding_changed(self):
         pixel_encoding = self._a3man.get_e_feature_str("PixelEncoding")
         if pixel_encoding != self._pixel_encoding:
             self._pixel_encoding = pixel_encoding
-            self._start_circular_buffers()
+            self._b_circular_buf_invalidated = True
 
     def grab_frame(self, n_channel_index: int):
         # n_channel_index is ignored as currently only mono cam is supported
-        if not self._b_circular_buf_acquiring: self._start_circular_buffers()
+        if not self._b_circular_buf_acquiring or self._b_circular_buf_invalidated:
+            self._start_circular_buffers()
         try:
             buffer_id, buffer_rd_size = self._a3man.wait_buffer(30000)  # wait for 30s
             raw_bytes = self._a3man.get_data_from_buffer(buffer_id, buffer_rd_size)

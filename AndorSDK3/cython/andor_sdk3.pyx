@@ -455,7 +455,7 @@ cdef class Andor3Man:
 
         ret = andor3.AT_QueueBuffer(self._c_dev_h, buffer_aligned, image_size)
         if ret != andor3.AT_SUCCESS:
-            log_error(f"Failed to queue buffer {buffer_id}:{buffer_size}@>{<unsigned long>buffer_aligned:016X}, {error_code_to_str(ret)}")
+            log_error(f"Failed to queue buffer {buffer_id}:{buffer_size}@>{<unsigned long long>buffer_aligned:016X}, {error_code_to_str(ret)}")
         andor3_logger.info(f"Buffer {buffer_id} queued", extra={"component": "Andor3"})
 
     def wait_buffer(self, timeout_ms: int):
