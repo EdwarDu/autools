@@ -449,7 +449,7 @@ cdef class Andor3Man:
                                                 self._buffer_map[buffer_id][1], "buffer_aligned")
         cdef int buffer_size = self._buffer_map[buffer_id][2]
 
-        int image_size = self.get_i_feature("ImageSizeBytes")
+        cdef int image_size = self.get_i_feature("ImageSizeBytes")
         if buffer_size < image_size:
             raise Exception(f"Buffer size {buffer_size} is smaller than the ImageSizeBytes {image_size}")
 
