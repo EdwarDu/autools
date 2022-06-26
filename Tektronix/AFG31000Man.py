@@ -269,6 +269,12 @@ class AFG31000Man(QObject):
     def trigger_force(self,):
         return self.send_cmd(f"TRIGGER:SEQUENCE:IMMEDIATE", False)
 
+    def show_config_window(self,):
+        if self.config_window is None:
+            self.config_window = AFG31000ConfigWindow(self)
+        self.config_window.show()
+
+
 class AFG31000ConfigWindow(Ui_AFG31000_Config_Window):
     """
         AFG31000 Helper class with configuration window
