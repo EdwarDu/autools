@@ -394,7 +394,7 @@ if __name__ == "__main__":
 
     circle_center=(15, 15)
     with open("./circles_30x30_15_15_r0.1_r8.txt", "w") as f_circles:
-        points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=0.1, start_degree=0, step_degree=10, cover_degree=360, min_step=36)
+        points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=5, start_degree=0, step_degree=10, cover_degree=360, min_step=0.1)
         dump_pattern_to_file(points_gen, canvas_offsets, f_circles, True)
 
         #points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=5, start_degree=0, step_degree=10, cover_degree=360, min_step=0.01)
@@ -411,10 +411,10 @@ if __name__ == "__main__":
 
         #plt.pause(1)
 
-        points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=0.1, start_degree=0, step_degree=-13, cover_degree=360, min_step=36)
+        points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=5, start_degree=0, step_degree=-13, cover_degree=360, min_step=0.1)
         dump_pattern_to_file(points_gen, canvas_offsets, f_circles, True)
 
-        points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=8, start_degree=0, step_degree=-13, cover_degree=360, min_step=1.3)
+        points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=5, start_degree=0, step_degree=-13, cover_degree=360, min_step=0.1)
         p_x = None
         while True:
             try:
@@ -428,10 +428,10 @@ if __name__ == "__main__":
 
         plt.pause(1)
 
-        points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=8, start_degree=0, step_degree=-13, cover_degree=360, min_step=1.3, distri_leftover_degree=True)
+        points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=8, start_degree=0, step_degree=-13, cover_degree=360, min_step=0.1, distri_leftover_degree=True)
         dump_pattern_to_file(points_gen, canvas_offsets, f_circles, True)
 
-        points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=8, start_degree=0, step_degree=-13, cover_degree=360, min_step=1.3, distri_leftover_degree=True)
+        points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=8, start_degree=0, step_degree=-13, cover_degree=360, min_step=0.1, distri_leftover_degree=True)
         p_x = None
         while True:
             try:

@@ -319,7 +319,7 @@ def dump_pattern_to_file(points_gen: Iterator[Tuple[float]], offset_v: Iterable[
                 print('#include "DrawInactive.txt"', file=f_output)
                 print(f"ja ( {pt_x+offset_x:.4f}, {pt_y+offset_y:.4f} ); // {extra_s} ", file=f_output)
                 print('#include "DrawActive.txt"', file=f_output)
-                print('MovingSpeed (1); // <----- YOU MAY WANT TO CHANGE THIS', file=f_output)
+                print('MovingSpeed (10); // <----- YOU MAY WANT TO CHANGE THIS', file=f_output)
                 ja_to_start=True
             else:
                 print(f"ma ( {pt_x+offset_x:.4f}, {pt_y+offset_y:.4f} ); // {extra_s} ", file=f_output)
@@ -334,7 +334,7 @@ if __name__ == "__main__":
     from random import random
     from itertools import cycle, repeat
 
-    canvas_s = (30, 30)  # 30 um * 30 um canvas
+    canvas_s = (60, 60)  # 30 um * 30 um canvas
     snake_head = (0, 0)
     snake_first_goes = (1, 0)
 
@@ -345,7 +345,7 @@ if __name__ == "__main__":
         # jump to snake starting point
         print(f'ja ( {snake_head[0] + canvas_offsets[0]:.4f}, {snake_head[1] + canvas_offsets[1]:.4f} );', file=f_snake)
         print('#include "DrawActive.txt"', file=f_snake)
-        print('MovingSpeed (4);', file=f_snake)
+        print('MovingSpeed (10);', file=f_snake)
         # for snake pattern the first point generated is not the start_point
         dump_pattern_to_file(points_gen, canvas_offsets, f_snake, False)
 
@@ -391,15 +391,21 @@ if __name__ == "__main__":
     fig_ax.set_xlim(left=-1, right=canvas_s[0]+1)
     fig_ax.set_ylim(bottom=-1, top=canvas_s[1]+1)
     fig_ax.set_aspect(1)
-    row=[5,10,15,20,25]
-    columns=[5,10,15,20,25]
-    with open("./circles_30x30_15_15_r0.05_m1.txt", "w") as f_circles:
+    row=[5,15,25]
+    columns=[5,15,25]
+    with open("./circles_30x30_15_15_r2_step0.4_multi_new.txt", "w") as f_circles:
         for i in row:
+            if i == 15:
+                columns=[25,15,5]
+            else:
+                columns=[5,15,25]
             for j in columns:
+                
                 circle_center=(i, j)
-                points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=0.1, start_degree=0, step_degree=1, cover_degree=360, min_step=0.05)
-                dump_pattern_to_file(points_gen, canvas_offsets, f_circles, True)
-
+                #points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=1, start_degree=0, step_degree=-30, cover_degree=360, min_step=0.2)
+                #dump_pattern_to_file(points_gen, canvas_offsets, f_circles, True)
+               
+   
                 #points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=5, start_degree=0, step_degree=10, cover_degree=360, min_step=0.01)
                 #p_x = None
                 #while True:
@@ -417,7 +423,40 @@ if __name__ == "__main__":
                 # points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=0.1, start_degree=0, step_degree=-13, cover_degree=360, min_step=36)
                 # dump_pattern_to_file(points_gen, canvas_offsets, f_circles, True)
 
-                points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=0.1, start_degree=0, step_degree=1, cover_degree=360, min_step=0.05)
+                # points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=0.4, start_degree=0, step_degree=5, cover_degree=360, min_step=0.1)
+                # p_x = None
+                # while True:
+                #     try:
+                #         n_x, n_y = next(points_gen)[:2]
+                #         if p_x is not None:
+                #             fig_ax.plot( (p_x, n_x), (p_y, n_y), '-')
+                #         plt.pause(0.01)
+                #         p_x, p_y = n_x, n_y
+                #     except StopIteration:
+                #         break
+
+                # plt.pause(1)                   
+
+                # points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=1, start_degree=1, step_degree=-40, cover_degree=360, min_step=0.2, distri_leftover_degree=True)
+                # dump_pattern_to_file(points_gen, canvas_offsets, f_circles, True)
+
+                # points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=1, start_degree=1, step_degree=-40, cover_degree=360, min_step=0.2, distri_leftover_degree=True)
+                # p_x = None
+                # while True:
+                #     try:
+                #         n_x, n_y = next(points_gen)[:2]
+                #         if p_x is not None:
+                #             fig_ax.plot( (p_x, n_x), (p_y, n_y), '-')
+                #         plt.pause(0.01)
+                #         p_x, p_y = n_x, n_y
+                #     except StopIteration:
+                #         break
+
+                # plt.pause(1)
+                points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=2, start_degree=1, step_degree=-25, cover_degree=360, min_step=0.4, distri_leftover_degree=True)
+                dump_pattern_to_file(points_gen, canvas_offsets, f_circles, True)
+
+                points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=2, start_degree=1, step_degree=-25, cover_degree=360, min_step=0.4, distri_leftover_degree=True)
                 p_x = None
                 while True:
                     try:
@@ -431,19 +470,3 @@ if __name__ == "__main__":
 
                 plt.pause(1)
 
-        # points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=8, start_degree=0, step_degree=-13, cover_degree=360, min_step=1.3, distri_leftover_degree=True)
-        # dump_pattern_to_file(points_gen, canvas_offsets, f_circles, True)
-
-        # points_gen = gen_circle_from_radius(canvas_s, circle_center, radius=8, start_degree=0, step_degree=-13, cover_degree=360, min_step=1.3, distri_leftover_degree=True)
-        # p_x = None
-        # while True:
-        #     try:
-        #         n_x, n_y = next(points_gen)[:2]
-        #         if p_x is not None:
-        #             fig_ax.plot( (p_x, n_x), (p_y, n_y), '-')
-        #         plt.pause(0.01)
-        #         p_x, p_y = n_x, n_y
-        #     except StopIteration:
-        #         break
-
-        # plt.pause(1)
