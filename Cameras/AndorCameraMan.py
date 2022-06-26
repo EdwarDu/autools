@@ -3,6 +3,9 @@
 import os
 
 import time
+from tkinter import W
+
+from pyparsing import And
 from .CameraMan import CameraMan
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -177,6 +180,7 @@ class AndorCameraMan(CameraMan):
         "VerticallyCentreAOI" : {"type": "b",},
     }
 
+    USE_CIRCULAR_BUFS = False
     camera_prop_changed = pyqtSignal(list, name="CameraPropChanged")
 
     def __init__(self, dev_id: int):
@@ -315,24 +319,48 @@ class AndorCameraMan(CameraMan):
             self._pixel_encoding = pixel_encoding
             self._b_circular_buf_invalidated = True
 
+    def grab_frame_single(self, n_channel_index: int):
+        if len(self._buffer_ids) == 0:
+            self._create_circular_buffers(1)
+        
+        try: self._a3man.send_command("AcquisitionStop")
+        except: pass
+        self._a3man.flush()        
+        self._a3man.queue_buffer(self._buffer_ids[0])
+        try: self._a3man.send_command("AcquisitionStart") 
+        except: pass
+        buf_id, buf_rd_size = self._a3man.wait_buffer(30000)
+        raw_bytes = self._a3man.get_data_from_buffer(buf_id, buf_rd_size)
+        np_arr = Andor3Man.convert_bytes_to_numpy_array(
+            raw_bytes,
+            self._pixel_encoding,
+            self._frame_stride,
+            self._frame_width,
+            self._frame_height
+        )
+        return np_arr
+
     def grab_frame(self, n_channel_index: int):
-        # n_channel_index is ignored as currently only mono cam is supported
-        if not self._b_circular_buf_acquiring or self._b_circular_buf_invalidated:
-            self._start_circular_buffers()
-        try:
-            buffer_id, buffer_rd_size = self._a3man.wait_buffer(30000)  # wait for 30s
-            raw_bytes = self._a3man.get_data_from_buffer(buffer_id, buffer_rd_size)
-            self._a3man.queue_buffer(buffer_id)
-            np_arr = Andor3Man.convert_bytes_to_numpy_array(
-                raw_bytes,
-                self._pixel_encoding,
-                self._frame_stride,
-                self._frame_width,
-                self._frame_height
-            )
-            return np_arr
-        except:
-            return None
+        if AndorCameraMan.USE_CIRCULAR_BUFS:
+            # n_channel_index is ignored as currently only mono cam is supported
+            if not self._b_circular_buf_acquiring or self._b_circular_buf_invalidated:
+                self._start_circular_buffers()
+            try:
+                buffer_id, buffer_rd_size = self._a3man.wait_buffer(30000)  # wait for 30s
+                raw_bytes = self._a3man.get_data_from_buffer(buffer_id, buffer_rd_size)
+                self._a3man.queue_buffer(buffer_id)
+                np_arr = Andor3Man.convert_bytes_to_numpy_array(
+                    raw_bytes,
+                    self._pixel_encoding,
+                    self._frame_stride,
+                    self._frame_width,
+                    self._frame_height
+                )
+                return np_arr
+            except:
+                return None
+        else:
+            return self.grab_frame_single(n_channel_index)
 
     def _set_features(self, features: dict, b_update: bool = False):
         self.features = features

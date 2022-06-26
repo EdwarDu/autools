@@ -266,9 +266,9 @@ class Ui_SetupMainWindow(object):
         self.horizontalLayout_13.addWidget(self.pushButton_LP_LoadRaw)
         self.verticalLayout_2.addLayout(self.horizontalLayout_13)
         self.verticalLayout_6.addLayout(self.verticalLayout_2)
-        self.widget_LaserProfiler = LaserProfilerWidget(self.tab_LaserProfiler)
-        self.widget_LaserProfiler.setObjectName("widget_LaserProfiler")
-        self.verticalLayout_6.addWidget(self.widget_LaserProfiler)
+        self.widget_CamImage = CamImageWidget(self.tab_LaserProfiler)
+        self.widget_CamImage.setObjectName("widget_CamImage")
+        self.verticalLayout_6.addWidget(self.widget_CamImage)
         self.verticalLayout_6.setStretch(1, 1)
         self.tabWidget.addTab(self.tab_LaserProfiler, "")
         self.horizontalLayout_7.addWidget(self.tabWidget)
@@ -319,5 +319,4 @@ class Ui_SetupMainWindow(object):
         self.pushButton_LP_ClearMarkers.setText(_translate("SetupMainWindow", "Clear Markers"))
         self.pushButton_LP_LoadRaw.setText(_translate("SetupMainWindow", "Load Raw"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_LaserProfiler), _translate("SetupMainWindow", "Laser Alignment"))
-
-from ..LaserProfiler.laser_profiler_widget import LaserProfilerWidget
+from ..LaserProfiler.cam_image_widget import CamImageWidget
