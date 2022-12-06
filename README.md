@@ -1,6 +1,10 @@
 # autools
 collection of tools for automating things
 
+This repo is no longer maintained. Use/Modify/Redistribute as you want without warranty/guanrantee.
+
+Documents/Manuals (including driver header files/libraries) are owned by respective manufacturers/publishers, will delete in case of any copy-right violation upon notice.
+
 ## Instruments
 * [ ] [AndorSDK3](AndorSDK3/README.md): Python3 binding for Andor3SDK
 * [ ] [Cameras](Cameras/README.md): Simple camera capture interface (No optimization for speed)
